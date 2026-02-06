@@ -5,9 +5,9 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useGameAudio } from '@/hooks/useGameAudio';
 import { useMultiplayerStore } from '@/store/multiplayerStore';
-import { Market } from './Market';
-import { PlayerHand } from './PlayerHand';
-import { TokenStack } from './TokenStack';
+import { TradingPost } from './TradingPost';
+import { ShipsHold } from './ShipsHold';
+import { TreasureStack } from './TreasureStack';
 import { BonusTokens } from './BonusTokens';
 import { ScoreBoard } from './ScoreBoard';
 import { ActionNotification } from './ActionNotification';
@@ -279,7 +279,7 @@ export const GameBoard = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-3">
-            <h1 className="font-pirate text-3xl lg:text-4xl text-primary">Plunder</h1>
+            <h1 className="font-pirate text-3xl lg:text-4xl text-primary">Privateer</h1>
             
             {/* Active Rules Indicators */}
             {activeRulesCount > 0 && (
@@ -352,10 +352,10 @@ export const GameBoard = () => {
             transition={{ delay: 0.2 }}
           >
             <div className="p-4 rounded-xl bg-card border border-primary/20">
-              <h3 className="font-pirate text-lg text-primary mb-4 text-center">Treasure</h3>
+              <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
               <div className="grid grid-cols-2 gap-4">
                 {GOODS_ORDER.map((type) => (
-                  <TokenStack key={type} type={type} tokens={tokenStacks[type]} />
+                  <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
                 ))}
               </div>
             </div>
@@ -423,9 +423,9 @@ export const GameBoard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            {/* Opponent's hand */}
+            {/* Opponent's Hold */}
             {opponentPlayer && (
-              <PlayerHand
+              <ShipsHold
                 player={opponentPlayer}
                 isCurrentPlayer={currentPlayerIndex === 1}
                 isOpponent
@@ -434,12 +434,12 @@ export const GameBoard = () => {
               />
             )}
 
-            {/* Market */}
-            <Market />
+            {/* Trading Post */}
+            <TradingPost />
 
-            {/* Player's hand */}
+            {/* Player's Hold */}
             {humanPlayer && (
-              <PlayerHand
+              <ShipsHold
                 player={humanPlayer}
                 isCurrentPlayer={currentPlayerIndex === 0}
               />
@@ -748,7 +748,7 @@ export const GameBoard = () => {
           )}
         </AnimatePresence>
 
-        {/* Round End Modal */}
+        {/* Voyage End Modal */}
         <AnimatePresence>
           {phase === 'roundEnd' && (
             <motion.div
@@ -764,9 +764,9 @@ export const GameBoard = () => {
                 className="bg-card p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
               >
                 <div className="text-center">
-                  <Trophy className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <Anchor className="w-16 h-16 text-primary mx-auto mb-4" />
                   <h2 className="font-pirate text-3xl text-primary mb-2">
-                    Round {round} Complete!
+                    Voyage {round} Complete!
                   </h2>
                   
                   {getRoundWinner() && (
@@ -774,7 +774,7 @@ export const GameBoard = () => {
                       <span className="text-primary font-bold">
                         {getRoundWinner()?.name}
                       </span>{' '}
-                      wins this round!
+                      wins this voyage!
                     </p>
                   )}
 
@@ -784,18 +784,18 @@ export const GameBoard = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="mb-4 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20"
+                      className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/20"
                     >
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <Gift className="w-5 h-5 text-amber-400" />
-                        <span className="font-pirate text-amber-400">Treasure Chest Revealed!</span>
+                        <Gift className="w-5 h-5 text-primary" />
+                        <span className="font-pirate text-primary">Hidden Cargo Revealed!</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         {hiddenTreasures.map((treasure) => {
                           const player = players.find(p => p.id === treasure.playerId);
                           return (
                             <div key={treasure.playerId} className="text-muted-foreground">
-                              {player?.name}: +{treasure.tokens.reduce((sum, t) => sum + t.value, 0)} pts
+                              {player?.name}: +{treasure.tokens.reduce((sum, t) => sum + t.value, 0)} doubloons
                             </div>
                           );
                         })}
@@ -803,6 +803,7 @@ export const GameBoard = () => {
                     </motion.div>
                   )}
 
+                  {/* Treasure Manifest */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     {players.map((player) => (
                       <div
@@ -813,7 +814,7 @@ export const GameBoard = () => {
                         <p className="text-3xl font-pirate text-primary">
                           {calculateScore(player)}
                         </p>
-                        <p className="text-xs text-muted-foreground">points</p>
+                        <p className="text-xs text-muted-foreground">doubloons</p>
                       </div>
                     ))}
                   </div>
@@ -831,7 +832,7 @@ export const GameBoard = () => {
                     <RotateCcw className="w-5 h-5 mr-2" />
                     {isMultiplayer && !isHost 
                       ? 'Waiting for host...' 
-                      : round >= 3 ? 'See Final Results' : `Start Round ${round + 1}`}
+                      : round >= 3 ? 'See Final Results' : `Begin Voyage ${round + 1}`}
                   </Button>
                 </div>
               </motion.div>
@@ -839,7 +840,7 @@ export const GameBoard = () => {
           )}
         </AnimatePresence>
 
-        {/* Game End Modal */}
+        {/* Game End Modal - Letters of Marque Awarded */}
         <AnimatePresence>
           {phase === 'gameEnd' && (
             <motion.div
@@ -862,15 +863,18 @@ export const GameBoard = () => {
                   <Trophy className="w-24 h-24 text-primary mx-auto mb-4" />
                 </motion.div>
                 
-                <h2 className="font-pirate text-4xl text-primary mb-2">
-                  {getWinner()?.isAI ? 'Defeated!' : 'Victory!'}
+                <h2 className="font-pirate text-3xl text-primary mb-1">
+                  {getWinner()?.isAI ? 'Defeated!' : 'Letters of Marque'}
                 </h2>
+                <h3 className="font-pirate text-xl text-primary/80 mb-4">
+                  {getWinner()?.isAI ? '' : 'Awarded!'}
+                </h3>
                 
                 <p className="text-xl mb-6">
                   <span className="text-primary font-bold">
                     {getWinner()?.name}
                   </span>{' '}
-                  wins the game!
+                  {getWinner()?.isAI ? 'claims victory!' : 'is the champion privateer!'}
                 </p>
 
                 <Button onClick={resetGame} className="game-button w-full">
