@@ -135,15 +135,18 @@ export const LandingPage = () => {
               duration: 4,
               repeat: Infinity
             }}>
-                <img src={logoImage} alt="Plunder Logo" className="w-16 h-16 lg:w-24 lg:h-24 drop-shadow-lg object-contain" />
+                <img src={logoImage} alt="Privateer Logo" className="w-16 h-16 lg:w-24 lg:h-24 drop-shadow-lg object-contain" />
               </motion.div>
             </div>
             
             <h1 className="font-pirate text-6xl lg:text-8xl text-primary mb-2 drop-shadow-[0_0_30px_hsl(var(--gold)/0.5)]">
-              Plunder
+              Privateer
             </h1>
-            <p className="text-xl lg:text-2xl text-foreground/80 font-serif">
-              A Pirate Trading Card Game
+            <p className="text-lg lg:text-xl text-primary/80 font-pirate tracking-wide">
+              Letters of Marque
+            </p>
+            <p className="text-base text-foreground/60 font-serif mt-1">
+              A Trading Duel
             </p>
           </motion.div>
 
@@ -270,7 +273,7 @@ export const LandingPage = () => {
           delay: 0.8
         }}>
               <p className="mb-2 text-lg">Sail the Seas</p>
-              <p>Trade goods • Collect ships • Plunder treasure • Become the richest pirate!</p>
+              <p>Claim cargo • Load your hold • Unload for doubloons • Become the richest captain!</p>
             </motion.div>}
         </div>
       </section>
@@ -278,21 +281,21 @@ export const LandingPage = () => {
       {/* How to play section */}
       {!showMultiplayer && <section className="relative py-12 px-4 bg-card/80 backdrop-blur-sm border-t border-border">
           <div className="max-w-4xl mx-auto">
-            <h2 className="font-pirate text-3xl text-primary text-center mb-8">How to Plunder</h2>
+            <h2 className="font-pirate text-3xl text-primary text-center mb-8">How to Play</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[{
             icon: <Ship className="w-10 h-10" />,
-            title: 'Take',
-            description: 'Take a card from the market or take all ships at once to grow your fleet.'
+            title: 'Claim Cargo',
+            description: 'Claim cargo from the Trading Post or commandeer all ships at once to grow your fleet.'
           }, {
             icon: <Swords className="w-10 h-10" />,
-            title: 'Exchange',
-            description: 'Swap 2+ cards between your hand and the market. Use ships as wildcards!'
+            title: 'Trade Goods',
+            description: 'Swap 2+ goods between your hold and the Trading Post. Ships work as wildcards!'
           }, {
             icon: <Coins className="w-10 h-10" />,
-            title: 'Sell',
-            description: 'Sell matching cards for treasure tokens. More cards means bigger bonus rewards!'
+            title: 'Unload Cargo',
+            description: 'Unload matching cargo for doubloons. Larger shipments earn bonus commissions!'
           }].map((item, i) => <motion.div key={item.title} className="p-6 rounded-xl bg-muted/50 border border-border text-center hover:border-primary/30 transition-colors" initial={{
             opacity: 0,
             y: 20
@@ -320,9 +323,9 @@ export const LandingPage = () => {
         }}>
               <h3 className="font-pirate text-xl text-primary mb-2">Victory Condition</h3>
               <p className="text-foreground/80">
-                Win 2 out of 3 rounds. Each round ends when the deck empties or 3 goods token stacks are depleted.
+                Win 2 out of 3 voyages. Each voyage ends when the supply ship empties or 3 cargo stacks are depleted.
                 <br />
-                The pirate with the most treasure points wins the round!
+                The captain with the most doubloons wins the voyage!
               </p>
             </motion.div>
           </div>
@@ -330,7 +333,7 @@ export const LandingPage = () => {
 
       {/* Footer */}
       <footer className="relative py-6 px-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50">
-        <p>Plunder © 2025 • QBall Creative</p>
+        <p>Privateer: Letters of Marque © 2025 • QBall Creative</p>
       </footer>
     </div>;
 };

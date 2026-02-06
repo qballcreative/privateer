@@ -1,29 +1,31 @@
 import { motion } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
-import { Trophy, Anchor, Star, Coins } from 'lucide-react';
+import { Trophy, Anchor, Medal, Coins, Scroll } from 'lucide-react';
 
 export const ScoreBoard = () => {
   const { players, round, maxRounds, roundWins } = useGameStore();
 
   return (
-    <div className="p-4 rounded-xl bg-card border border-primary/20">
+    <div className="p-4 rounded-xl bg-card border border-primary/20 parchment-texture">
+      {/* Captain's Ledger header */}
       <div className="flex items-center justify-center gap-2 mb-4">
-        <Trophy className="w-5 h-5 text-primary" />
-        <h2 className="font-pirate text-xl text-primary">Scoreboard</h2>
+        <Scroll className="w-5 h-5 text-primary" />
+        <h2 className="font-pirate text-xl text-primary">Captain's Ledger</h2>
       </div>
 
-      {/* Round indicator */}
+      {/* Voyage indicator (rounds) */}
       <div className="text-center mb-4">
-        <span className="text-sm text-muted-foreground">Round</span>
+        <span className="text-sm text-muted-foreground">Voyage</span>
         <div className="flex items-center justify-center gap-1 mt-1">
           {Array.from({ length: maxRounds }).map((_, i) => (
             <div
               key={i}
               className={cn(
                 'w-8 h-8 rounded-full border-2 flex items-center justify-center',
+                'transition-all duration-300',
                 i + 1 === round
-                  ? 'border-primary bg-primary/20 text-primary'
+                  ? 'border-primary bg-primary/20 text-primary font-bold'
                   : i + 1 < round
                   ? 'border-primary/50 bg-primary/10 text-primary/50'
                   : 'border-border text-muted-foreground'
@@ -35,7 +37,7 @@ export const ScoreBoard = () => {
         </div>
       </div>
 
-      {/* Player scores */}
+      {/* Player manifests */}
       <div className="space-y-3">
         {players.map((player, index) => {
           const score = calculateScore(player);
@@ -65,33 +67,42 @@ export const ScoreBoard = () => {
                     </span>
                   )}
                 </div>
+                {/* Voyage wins as wax seals */}
                 <div className="flex items-center gap-1">
                   {Array.from({ length: roundWins[index] }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-primary fill-primary" />
+                    <div 
+                      key={i} 
+                      className="w-5 h-5 rounded-full bg-destructive/80 border border-destructive flex items-center justify-center"
+                      title="Voyage Won"
+                    >
+                      <Trophy className="w-3 h-3 text-destructive-foreground" />
+                    </div>
                   ))}
                 </div>
               </div>
 
+              {/* Score breakdown */}
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="flex items-center gap-1 text-muted-foreground">
+                <div className="flex items-center gap-1 text-muted-foreground" title="Doubloons">
                   <Coins className="w-3 h-3" />
                   <span>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Star className="w-3 h-3" />
+                <div className="flex items-center gap-1 text-muted-foreground" title="Commissions">
+                  <Medal className="w-3 h-3" />
                   <span>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
+                <div className="flex items-center gap-1 text-muted-foreground" title="Fleet">
                   <Anchor className="w-3 h-3" />
                   <span>{player.ships.length}</span>
                 </div>
               </div>
 
+              {/* Total score */}
               <div className="mt-2 pt-2 border-t border-border">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total</span>
+                  <span className="text-xs text-muted-foreground">Total Doubloons</span>
                   <span className={cn(
-                    'font-bold text-lg',
+                    'font-bold text-lg font-pirate',
                     player.isAI ? 'text-foreground' : 'text-primary'
                   )}>
                     {score}

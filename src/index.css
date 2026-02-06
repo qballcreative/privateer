@@ -42,7 +42,7 @@
 
     --radius: 0.75rem;
 
-    /* Custom Pirate Colors */
+    /* Custom Privateer Colors */
     --gold: 43 74% 49%;
     --gold-light: 43 80% 60%;
     --gold-glow: 43 90% 70%;
@@ -56,17 +56,32 @@
     --rum: 25 60% 35%;
     --silver-metal: 220 10% 70%;
     --gemstone: 280 60% 50%;
+    
+    /* New tactile material colors */
+    --brass: 38 70% 45%;
+    --brass-light: 38 75% 55%;
+    --leather: 25 35% 25%;
+    --leather-dark: 25 40% 18%;
+    --rope: 35 30% 50%;
+    --wood-plank: 25 40% 22%;
+    --wood-plank-light: 25 35% 28%;
+    --iron: 220 8% 40%;
+    --velvet: 280 40% 30%;
 
     /* Gradients */
     --gradient-gold: linear-gradient(135deg, hsl(43, 74%, 49%), hsl(35, 80%, 40%));
     --gradient-wood: linear-gradient(180deg, hsl(20, 40%, 18%), hsl(20, 45%, 10%));
     --gradient-ocean: linear-gradient(135deg, hsl(185, 50%, 35%), hsl(200, 60%, 25%));
     --gradient-parchment: linear-gradient(135deg, hsl(35, 40%, 85%), hsl(30, 35%, 75%));
+    --gradient-brass: linear-gradient(135deg, hsl(38, 70%, 50%), hsl(38, 65%, 35%));
+    --gradient-leather: linear-gradient(180deg, hsl(25, 35%, 28%), hsl(25, 40%, 18%));
 
     /* Shadows */
     --shadow-gold: 0 0 20px hsl(43, 74%, 49%, 0.4);
     --shadow-card: 0 8px 32px hsl(0, 0%, 0%, 0.5);
     --shadow-elevated: 0 12px 40px hsl(0, 0%, 0%, 0.6);
+    --shadow-brass: 0 2px 8px hsl(38, 70%, 30%, 0.4);
+    --shadow-inset: inset 0 2px 4px hsl(0, 0%, 0%, 0.3);
 
     /* Sidebar - keeping for compatibility */
     --sidebar-background: 20 35% 10%;
@@ -111,11 +126,74 @@
       hsl(20, 40%, 15%) 100%);
   }
 
+  /* Wood plank texture for dock/table surfaces */
+  .wood-plank-texture {
+    background: 
+      repeating-linear-gradient(
+        90deg,
+        hsl(var(--wood-plank)) 0px,
+        hsl(var(--wood-plank-light)) 2px,
+        hsl(var(--wood-plank)) 4px,
+        hsl(var(--mahogany)) 80px
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--wood-plank-light)) 0%,
+        hsl(var(--wood-plank)) 50%,
+        hsl(var(--mahogany)) 100%
+      );
+    box-shadow: 
+      inset 0 2px 4px hsl(0, 0%, 0%, 0.3),
+      inset 0 -2px 4px hsl(0, 0%, 0%, 0.2);
+  }
+
+  /* Parchment texture for modals/info panels */
   .parchment-texture {
     background: linear-gradient(135deg,
       hsl(35, 40%, 85%) 0%,
       hsl(30, 35%, 80%) 50%,
       hsl(35, 40%, 85%) 100%);
+  }
+
+  /* Brass plate styling for labels */
+  .brass-plate {
+    background: linear-gradient(180deg,
+      hsl(var(--brass-light)) 0%,
+      hsl(var(--brass)) 50%,
+      hsl(var(--brass-light) / 0.8) 100%);
+    border: 1px solid hsl(var(--brass-light));
+    box-shadow: 
+      0 2px 4px hsl(0, 0%, 0%, 0.3),
+      inset 0 1px 0 hsl(var(--brass-light) / 0.5);
+  }
+
+  /* Leather texture for pouches/straps */
+  .leather-texture {
+    background: linear-gradient(180deg,
+      hsl(var(--leather)) 0%,
+      hsl(var(--leather-dark)) 100%);
+    border: 1px solid hsl(var(--leather-dark));
+    box-shadow: inset 0 1px 2px hsl(0, 0%, 100%, 0.1);
+  }
+
+  /* Rope border effect */
+  .rope-border {
+    border: 3px solid hsl(var(--rope));
+    border-radius: 0.5rem;
+    box-shadow: 
+      inset 0 0 0 1px hsl(var(--rope) / 0.5),
+      0 2px 4px hsl(0, 0%, 0%, 0.3);
+  }
+
+  /* Cargo crate base styling */
+  .cargo-crate {
+    background: linear-gradient(180deg,
+      hsl(var(--wood-plank-light)) 0%,
+      hsl(var(--wood-plank)) 100%);
+    border: 2px solid hsl(var(--mahogany));
+    box-shadow: 
+      0 4px 8px hsl(0, 0%, 0%, 0.4),
+      inset 0 1px 0 hsl(var(--wood-plank-light) / 0.3);
   }
 
   .gold-text {
@@ -156,6 +234,21 @@
     @apply text-accent-foreground;
     @apply hover:from-accent/90 hover:to-accent/70;
     @apply active:scale-95;
+  }
+
+  /* Doubloon/coin styling */
+  .doubloon {
+    background: radial-gradient(
+      circle at 30% 30%,
+      hsl(var(--gold-light)) 0%,
+      hsl(var(--gold)) 50%,
+      hsl(38, 70%, 35%) 100%
+    );
+    border: 2px solid hsl(var(--gold-light));
+    box-shadow: 
+      0 2px 4px hsl(0, 0%, 0%, 0.4),
+      inset 0 -2px 4px hsl(0, 0%, 0%, 0.2),
+      inset 0 2px 4px hsl(var(--gold-light) / 0.5);
   }
 
   .card-flip {
