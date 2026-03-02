@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useGameAudio } from '@/hooks/useGameAudio';
 import { useMultiplayerStore } from '@/store/multiplayerStore';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { TradingPost } from './TradingPost';
 import { ShipsHold } from './ShipsHold';
 import { TreasureStack } from './TreasureStack';
@@ -16,8 +17,9 @@ import { ConnectionIndicator } from './ConnectionIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { GoodsType, Card } from '@/types/game';
-import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown } from 'lucide-react';
+import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown, Coins, Medal, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sanitizeChatMessage, sanitizePlayerName, isValidChatPayload, CHAT_MESSAGE_MAX_LENGTH } from '@/lib/security';
 
@@ -50,6 +52,7 @@ export const GameBoard = () => {
   const { recordGameResult } = usePlayerStore();
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
   const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
+  const isMobile = useIsMobile();
 
   const [isRaidMode, setIsRaidMode] = useState(false);
   const [showAction, setShowAction] = useState(false);
@@ -64,6 +67,11 @@ export const GameBoard = () => {
   const disconnectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const showChatRef = useRef(showChat);
+
+  // Mobile drawer states
+  const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
+  const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
+  const [tradingPostCollapsed, setTradingPostCollapsed] = useState(false);
   
   // Keep ref in sync with state
   useEffect(() => {
@@ -72,11 +80,9 @@ export const GameBoard = () => {
 
   const currentPlayer = players[currentPlayerIndex];
   
-  // In multiplayer, use player indices; in single player, find AI/human
   const localPlayer = isMultiplayer ? players[0] : players.find((p) => !p.isAI)!;
   const opponentPlayer = isMultiplayer ? players[1] : players.find((p) => p.isAI);
   
-  // For backwards compatibility with existing code
   const humanPlayer = localPlayer;
   const aiPlayer = opponentPlayer;
 
@@ -93,7 +99,6 @@ export const GameBoard = () => {
   useEffect(() => {
     if (prevPhase !== phase) {
       if (phase === 'playing' && (prevPhase === null || prevPhase === 'lobby' || prevPhase === 'roundEnd')) {
-        // Round starting - "Hoist the sails!"
         playSound('new-round');
       } else if (phase === 'roundEnd') {
         const winner = getRoundWinner();
@@ -125,7 +130,7 @@ export const GameBoard = () => {
     }
   }, [phase, prevPhase, isMultiplayer, getWinner, recordGameResult]);
 
-  // Show action notification when lastAction changes and play sound
+  // Show action notification
   useEffect(() => {
     if (lastAction) {
       setShowAction(true);
@@ -138,18 +143,15 @@ export const GameBoard = () => {
   // Track previous multiplayer state to detect reconnection
   const prevMultiplayerStateRef = useRef(multiplayerState);
   
-  // Detect multiplayer disconnect and start timer
+  // Detect multiplayer disconnect
   useEffect(() => {
     if (isMultiplayer && multiplayerState === 'disconnected' && phase === 'playing') {
       setShowDisconnectModal(true);
       setDisconnectTimer(0);
-      
-      // Start countdown timer for claim victory
       disconnectTimerRef.current = setInterval(() => {
         setDisconnectTimer((prev) => prev + 1);
       }, 1000);
     } else {
-      // Clear timer if reconnected
       if (disconnectTimerRef.current) {
         clearInterval(disconnectTimerRef.current);
         disconnectTimerRef.current = null;
@@ -159,7 +161,6 @@ export const GameBoard = () => {
         setDisconnectTimer(0);
       }
     }
-    
     return () => {
       if (disconnectTimerRef.current) {
         clearInterval(disconnectTimerRef.current);
@@ -167,52 +168,37 @@ export const GameBoard = () => {
     };
   }, [isMultiplayer, multiplayerState, phase]);
 
-  // Host: Send game state to reconnecting guest when connection re-establishes
+  // Host: Send game state to reconnecting guest
   useEffect(() => {
     const wasDisconnected = prevMultiplayerStateRef.current === 'disconnected' || 
                             prevMultiplayerStateRef.current === 'hosting';
     const nowConnected = multiplayerState === 'connected';
-    
-    // If we're the host, game is in progress, and connection just re-established
     if (isMultiplayer && isHost && phase === 'playing' && wasDisconnected && nowConnected) {
-      console.log('Host detected reconnection, sending rejoin-sync to guest');
-      // Send current game state to the reconnected guest
       const gameState = getSerializableState();
       sendMessage({ type: 'rejoin-sync', payload: { gameState } });
     }
-    
-    // Update the ref for next comparison
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
-  // Listen for multiplayer messages (chat and game state sync)
+  // Listen for multiplayer messages
   useEffect(() => {
     if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
       const unsubscribe = registerMessageHandler((message) => {
-        console.log('GameBoard received message:', message.type);
         if (message.type === 'chat' && isValidChatPayload(message.payload)) {
-          // Validate and sanitize incoming chat message
           const payload = message.payload;
           const sanitizedText = sanitizeChatMessage(payload.text);
           const sanitizedSender = sanitizePlayerName(payload.sender);
-          
-          // Only add if message has content after sanitization
           if (sanitizedText) {
             setChatMessages((prev) => [...prev, { sender: sanitizedSender, text: sanitizedText }]);
-            // Always play sound for incoming messages
             playSound('message');
-            // Increment unread if chat is closed
             if (!showChatRef.current) {
               setUnreadMessages((prev) => prev + 1);
             }
           }
         } else if (message.type === 'game-state') {
-          // Receive game state update from opponent (swap players for our perspective)
           const payload = message.payload as { gameState: any };
-          console.log('Received game state sync from opponent');
           applyGameState(payload.gameState, true);
         } else if (message.type === 'next-round') {
-          // Host triggered next round, sync it
           nextRound();
         }
       });
@@ -224,10 +210,7 @@ export const GameBoard = () => {
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
     if (isMultiplayer && phase === 'playing' && lastAction && lastAction !== prevLastActionRef.current) {
-      // Only sync if it was our turn (currentPlayerIndex was 0 before action completed)
-      // After the action, currentPlayerIndex switches, so if it's now 1, we just made a move
       if (currentPlayerIndex === 1) {
-        console.log('Sending game state sync to opponent');
         const gameState = getSerializableState();
         sendMessage({ type: 'game-state', payload: { gameState } });
       }
@@ -235,10 +218,9 @@ export const GameBoard = () => {
     }
   }, [isMultiplayer, phase, lastAction, currentPlayerIndex, sendMessage, getSerializableState]);
 
-  // Auto-scroll chat when messages change
+  // Auto-scroll chat
   useEffect(() => {
     if (chatScrollRef.current) {
-      // Use setTimeout to ensure DOM has updated
       setTimeout(() => {
         if (chatScrollRef.current) {
           chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
@@ -249,10 +231,8 @@ export const GameBoard = () => {
 
   const sendChatMessage = () => {
     if (!chatInput.trim()) return;
-    // Sanitize outgoing message as well (defense in depth)
     const sanitizedText = sanitizeChatMessage(chatInput);
     if (!sanitizedText) return;
-    
     const message = { sender: localPlayer?.name || 'You', text: sanitizedText };
     setChatMessages((prev) => [...prev, message]);
     sendMessage({ type: 'chat', payload: message });
@@ -266,52 +246,134 @@ export const GameBoard = () => {
 
   const activeRulesCount = Object.values(optionalRules).filter(Boolean).length;
 
+  // ─── Treasure Supply Panel (reusable across layouts) ───
+  const TreasureSupplyPanel = ({ compact = false }: { compact?: boolean }) => (
+    <div className="space-y-4">
+      <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
+        <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
+        <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
+          {GOODS_ORDER.map((type) => (
+            <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
+          ))}
+        </div>
+      </div>
+
+      <BonusTokens
+        threeCards={bonusTokens.three}
+        fourCards={bonusTokens.four}
+        fiveCards={bonusTokens.five}
+      />
+
+      {/* Pirate Raid Button */}
+      {optionalRules.pirateRaid && currentPlayerIndex === 0 && phase === 'playing' && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="p-4 rounded-xl bg-card border border-red-500/20"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Crosshair className="w-5 h-5 text-red-400" />
+            <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
+          </div>
+          
+          {humanPlayer.hasUsedPirateRaid ? (
+            <p className="text-xs text-muted-foreground">Already used this game</p>
+          ) : canUsePirateRaid() && !currentPlayer.isAI ? (
+            <>
+              <p className="text-xs text-muted-foreground mb-2">
+                Steal one card from your opponent!
+              </p>
+              <Button
+                size="sm"
+                variant={isRaidMode ? 'destructive' : 'outline'}
+                className={cn(
+                  'w-full',
+                  !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+                )}
+                onClick={() => setIsRaidMode(!isRaidMode)}
+              >
+                {isRaidMode ? (
+                  <>
+                    <X className="w-4 h-4 mr-1" />
+                    Cancel Raid
+                  </>
+                ) : (
+                  <>
+                    <Crosshair className="w-4 h-4 mr-1" />
+                    Activate Raid
+                  </>
+                )}
+              </Button>
+            </>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
+            </p>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+
+  // ─── Opponent Panel (reusable) ───
+  const OpponentPanel = () => (
+    <div className="space-y-4">
+      {opponentPlayer && (
+        <ShipsHold
+          player={opponentPlayer}
+          isCurrentPlayer={currentPlayerIndex === 1}
+          isOpponent
+          isRaidMode={isRaidMode && currentPlayerIndex === 0}
+          onRaidCard={handlePirateRaid}
+        />
+      )}
+      <ScoreBoard />
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-background p-4 lg:p-6">
+    <div className="min-h-screen bg-background p-2 sm:p-4 lg:p-6">
       {/* Action Notification */}
       <ActionNotification action={lastAction} show={showAction} />
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.header
-          className="flex items-center justify-between mb-6"
+          className="flex items-center justify-between mb-3 sm:mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex items-center gap-3">
-            <h1 className="font-pirate text-3xl lg:text-4xl text-primary">Privateer</h1>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="font-pirate text-2xl sm:text-3xl lg:text-4xl text-primary">Privateer</h1>
             
-            {/* Active Rules Indicators */}
             {activeRulesCount > 0 && (
               <div className="flex items-center gap-1">
                 {optionalRules.stormRule && (
-                  <div className="p-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30" title="Storm Rule Active">
-                    <CloudLightning className="w-4 h-4 text-blue-400" />
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30" title="Storm Rule Active">
+                    <CloudLightning className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
                   </div>
                 )}
                 {optionalRules.pirateRaid && (
-                  <div className="p-1.5 rounded-lg bg-red-500/20 border border-red-500/30" title="Pirate Raid Active">
-                    <Crosshair className="w-4 h-4 text-red-400" />
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-red-500/20 border border-red-500/30" title="Pirate Raid Active">
+                    <Crosshair className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400" />
                   </div>
                 )}
                 {optionalRules.treasureChest && (
-                  <div className="p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30" title="Treasure Chest Active">
-                    <Gift className="w-4 h-4 text-amber-400" />
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30" title="Treasure Chest Active">
+                    <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                   </div>
                 )}
               </div>
             )}
           </div>
           
-          <div className="flex items-center gap-2">
-            {/* Multiplayer Connection Indicator */}
+          <div className="flex items-center gap-1 sm:gap-2">
             {isMultiplayer && phase === 'playing' && (
               <ConnectionIndicator className="hidden sm:flex" />
             )}
             
-            {/* Storm Rule Turn Counter */}
             {optionalRules.stormRule && (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <CloudLightning className="w-4 h-4 text-blue-400" />
                 <span className="text-xs text-blue-400">
                   {3 - (turnCount % 3)} turn{3 - (turnCount % 3) !== 1 ? 's' : ''} to storm
@@ -336,158 +398,238 @@ export const GameBoard = () => {
               variant="ghost"
               size="icon"
               onClick={resetGame}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         </motion.header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left sidebar - Token stacks */}
-          <motion.aside
-            className="lg:col-span-1 space-y-4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="p-4 rounded-xl bg-card border border-primary/20">
-              <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {GOODS_ORDER.map((type) => (
-                  <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-                ))}
+        {/* ════════════════════════════════════════════════════════════════
+            PHONE LAYOUT — stacked, drawers for treasure/opponent
+            ════════════════════════════════════════════════════════════════ */}
+        <div className="block md:hidden space-y-3">
+          {/* Drawer triggers bar */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Left: Treasure drawer */}
+            <Sheet open={treasureDrawerOpen} onOpenChange={setTreasureDrawerOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-primary/30 text-primary">
+                  <Coins className="w-4 h-4" />
+                  <span className="text-xs">Treasure</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[85vw] max-w-sm bg-card border-primary/20 p-4 overflow-y-auto">
+                <SheetTitle className="font-pirate text-primary text-lg mb-4">Treasure Supply</SheetTitle>
+                <TreasureSupplyPanel compact />
+              </SheetContent>
+            </Sheet>
+
+            {/* Center: Storm indicator (mobile) */}
+            {optionalRules.stormRule && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <CloudLightning className="w-3.5 h-3.5 text-blue-400" />
+                <span className="text-[10px] text-blue-400">
+                  {3 - (turnCount % 3)} to storm
+                </span>
               </div>
-            </div>
-
-            <BonusTokens
-              threeCards={bonusTokens.three}
-              fourCards={bonusTokens.four}
-              fiveCards={bonusTokens.five}
-            />
-
-            {/* Pirate Raid Button */}
-            {optionalRules.pirateRaid && currentPlayerIndex === 0 && phase === 'playing' && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 rounded-xl bg-card border border-red-500/20"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Crosshair className="w-5 h-5 text-red-400" />
-                  <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
-                </div>
-                
-                {humanPlayer.hasUsedPirateRaid ? (
-                  <p className="text-xs text-muted-foreground">Already used this game</p>
-                ) : canUsePirateRaid() && !currentPlayer.isAI ? (
-                  <>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Steal one card from your opponent!
-                    </p>
-                    <Button
-                      size="sm"
-                      variant={isRaidMode ? 'destructive' : 'outline'}
-                      className={cn(
-                        'w-full',
-                        !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-                      )}
-                      onClick={() => setIsRaidMode(!isRaidMode)}
-                    >
-                      {isRaidMode ? (
-                        <>
-                          <X className="w-4 h-4 mr-1" />
-                          Cancel Raid
-                        </>
-                      ) : (
-                        <>
-                          <Crosshair className="w-4 h-4 mr-1" />
-                          Activate Raid
-                        </>
-                      )}
-                    </Button>
-                  </>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
-                  </p>
-                )}
-              </motion.div>
-            )}
-          </motion.aside>
-
-          {/* Main game area */}
-          <motion.main
-            className="lg:col-span-2 space-y-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            {/* Opponent's Hold */}
-            {opponentPlayer && (
-              <ShipsHold
-                player={opponentPlayer}
-                isCurrentPlayer={currentPlayerIndex === 1}
-                isOpponent
-                isRaidMode={isRaidMode && currentPlayerIndex === 0}
-                onRaidCard={handlePirateRaid}
-              />
             )}
 
-            {/* Trading Post */}
-            <TradingPost />
+            {/* Right: Opponent drawer */}
+            <Sheet open={opponentDrawerOpen} onOpenChange={setOpponentDrawerOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-accent/30 text-accent">
+                  <Eye className="w-4 h-4" />
+                  <span className="text-xs">Opponent</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] max-w-sm bg-card border-accent/20 p-4 overflow-y-auto">
+                <SheetTitle className="font-pirate text-accent text-lg mb-4">Opponent & Ledger</SheetTitle>
+                <OpponentPanel />
+              </SheetContent>
+            </Sheet>
+          </div>
 
-            {/* Player's Hold */}
-            {humanPlayer && (
-              <ShipsHold
-                player={humanPlayer}
-                isCurrentPlayer={currentPlayerIndex === 0}
-              />
-            )}
-
-            {/* Turn indicator */}
-            <AnimatePresence>
-              {currentPlayerIndex === 1 && phase === 'playing' && (
+          {/* Trading Post — collapsible on phone */}
+          <div className="space-y-1">
+            <button
+              onClick={() => setTradingPostCollapsed(!tradingPostCollapsed)}
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-card/50 border border-border text-sm"
+            >
+              <span className="font-pirate text-primary text-sm">Trading Post</span>
+              {tradingPostCollapsed ? (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+            <AnimatePresence initial={false}>
+              {!tradingPostCollapsed && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
                 >
-                  <div className="px-6 py-3 rounded-xl bg-card/95 border border-primary/30 shadow-xl">
-                    <div className="flex items-center gap-3">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                      >
-                        {isMultiplayer ? (
-                          <Anchor className="w-6 h-6 text-primary" />
-                        ) : (
-                          <Swords className="w-6 h-6 text-primary" />
-                        )}
-                      </motion.div>
-                      <span className="font-pirate text-xl text-primary">
-                        {isMultiplayer 
-                          ? `Waiting for ${opponentName || 'opponent'}...` 
-                          : 'Pirate AI is thinking...'}
-                      </span>
-                    </div>
-                  </div>
+                  <TradingPost layout="phone" />
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.main>
+          </div>
 
-          {/* Right sidebar - Scoreboard */}
-          <motion.aside
-            className="lg:col-span-1"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <ScoreBoard />
-          </motion.aside>
+          {/* Ship's Hold — primary zone, thumb-reachable */}
+          {humanPlayer && (
+            <ShipsHold
+              player={humanPlayer}
+              isCurrentPlayer={currentPlayerIndex === 0}
+              layout="phone"
+            />
+          )}
         </div>
+
+        {/* ════════════════════════════════════════════════════════════════
+            TABLET LAYOUT — board composition, all panels docked
+            ════════════════════════════════════════════════════════════════ */}
+        <div className="hidden md:block lg:hidden">
+          <div className="grid grid-cols-3 gap-4">
+            {/* Left column: Opponent + ScoreBoard */}
+            <motion.aside
+              className="col-span-1 space-y-4"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {opponentPlayer && (
+                <ShipsHold
+                  player={opponentPlayer}
+                  isCurrentPlayer={currentPlayerIndex === 1}
+                  isOpponent
+                  isRaidMode={isRaidMode && currentPlayerIndex === 0}
+                  onRaidCard={handlePirateRaid}
+                  layout="tablet"
+                />
+              )}
+              <ScoreBoard />
+            </motion.aside>
+
+            {/* Center column: Trading Post + Player Hold */}
+            <motion.main
+              className="col-span-1 space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <TradingPost layout="tablet" />
+              {humanPlayer && (
+                <ShipsHold
+                  player={humanPlayer}
+                  isCurrentPlayer={currentPlayerIndex === 0}
+                  layout="tablet"
+                />
+              )}
+            </motion.main>
+
+            {/* Right column: Treasure Supply + Bonuses */}
+            <motion.aside
+              className="col-span-1 space-y-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <TreasureSupplyPanel />
+            </motion.aside>
+          </div>
+        </div>
+
+        {/* ════════════════════════════════════════════════════════════════
+            DESKTOP LAYOUT — Trading Post top, Hold bottom, sidebars
+            ════════════════════════════════════════════════════════════════ */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-4 gap-6">
+            {/* Left sidebar - Treasure & Bonuses (fixed) */}
+            <motion.aside
+              className="col-span-1 space-y-4"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <TreasureSupplyPanel />
+            </motion.aside>
+
+            {/* Main game area — Trading Post top, Hold bottom */}
+            <motion.main
+              className="col-span-2 space-y-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              {/* Trading Post — top center */}
+              <TradingPost layout="desktop" />
+
+              {/* Player's Hold — bottom center */}
+              {humanPlayer && (
+                <ShipsHold
+                  player={humanPlayer}
+                  isCurrentPlayer={currentPlayerIndex === 0}
+                  layout="desktop"
+                />
+              )}
+            </motion.main>
+
+            {/* Right sidebar — Opponent & Scoreboard (fixed) */}
+            <motion.aside
+              className="col-span-1 space-y-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {opponentPlayer && (
+                <ShipsHold
+                  player={opponentPlayer}
+                  isCurrentPlayer={currentPlayerIndex === 1}
+                  isOpponent
+                  isRaidMode={isRaidMode && currentPlayerIndex === 0}
+                  onRaidCard={handlePirateRaid}
+                  layout="desktop"
+                />
+              )}
+              <ScoreBoard />
+            </motion.aside>
+          </div>
+        </div>
+
+        {/* Turn indicator overlay */}
+        <AnimatePresence>
+          {currentPlayerIndex === 1 && phase === 'playing' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+            >
+              <div className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-card/95 border border-primary/30 shadow-xl">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                  >
+                    {isMultiplayer ? (
+                      <Anchor className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    ) : (
+                      <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    )}
+                  </motion.div>
+                  <span className="font-pirate text-lg sm:text-xl text-primary">
+                    {isMultiplayer 
+                      ? `Waiting for ${opponentName || 'opponent'}...` 
+                      : 'Pirate AI is thinking...'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Multiplayer Chat */}
         {isMultiplayer && (
@@ -497,7 +639,7 @@ export const GameBoard = () => {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-80 bg-card border border-primary/30 rounded-xl shadow-xl overflow-hidden"
+                className="w-72 sm:w-80 bg-card border border-primary/30 rounded-xl shadow-xl overflow-hidden"
               >
                 <div className="flex items-center justify-between p-3 bg-primary/10 border-b border-border">
                   <div className="flex items-center gap-2">
@@ -545,9 +687,9 @@ export const GameBoard = () => {
                   setShowChat(true);
                   setUnreadMessages(0);
                 }}
-                className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg relative"
+                className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-primary hover:bg-primary/90 shadow-lg relative"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                 {unreadMessages > 0 && (
                   <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {unreadMessages > 9 ? '9+' : unreadMessages}
@@ -572,22 +714,15 @@ export const GameBoard = () => {
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
                 className={cn(
-                  "bg-card p-8 rounded-2xl shadow-2xl max-w-md w-full text-center",
+                  "bg-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full text-center",
                   !isHost ? "border border-primary/30" : "border border-destructive/30"
                 )}
               >
-                {/* Guest sees host disconnected - show timer and claim victory option */}
                 {!isHost ? (
                   <>
-                    <WifiOff className="w-16 h-16 text-destructive mx-auto mb-4" />
-                    <h2 className="font-pirate text-2xl text-destructive mb-2">
-                      Host Disconnected
-                    </h2>
-                    <p className="text-muted-foreground mb-4">
-                      The host has lost connection to the game.
-                    </p>
-                    
-                    {/* Disconnect Timer */}
+                    <WifiOff className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
+                    <h2 className="font-pirate text-xl sm:text-2xl text-destructive mb-2">Host Disconnected</h2>
+                    <p className="text-muted-foreground mb-4 text-sm">The host has lost connection.</p>
                     <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
                       <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
                       <p className="font-pirate text-2xl text-foreground">
@@ -595,13 +730,11 @@ export const GameBoard = () => {
                       </p>
                       {disconnectTimer < 30 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Claim victory available in {30 - disconnectTimer}s
+                          Claim victory in {30 - disconnectTimer}s
                         </p>
                       )}
                     </div>
-                    
                     <div className="space-y-3">
-                      {/* Claim Victory Button - available after 30 seconds */}
                       {disconnectTimer >= 30 && (
                         <Button 
                           onClick={() => {
@@ -617,27 +750,17 @@ export const GameBoard = () => {
                           Claim Victory
                         </Button>
                       )}
-                      
                       <Button 
                         variant={disconnectTimer >= 30 ? "outline" : "default"}
-                        className={cn(
-                          "w-full",
-                          disconnectTimer < 30 && "game-button"
-                        )}
+                        className={cn("w-full", disconnectTimer < 30 && "game-button")}
                         disabled
                       >
                         <WifiOff className="w-5 h-5 mr-2" />
                         Waiting for Host...
                       </Button>
-                      
                       <Button 
                         variant="ghost"
-                        onClick={() => {
-                          setShowDisconnectModal(false);
-                          setDisconnectTimer(0);
-                          resetMultiplayer();
-                          resetGame();
-                        }} 
+                        onClick={() => { setShowDisconnectModal(false); setDisconnectTimer(0); resetMultiplayer(); resetGame(); }} 
                         className="w-full text-muted-foreground"
                       >
                         <Home className="w-5 h-5 mr-2" />
@@ -646,17 +769,10 @@ export const GameBoard = () => {
                     </div>
                   </>
                 ) : (
-                  /* Host sees guest disconnected - wait or claim after timeout */
                   <>
-                    <WifiOff className="w-16 h-16 text-destructive mx-auto mb-4" />
-                    <h2 className="font-pirate text-2xl text-destructive mb-2">
-                      Connection Lost
-                    </h2>
-                    <p className="text-muted-foreground mb-4">
-                      Your opponent has disconnected from the game.
-                    </p>
-                    
-                    {/* Disconnect Timer */}
+                    <WifiOff className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
+                    <h2 className="font-pirate text-xl sm:text-2xl text-destructive mb-2">Connection Lost</h2>
+                    <p className="text-muted-foreground mb-4 text-sm">Your opponent has disconnected.</p>
                     <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
                       <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
                       <p className="font-pirate text-2xl text-foreground">
@@ -664,13 +780,11 @@ export const GameBoard = () => {
                       </p>
                       {disconnectTimer < 30 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Claim victory available in {30 - disconnectTimer}s
+                          Claim victory in {30 - disconnectTimer}s
                         </p>
                       )}
                     </div>
-                    
                     <div className="space-y-3">
-                      {/* Claim Victory Button - available after 30 seconds */}
                       {disconnectTimer >= 30 && (
                         <Button 
                           onClick={() => {
@@ -686,7 +800,6 @@ export const GameBoard = () => {
                           Claim Victory
                         </Button>
                       )}
-                      
                       <Button 
                         onClick={async () => {
                           const gameCode = isHost ? peerId : hostId;
@@ -705,17 +818,11 @@ export const GameBoard = () => {
                         }}
                         disabled={isReconnecting}
                         variant={disconnectTimer >= 30 ? "outline" : "default"}
-                        className={cn(
-                          "w-full",
-                          disconnectTimer < 30 && "game-button"
-                        )}
+                        className={cn("w-full", disconnectTimer < 30 && "game-button")}
                       >
                         {isReconnecting ? (
                           <>
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                            >
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
                               <RotateCcw className="w-5 h-5 mr-2" />
                             </motion.div>
                             Reconnecting...
@@ -729,12 +836,7 @@ export const GameBoard = () => {
                       </Button>
                       <Button 
                         variant="ghost"
-                        onClick={() => {
-                          setShowDisconnectModal(false);
-                          setDisconnectTimer(0);
-                          resetMultiplayer();
-                          resetGame();
-                        }} 
+                        onClick={() => { setShowDisconnectModal(false); setDisconnectTimer(0); resetMultiplayer(); resetGame(); }} 
                         className="w-full text-muted-foreground"
                       >
                         <Home className="w-5 h-5 mr-2" />
@@ -761,24 +863,21 @@ export const GameBoard = () => {
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="bg-card p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
+                className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
               >
                 <div className="text-center">
-                  <Anchor className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <h2 className="font-pirate text-3xl text-primary mb-2">
+                  <Anchor className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-4" />
+                  <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-2">
                     Voyage {round} Complete!
                   </h2>
                   
                   {getRoundWinner() && (
-                    <p className="text-xl mb-4">
-                      <span className="text-primary font-bold">
-                        {getRoundWinner()?.name}
-                      </span>{' '}
+                    <p className="text-lg sm:text-xl mb-4">
+                      <span className="text-primary font-bold">{getRoundWinner()?.name}</span>{' '}
                       wins this voyage!
                     </p>
                   )}
 
-                  {/* Hidden Treasures Reveal */}
                   {optionalRules.treasureChest && hiddenTreasures.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -803,17 +902,11 @@ export const GameBoard = () => {
                     </motion.div>
                   )}
 
-                  {/* Treasure Manifest */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     {players.map((player) => (
-                      <div
-                        key={player.id}
-                        className="p-4 rounded-lg bg-muted/50 border border-border"
-                      >
-                        <p className="font-bold text-foreground">{player.name}</p>
-                        <p className="text-3xl font-pirate text-primary">
-                          {calculateScore(player)}
-                        </p>
+                      <div key={player.id} className="p-3 sm:p-4 rounded-lg bg-muted/50 border border-border">
+                        <p className="font-bold text-foreground text-sm sm:text-base">{player.name}</p>
+                        <p className="text-2xl sm:text-3xl font-pirate text-primary">{calculateScore(player)}</p>
                         <p className="text-xs text-muted-foreground">doubloons</p>
                       </div>
                     ))}
@@ -840,7 +933,7 @@ export const GameBoard = () => {
           )}
         </AnimatePresence>
 
-        {/* Game End Modal - Letters of Marque Awarded */}
+        {/* Game End Modal */}
         <AnimatePresence>
           {phase === 'gameEnd' && (
             <motion.div
@@ -853,27 +946,25 @@ export const GameBoard = () => {
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="bg-card p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full text-center"
+                className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full text-center"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', delay: 0.2 }}
                 >
-                  <Trophy className="w-24 h-24 text-primary mx-auto mb-4" />
+                  <Trophy className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
                 </motion.div>
                 
-                <h2 className="font-pirate text-3xl text-primary mb-1">
+                <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-1">
                   {getWinner()?.isAI ? 'Defeated!' : 'Letters of Marque'}
                 </h2>
-                <h3 className="font-pirate text-xl text-primary/80 mb-4">
+                <h3 className="font-pirate text-lg sm:text-xl text-primary/80 mb-4">
                   {getWinner()?.isAI ? '' : 'Awarded!'}
                 </h3>
                 
-                <p className="text-xl mb-6">
-                  <span className="text-primary font-bold">
-                    {getWinner()?.name}
-                  </span>{' '}
+                <p className="text-lg sm:text-xl mb-6">
+                  <span className="text-primary font-bold">{getWinner()?.name}</span>{' '}
                   {getWinner()?.isAI ? 'claims victory!' : 'is the champion privateer!'}
                 </p>
 
