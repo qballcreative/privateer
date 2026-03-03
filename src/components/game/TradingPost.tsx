@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Card, HAND_LIMIT } from '@/types/game';
 import { CargoObject } from './CargoObject';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,22 @@ interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
 }
 
+// Rise-from-dock animation for new cards arriving from deck
+const riseFromDock = {
+  initial: { opacity: 0, y: 50, scale: 0.7 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -30, scale: 0.85 },
+};
+
+// Ship fan-out exit animation
+const shipFanExit = (index: number, total: number) => ({
+  opacity: 0,
+  y: 60,
+  x: (index - (total - 1) / 2) * 30,
+  scale: 0.6,
+  rotate: (index - (total - 1) / 2) * 8,
+});
+
 export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
   const { 
     market, 
@@ -21,6 +37,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
     getCurrentPlayer,
     phase,
     deck,
+    lastAction,
   } = useGameStore();
   
   const [selectedMarketCards, setSelectedMarketCards] = useState<string[]>([]);
@@ -115,12 +132,12 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
       {/* Trading Post — Dock Table Surface */}
       <div className={cn(
-        "relative rounded-xl wood-plank-texture border-2 border-primary/30 rope-border",
+        "relative rounded-xl wood-plank-texture border-2 border-primary/30 rope-border overflow-hidden",
         isPhone ? "p-3" : "p-6"
       )}>
         {/* Trading Post Label */}
         {!isPhone && (
-          <div className="absolute -top-3 left-4">
+          <div className="absolute -top-3 left-4 z-10">
             <span className="font-pirate text-primary text-sm px-3 py-1 bg-card rounded-full border border-primary/30 shadow-md">
               Trading Post
             </span>
@@ -129,7 +146,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
         {/* Supply Ship indicator */}
         <div className={cn(
-          "flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1 bg-card rounded-full border border-border shadow-md",
+          "flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1 bg-card rounded-full border border-border shadow-md z-10",
           isPhone ? "mb-2 w-fit mx-auto" : "absolute -top-3 right-4"
         )}>
           <Ship className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-accent" />
@@ -137,33 +154,49 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
           <span className="font-bold text-foreground">{deck.length}</span>
         </div>
 
-        {/* Cargo on the dock — horizontal scroll on phone */}
+        {/* Cargo on the dock */}
         <div className={cn(
           "min-h-[80px] sm:min-h-[140px]",
           isPhone 
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
             : "flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-4"
         )}>
-          <AnimatePresence mode="popLayout">
-            {market.map((card, index) => (
-              <motion.div
-                key={card.id}
-                initial={{ opacity: 0, y: -20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ delay: index * 0.1, type: 'spring', stiffness: 200 }}
-                className={cn(isPhone && "flex-shrink-0")}
-              >
-                <CargoObject
-                  card={card}
-                  selected={selectedMarketCards.includes(card.id)}
-                  onClick={() => handleCardClick(card.id)}
-                  disabled={!isPlayerTurn || phase !== 'playing'}
-                  size={cargoSize}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          <LayoutGroup id="trading-post">
+            <AnimatePresence mode="popLayout">
+              {market.map((card, index) => (
+                <motion.div
+                  key={card.id}
+                  layout
+                  initial={riseFromDock.initial}
+                  animate={riseFromDock.animate}
+                  exit={
+                    lastAction?.type === 'take-ships' && card.type === 'ships'
+                      ? shipFanExit(index, ships.length)
+                      : lastAction?.type === 'exchange'
+                        ? { opacity: 0, x: 80, scale: 0.8 }
+                        : { opacity: 0, y: 40, scale: 0.85 }
+                  }
+                  transition={{
+                    layout: { type: 'spring', stiffness: 300, damping: 25 },
+                    delay: index * 0.06,
+                    type: 'spring',
+                    stiffness: 250,
+                    damping: 22,
+                  }}
+                  className={cn(isPhone && "flex-shrink-0")}
+                >
+                  <CargoObject
+                    card={card}
+                    selected={selectedMarketCards.includes(card.id)}
+                    onClick={() => handleCardClick(card.id)}
+                    disabled={!isPlayerTurn || phase !== 'playing'}
+                    size={cargoSize}
+                    enableLayoutId
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </LayoutGroup>
           
           {market.length === 0 && (
             <div className="text-muted-foreground text-sm italic">
@@ -211,31 +244,68 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
             </div>
           )}
           
-          <div className={cn(
-            isPhone
-              ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
-              : "flex flex-wrap gap-3 justify-center"
-          )}>
-            {currentPlayer.hand.map((card) => (
-              <div key={card.id} className={cn(isPhone && "flex-shrink-0")}>
-                <CargoObject
-                  card={card}
-                  selected={selectedHandCards.includes(card.id)}
-                  onClick={() => toggleHandCard(card.id)}
-                  size={isPhone ? 'sm' : 'sm'}
-                />
-              </div>
-            ))}
-            {currentPlayer.ships.map((card) => (
-              <div key={card.id} className={cn(isPhone && "flex-shrink-0")}>
-                <CargoObject
-                  card={card}
-                  selected={selectedHandCards.includes(card.id)}
-                  onClick={() => toggleHandCard(card.id)}
-                  size={isPhone ? 'sm' : 'sm'}
-                />
-              </div>
-            ))}
+          {/* Exchange swap lane visualization */}
+          <div className="relative">
+            {selectedMarketCards.length > 0 && selectedHandCards.length > 0 && (
+              <motion.div
+                className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <motion.div
+                  className="flex items-center gap-2 text-accent"
+                  animate={{ x: [0, 8, 0] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <ArrowLeftRight className="w-5 h-5" />
+                </motion.div>
+              </motion.div>
+            )}
+
+            <div className={cn(
+              isPhone
+                ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                : "flex flex-wrap gap-3 justify-center"
+            )}>
+              <AnimatePresence mode="popLayout">
+                {currentPlayer.hand.map((card) => (
+                  <motion.div
+                    key={card.id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 80 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    className={cn(isPhone && "flex-shrink-0")}
+                  >
+                    <CargoObject
+                      card={card}
+                      selected={selectedHandCards.includes(card.id)}
+                      onClick={() => toggleHandCard(card.id)}
+                      size={isPhone ? 'sm' : 'sm'}
+                    />
+                  </motion.div>
+                ))}
+                {currentPlayer.ships.map((card) => (
+                  <motion.div
+                    key={card.id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 80 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    className={cn(isPhone && "flex-shrink-0")}
+                  >
+                    <CargoObject
+                      card={card}
+                      selected={selectedHandCards.includes(card.id)}
+                      onClick={() => toggleHandCard(card.id)}
+                      size={isPhone ? 'sm' : 'sm'}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
           </div>
 
           <div className="mt-3 sm:mt-4 flex justify-center gap-2">

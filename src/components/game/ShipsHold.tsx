@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';
 import { CargoObject } from './CargoObject';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,22 @@ interface ShipsHoldProps {
   layout?: 'phone' | 'tablet' | 'desktop';
 }
 
+// Cargo slides into hold from above (arriving from Trading Post)
+const slideIntoSlot = {
+  initial: { opacity: 0, y: -40, scale: 0.8 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: 20, scale: 0.85 },
+};
+
+// Ships fan into the hold with stagger
+const shipFanIn = (index: number) => ({
+  opacity: 0,
+  y: -50,
+  x: (index - 1) * -20,
+  scale: 0.6,
+  rotate: (index - 1) * -6,
+});
+
 export const ShipsHold = ({ 
   player, 
   isCurrentPlayer, 
@@ -25,7 +41,7 @@ export const ShipsHold = ({
   layout = 'desktop',
 }: ShipsHoldProps) => {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
-  const { sellCards, canSellCards, phase } = useGameStore();
+  const { sellCards, canSellCards, phase, lastAction } = useGameStore();
 
   const toggleCard = (cardId: string) => {
     if (!isCurrentPlayer || isOpponent) return;
@@ -61,6 +77,10 @@ export const ShipsHold = ({
   const emptySlots = Math.max(0, HAND_LIMIT - player.hand.length);
   const isPhone = layout === 'phone';
   const cargoSize = isPhone ? 'sm' : layout === 'tablet' ? 'md' : 'md';
+
+  // Determine entry animation based on last action
+  const wasShipTake = lastAction?.type === 'take-ships';
+  const wasExchange = lastAction?.type === 'exchange';
 
   return (
     <div className={cn(
@@ -100,7 +120,7 @@ export const ShipsHold = ({
         </div>
       </div>
 
-      {/* Cargo Hold — horizontal scroll on phone */}
+      {/* Cargo Hold */}
       <div className={cn(
         "relative rounded-lg bg-muted/30 border border-border",
         isPhone ? "p-2 min-h-[80px]" : "p-3 min-h-[120px]"
@@ -110,46 +130,68 @@ export const ShipsHold = ({
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-1"
             : "flex flex-wrap gap-2 items-center justify-center"
         )}>
-          <AnimatePresence mode="popLayout">
-            {player.hand.map((card, index) => (
-              <motion.div
-                key={card.id}
-                initial={{ opacity: 0, scale: 0.8, x: -20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                transition={{ delay: index * 0.05 }}
-                className={cn(
-                  isRaidMode && isOpponent && 'cursor-crosshair',
-                  isPhone && 'flex-shrink-0'
-                )}
-              >
-                <CargoObject
-                  card={card}
-                  selected={selectedCards.includes(card.id)}
-                  onClick={() => handleCardClick(card)}
-                  disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
-                  hidden={isOpponent && !isRaidMode}
-                  size={cargoSize}
-                  className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-destructive hover:scale-105 transition-all')}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          <LayoutGroup id="ships-hold">
+            <AnimatePresence mode="popLayout">
+              {player.hand.map((card, index) => (
+                <motion.div
+                  key={card.id}
+                  layout
+                  initial={
+                    wasExchange
+                      ? { opacity: 0, x: -60, scale: 0.8 }
+                      : slideIntoSlot.initial
+                  }
+                  animate={slideIntoSlot.animate}
+                  exit={
+                    wasExchange
+                      ? { opacity: 0, x: 60, scale: 0.8 }
+                      : slideIntoSlot.exit
+                  }
+                  transition={{
+                    layout: { type: 'spring', stiffness: 300, damping: 25 },
+                    delay: index * 0.04,
+                    type: 'spring',
+                    stiffness: 280,
+                    damping: 22,
+                  }}
+                  className={cn(
+                    isRaidMode && isOpponent && 'cursor-crosshair',
+                    isPhone && 'flex-shrink-0'
+                  )}
+                >
+                  <CargoObject
+                    card={card}
+                    selected={selectedCards.includes(card.id)}
+                    onClick={() => handleCardClick(card)}
+                    disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
+                    hidden={isOpponent && !isRaidMode}
+                    size={cargoSize}
+                    enableLayoutId={!isOpponent}
+                    className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-destructive hover:scale-105 transition-all')}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </LayoutGroup>
 
           {/* Empty cargo slots */}
           {!isOpponent && Array.from({ length: emptySlots }).map((_, index) => (
-            <div
+            <motion.div
               key={`empty-${index}`}
+              layout
               className={cn(
                 "rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
                 isPhone ? "w-14 h-16 flex-shrink-0" : "w-20 h-24"
               )}
+              style={{
+                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.15)',
+              }}
             >
               <Package className={cn(
                 "text-muted-foreground/20",
                 isPhone ? "w-4 h-4" : "w-6 h-6"
               )} />
-            </div>
+            </motion.div>
           ))}
 
           {player.hand.length === 0 && isOpponent && (
@@ -158,7 +200,7 @@ export const ShipsHold = ({
         </div>
       </div>
 
-      {/* Unload Cargo — near bottom on phone */}
+      {/* Unload Cargo */}
       {isCurrentPlayer && !isOpponent && phase === 'playing' && (
         <motion.div
           className="mt-3 sm:mt-4 flex items-center justify-center gap-2"

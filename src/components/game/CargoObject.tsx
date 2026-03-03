@@ -11,6 +11,8 @@ interface CargoObjectProps {
   hidden?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  /** Enable shared layout animation across components */
+  enableLayoutId?: boolean;
 }
 
 // Cargo configuration - each type has distinct visual identity
@@ -86,18 +88,24 @@ const sizeConfig = {
     icon: 'w-5 h-5',
     label: 'text-[8px]',
     plate: 'px-1 py-0.5',
+    shadow: '0 4px 8px -2px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3)',
+    liftShadow: '0 8px 16px -4px rgba(0,0,0,0.5), 0 4px 8px -2px rgba(0,0,0,0.35)',
   },
   md: {
     container: 'w-20 h-24',
     icon: 'w-7 h-7',
     label: 'text-[10px]',
     plate: 'px-1.5 py-0.5',
+    shadow: '0 6px 12px -3px rgba(0,0,0,0.45), 0 3px 6px -2px rgba(0,0,0,0.3)',
+    liftShadow: '0 12px 24px -6px rgba(0,0,0,0.55), 0 6px 12px -3px rgba(0,0,0,0.35)',
   },
   lg: {
     container: 'w-24 h-28',
     icon: 'w-9 h-9',
     label: 'text-xs',
     plate: 'px-2 py-1',
+    shadow: '0 8px 16px -4px rgba(0,0,0,0.5), 0 4px 8px -2px rgba(0,0,0,0.3)',
+    liftShadow: '0 16px 32px -8px rgba(0,0,0,0.6), 0 8px 16px -4px rgba(0,0,0,0.35)',
   },
 };
 
@@ -109,15 +117,18 @@ export const CargoObject = ({
   hidden = false,
   size = 'md',
   className,
+  enableLayoutId = false,
 }: CargoObjectProps) => {
   const config = cargoConfig[card.type];
   const sizes = sizeConfig[size];
   const IconComponent = config.icon;
+  const layoutProps = enableLayoutId ? { layoutId: `cargo-${card.id}` } : {};
 
   // Hidden cargo (opponent's cargo) shows as covered crate
   if (hidden) {
     return (
       <motion.div
+        {...layoutProps}
         className={cn(
           sizes.container,
           'relative cursor-pointer select-none',
@@ -125,20 +136,19 @@ export const CargoObject = ({
           disabled && 'opacity-50 cursor-not-allowed',
           className
         )}
+        style={{ boxShadow: sizes.shadow }}
         onClick={disabled ? undefined : onClick}
-        whileHover={disabled ? {} : { scale: 1.05, y: -3 }}
-        whileTap={disabled ? {} : { scale: 0.95 }}
+        whileHover={disabled ? {} : { scale: 1.02, y: -3, boxShadow: sizes.liftShadow }}
+        whileTap={disabled ? {} : { scale: 0.98 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
         {/* Tarp cover effect */}
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-secondary to-secondary/80 border-2 border-border">
-          {/* Rope bindings */}
           <div className="absolute inset-x-2 top-1/3 h-0.5 bg-muted-foreground/40" />
           <div className="absolute inset-x-2 bottom-1/3 h-0.5 bg-muted-foreground/40" />
           <div className="absolute inset-y-2 left-1/3 w-0.5 bg-muted-foreground/40" />
           <div className="absolute inset-y-2 right-1/3 w-0.5 bg-muted-foreground/40" />
         </div>
-        
-        {/* Mystery indicator */}
         <div className="absolute inset-0 flex items-center justify-center">
           <Package className={cn(sizes.icon, 'text-muted-foreground/50')} />
         </div>
@@ -148,27 +158,35 @@ export const CargoObject = ({
 
   return (
     <motion.div
+      {...layoutProps}
       className={cn(
         sizes.container,
-        'relative cursor-pointer select-none',
+        'relative cursor-pointer select-none cargo-object-tile',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
       onClick={disabled ? undefined : onClick}
-      whileHover={disabled ? {} : { scale: 1.05, y: -5 }}
-      whileTap={disabled ? {} : { scale: 0.95 }}
+      whileHover={disabled ? {} : {
+        scale: 1.02,
+        y: -3,
+        boxShadow: `${sizes.liftShadow}, 0 0 12px 2px hsla(43, 80%, 60%, 0.35)`,
+      }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
       animate={{
         y: selected ? -8 : 0,
+        boxShadow: selected
+          ? `${sizes.liftShadow}, 0 0 18px 4px hsla(43, 80%, 60%, 0.5)`
+          : sizes.shadow,
       }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
       {/* Cargo container (crate/barrel/chest base) */}
       <div
         className={cn(
           'absolute inset-0 rounded-lg border-2 overflow-hidden',
-          'bg-gradient-to-b shadow-lg',
+          'bg-gradient-to-b',
           config.containerClass,
-          selected && 'ring-2 ring-primary shadow-[0_0_15px_hsl(var(--gold)/0.6)]'
+          selected && 'ring-2 ring-primary'
         )}
       >
         {/* Wood grain/texture overlay */}
@@ -180,7 +198,7 @@ export const CargoObject = ({
         <div className="absolute bottom-0.5 left-0.5 w-2 h-2 border-b-2 border-l-2 border-primary/40 rounded-bl" />
         <div className="absolute bottom-0.5 right-0.5 w-2 h-2 border-b-2 border-r-2 border-primary/40 rounded-br" />
 
-        {/* Icon container - simulates cargo visible through opening */}
+        {/* Icon container */}
         <div className={cn(
           'absolute top-1/4 inset-x-2 h-1/2 rounded flex items-center justify-center',
           config.accentClass
@@ -210,12 +228,9 @@ export const CargoObject = ({
             transition={{ duration: 1.5, repeat: Infinity }}
           />
         )}
-      </div>
 
-      {/* Lift shadow when selected */}
-      {selected && (
-        <div className="absolute -bottom-1 inset-x-1 h-2 bg-background/50 rounded-full blur-sm" />
-      )}
+        {/* Gold rim highlight on hover — handled via boxShadow in whileHover */}
+      </div>
     </motion.div>
   );
 };
