@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';
 import { CargoObject } from './CargoObject';
-import { Button } from '@/components/ui/button';
+import { UnloadChest } from './UnloadChest';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
 import { Anchor, Package, Crosshair } from 'lucide-react';
@@ -200,52 +200,33 @@ export const ShipsHold = ({
         </div>
       </div>
 
-      {/* Unload Cargo */}
+      {/* Unload Chest + Score */}
       {isCurrentPlayer && !isOpponent && phase === 'playing' && (
-        <motion.div
-          className="mt-3 sm:mt-4 flex items-center justify-center gap-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Button
-            onClick={handleUnload}
-            disabled={!canUnload}
-            className="game-button text-xs sm:text-sm"
-            size="sm"
-          >
-            <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-            Unload {selectedCards.length > 0 ? `(${selectedCards.length})` : ''}
-          </Button>
-          
-          {selectedCards.length > 0 && !allSameType && (
-            <span className="text-[10px] sm:text-xs text-destructive">Same type only</span>
-          )}
-          
-          {selectedCards.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedCards([])}
-              className="text-muted-foreground text-xs"
-            >
-              Clear
-            </Button>
-          )}
-        </motion.div>
+        <UnloadChest
+          selectedCards={selectedCards}
+          player={player}
+          onUnload={handleUnload}
+          onClear={() => setSelectedCards([])}
+          canUnload={canUnload}
+          allSameType={allSameType}
+          layout={layout}
+        />
       )}
 
-      {/* Score summary */}
-      <div className={cn(
-        "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between",
-        isPhone ? "text-xs" : "text-sm"
-      )}>
-        <span className="text-muted-foreground">
-          Doubloons: <span className="font-bold text-primary">{player.tokens.reduce((sum, t) => sum + t.value, 0)}</span>
-        </span>
-        <span className="text-muted-foreground">
-          Comm: <span className="font-bold text-primary">{player.bonusTokens.reduce((sum, t) => sum + t.value, 0)}</span>
-        </span>
-      </div>
+      {/* Score summary (shown when not current player or opponent) */}
+      {(!isCurrentPlayer || isOpponent || phase !== 'playing') && (
+        <div className={cn(
+          "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between",
+          isPhone ? "text-xs" : "text-sm"
+        )}>
+          <span className="text-muted-foreground">
+            Doubloons: <span className="font-bold text-primary">{player.tokens.reduce((sum, t) => sum + t.value, 0)}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Comm: <span className="font-bold text-primary">{player.bonusTokens.reduce((sum, t) => sum + t.value, 0)}</span>
+          </span>
+        </div>
+      )}
     </div>
   );
 };

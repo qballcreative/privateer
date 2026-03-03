@@ -1,0 +1,319 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Card, GoodsType } from '@/types/game';
+import { cn } from '@/lib/utils';
+import { Package, Lock, Unlock, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useGameStore } from '@/store/gameStore';
+
+interface UnloadChestProps {
+  selectedCards: string[];
+  player: { hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
+  onUnload: () => void;
+  onClear: () => void;
+  canUnload: boolean;
+  allSameType: boolean;
+  layout?: 'phone' | 'tablet' | 'desktop';
+}
+
+// Sparkle particle component
+const SparkleParticle = ({ index, delay }: { index: number; delay: number }) => {
+  const angle = (index / 8) * Math.PI * 2;
+  const distance = 30 + Math.random() * 40;
+  return (
+    <motion.div
+      className="absolute w-1.5 h-1.5 rounded-full bg-primary"
+      style={{
+        left: '50%',
+        top: '50%',
+        filter: 'blur(0.5px)',
+      }}
+      initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      animate={{
+        opacity: [1, 1, 0],
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance - 20,
+        scale: [1, 1.3, 0],
+      }}
+      transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+    />
+  );
+};
+
+// Flipping token animation
+const FlippingToken = ({ 
+  value, 
+  delay, 
+  type 
+}: { 
+  value: number; 
+  delay: number; 
+  type: 'doubloon' | 'bonus';
+}) => (
+  <motion.div
+    className={cn(
+      'w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs',
+      type === 'doubloon'
+        ? 'bg-gradient-to-br from-primary/80 to-primary border-primary/60 text-primary-foreground'
+        : 'bg-gradient-to-br from-accent/80 to-accent border-accent/60 text-accent-foreground'
+    )}
+    initial={{ opacity: 0, rotateX: 180, y: -30, scale: 0.5 }}
+    animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
+    transition={{
+      delay,
+      type: 'spring',
+      stiffness: 350,
+      damping: 18,
+    }}
+    style={{ perspective: 200 }}
+  >
+    +{value}
+  </motion.div>
+);
+
+// Animated score counter
+const TickingScore = ({ value, label }: { value: number; label: string }) => {
+  const motionValue = useMotionValue(0);
+  const displayValue = useTransform(motionValue, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+  const prevValue = useRef(value);
+
+  useEffect(() => {
+    if (value !== prevValue.current) {
+      const controls = animate(motionValue, value, {
+        duration: 0.6,
+        ease: 'easeOut',
+        onUpdate: (latest) => setDisplay(Math.round(latest)),
+      });
+      prevValue.current = value;
+      return controls.stop;
+    } else {
+      setDisplay(value);
+      motionValue.set(value);
+    }
+  }, [value, motionValue]);
+
+  return (
+    <span className="text-muted-foreground">
+      {label}: <span className="font-bold text-primary">{display}</span>
+    </span>
+  );
+};
+
+export const UnloadChest = ({
+  selectedCards,
+  player,
+  onUnload,
+  onClear,
+  canUnload,
+  allSameType,
+  layout = 'desktop',
+}: UnloadChestProps) => {
+  const [isUnloading, setIsUnloading] = useState(false);
+  const [showSparkles, setShowSparkles] = useState(false);
+  const [earnedTokens, setEarnedTokens] = useState<{ value: number; type: 'doubloon' | 'bonus' }[]>([]);
+  const { lastAction } = useGameStore();
+  const [announcement, setAnnouncement] = useState('');
+
+  const isPhone = layout === 'phone';
+  const hasSelection = selectedCards.length > 0;
+
+  // Track the sell action to trigger animations
+  useEffect(() => {
+    if (lastAction?.type === 'sell' && lastAction.cardsInvolved) {
+      setIsUnloading(true);
+      setShowSparkles(true);
+
+      const tokens: { value: number; type: 'doubloon' | 'bonus' }[] = [];
+      if (lastAction.tokensEarned) {
+        tokens.push({ value: lastAction.tokensEarned, type: 'doubloon' });
+      }
+      if (lastAction.bonusEarned) {
+        tokens.push({ value: lastAction.bonusEarned, type: 'bonus' });
+      }
+      setEarnedTokens(tokens);
+
+      // Accessibility announcement
+      const cargoType = lastAction.cardsInvolved[0]?.type || 'cargo';
+      const count = lastAction.cardsInvolved.length;
+      const coinText = lastAction.tokensEarned ? `+${lastAction.tokensEarned} coins` : '';
+      const bonusText = lastAction.bonusEarned ? ` +${lastAction.bonusEarned} bonus` : '';
+      setAnnouncement(`Unloaded ${count} ${cargoType}. ${coinText}.${bonusText}`);
+
+      const timer = setTimeout(() => {
+        setIsUnloading(false);
+        setShowSparkles(false);
+        setEarnedTokens([]);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAction]);
+
+  const handleUnload = useCallback(() => {
+    onUnload();
+  }, [onUnload]);
+
+  const selectedType = hasSelection
+    ? player.hand.find((c) => selectedCards.includes(c.id))?.type
+    : null;
+
+  const doubloonTotal = player.tokens.reduce((sum, t) => sum + t.value, 0);
+  const bonusTotal = player.bonusTokens.reduce((sum, t) => sum + t.value, 0);
+
+  return (
+    <div className={cn(
+      'relative',
+      isPhone ? 'mt-2' : 'mt-3 sm:mt-4'
+    )}>
+      {/* Accessibility live region */}
+      <div
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announcement}
+      </div>
+
+      {/* Chest Area */}
+      <motion.div
+        className={cn(
+          'relative rounded-xl border-2 overflow-hidden transition-colors',
+          isPhone ? 'p-2' : 'p-3',
+          hasSelection && canUnload
+            ? 'border-primary/50 bg-primary/5'
+            : 'border-border bg-muted/20',
+          isUnloading && 'border-primary bg-primary/10'
+        )}
+        animate={isUnloading ? {
+          // Chest lid bump
+          scale: [1, 1.03, 0.98, 1.01, 1],
+        } : {}}
+        transition={{ duration: 0.5, ease: 'easeInOut' }}
+      >
+        {/* Wood texture for chest */}
+        <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_6px,rgba(139,90,43,0.15)_6px,rgba(139,90,43,0.15)_7px)]" />
+
+        {/* Metal bands */}
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
+        <div className={cn(
+          'relative flex items-center gap-2',
+          isPhone ? 'flex-col' : 'justify-between'
+        )}>
+          {/* Chest icon + label */}
+          <div className="flex items-center gap-2">
+            <motion.div
+              className={cn(
+                'p-1.5 rounded-lg',
+                canUnload ? 'bg-primary/20' : 'bg-muted/40'
+              )}
+              animate={isUnloading ? { rotate: [0, -5, 5, -3, 0] } : {}}
+            >
+              {canUnload ? (
+                <Unlock className={cn(
+                  'text-primary',
+                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
+                )} />
+              ) : (
+                <Lock className={cn(
+                  'text-muted-foreground',
+                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
+                )} />
+              )}
+            </motion.div>
+            
+            <div>
+              <span className={cn(
+                'font-pirate text-primary block',
+                isPhone ? 'text-sm' : 'text-base'
+              )}>
+                Sell Chest
+              </span>
+              {hasSelection && !allSameType && (
+                <span className="text-[10px] text-destructive">Same type only</span>
+              )}
+              {hasSelection && allSameType && selectedType && (
+                <span className="text-[10px] text-muted-foreground">
+                  {selectedCards.length}× {selectedType}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleUnload}
+              disabled={!canUnload}
+              className={cn(
+                'game-button',
+                isPhone ? 'text-xs h-8' : 'text-sm'
+              )}
+              size="sm"
+            >
+              <Package className={cn(isPhone ? 'w-3.5 h-3.5' : 'w-4 h-4', 'mr-1')} />
+              Unload{hasSelection ? ` (${selectedCards.length})` : ''}
+            </Button>
+
+            {hasSelection && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClear}
+                className="text-muted-foreground text-xs h-8"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Sparkle particles on unload */}
+        <AnimatePresence>
+          {showSparkles && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <SparkleParticle key={i} index={i} delay={i * 0.05} />
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Earned tokens flipping onto table */}
+        <AnimatePresence>
+          {earnedTokens.length > 0 && (
+            <motion.div
+              className={cn(
+                'flex items-center justify-center gap-2 mt-2',
+                isPhone ? 'gap-1.5' : 'gap-3'
+              )}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {earnedTokens.map((token, i) => (
+                <FlippingToken
+                  key={`${token.type}-${i}`}
+                  value={token.value}
+                  delay={token.type === 'bonus' ? 0.6 : 0.2}
+                  type={token.type}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Score summary with ticking animation */}
+      <div className={cn(
+        'mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between',
+        isPhone ? 'text-xs' : 'text-sm'
+      )}>
+        <TickingScore value={doubloonTotal} label="Doubloons" />
+        <TickingScore value={bonusTotal} label="Comm" />
+      </div>
+    </div>
+  );
+};
