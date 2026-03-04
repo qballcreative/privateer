@@ -21,6 +21,41 @@ import {
   MIN_SELL_EXPENSIVE,
 } from '@/types/game';
 import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
+import {
+  RulesEngine,
+  RuleContext,
+  TurnEndContext,
+  RoundEndContext,
+  stormRule,
+  pirateRaidRule,
+  treasureChestRule,
+} from '@/rules';
+
+// ─── Rules Engine singleton ─────────────────────────────────────────
+const rulesEngine = new RulesEngine();
+rulesEngine.register(stormRule);
+rulesEngine.register(pirateRaidRule);
+rulesEngine.register(treasureChestRule);
+
+/** Maps the legacy OptionalRules booleans to engine plugin ids. */
+const syncEngineRules = (rules: OptionalRules) => {
+  const ids: string[] = [];
+  if (rules.stormRule) ids.push('storm');
+  if (rules.pirateRaid) ids.push('pirate_raid');
+  if (rules.treasureChest) ids.push('treasure_chest');
+  rulesEngine.setEnabled(ids);
+};
+
+/** Build a RuleContext from the current store state (mutable snapshot). */
+const buildCtx = (state: GameState): RuleContext => ({
+  state,
+  currentPlayerIndex: state.currentPlayerIndex,
+  currentPlayer: state.players[state.currentPlayerIndex],
+  opponent: state.players[state.currentPlayerIndex === 0 ? 1 : 0],
+  pushAction: (action) => { state.lastAction = action; },
+  shuffle: secureShuffle,
+  generateId: generateSecureId,
+});
 
 // Pirate names for AI opponent
 const PIRATE_NAMES = [
@@ -225,12 +260,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Create hidden treasures if treasure chest rule is enabled
-    const hiddenTreasures = optionalRules.treasureChest 
-      ? createHiddenTreasures(players.map(p => p.id))
-      : [];
+    // Sync rules engine
+    syncEngineRules(optionalRules);
 
-    set({
+    const initialState: GameState = {
       phase: 'playing',
       deck: remainingDeck,
       market,
@@ -239,14 +272,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       bonusTokens: createBonusTokens(),
       currentPlayerIndex: 0,
       round: 1,
+      maxRounds: 3,
       roundWins: [0, 0],
       lastAction: null,
       difficulty,
       optionalRules,
       turnCount: 0,
-      hiddenTreasures,
+      hiddenTreasures: [],
       isMultiplayer: false,
-    });
+    };
+
+    // Fire engine hooks
+    const ctx = buildCtx(initialState);
+    rulesEngine.fireGameStart(ctx);
+    rulesEngine.fireDeal(ctx);
+
+    set(initialState);
   },
 
   startMultiplayerGame: (playerName, opponentName, optionalRules, isHost) => {
@@ -292,27 +333,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    const hiddenTreasures = optionalRules.treasureChest 
-      ? createHiddenTreasures(players.map(p => p.id))
-      : [];
+    syncEngineRules(optionalRules);
 
-    set({
+    const initialState: GameState = {
       phase: 'playing',
       deck: remainingDeck,
       market,
       players,
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      currentPlayerIndex: 0, // Host always starts
+      currentPlayerIndex: 0,
       round: 1,
+      maxRounds: 3,
       roundWins: [0, 0],
       lastAction: null,
       difficulty: 'medium',
       optionalRules,
       turnCount: 0,
-      hiddenTreasures,
+      hiddenTreasures: [],
       isMultiplayer: true,
-    });
+    };
+
+    const ctx = buildCtx(initialState);
+    rulesEngine.fireGameStart(ctx);
+    rulesEngine.fireDeal(ctx);
+
+    set(initialState);
   },
 
   // Apply game state received from network (for multiplayer sync)
@@ -582,76 +628,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   endTurn: () => {
-    const { currentPlayerIndex, players, optionalRules, turnCount, market, deck } = get();
-    
-    // Increment turn count
-    const newTurnCount = turnCount + 1;
+    const fullState = { ...get() } as GameState;
+    const newTurnCount = fullState.turnCount + 1;
+    fullState.turnCount = newTurnCount;
 
     // Check for round end
     if (get().isRoundOver()) {
-      // If treasure chest rule is active, reveal and add hidden treasures
-      if (optionalRules.treasureChest) {
-        const { hiddenTreasures } = get();
-        const updatedPlayers = [...players] as [Player, Player];
-        
-        hiddenTreasures.forEach((treasure) => {
-          const playerIndex = updatedPlayers.findIndex(p => p.id === treasure.playerId);
-          if (playerIndex !== -1) {
-            updatedPlayers[playerIndex] = {
-              ...updatedPlayers[playerIndex],
-              bonusTokens: [...updatedPlayers[playerIndex].bonusTokens, ...treasure.tokens],
-            };
-          }
-        });
-        
-        set({ players: updatedPlayers });
-      }
+      // Fire round-end hooks (e.g. treasure chest reveal)
+      const roundCtx: RoundEndContext = {
+        ...buildCtx(fullState),
+        round: fullState.round,
+      };
+      rulesEngine.fireRoundEnd(roundCtx);
 
       const winner = get().getRoundWinner();
-      const roundWins = [...get().roundWins] as [number, number];
+      const roundWins = [...fullState.roundWins] as [number, number];
       if (winner) {
-        const winnerIndex = players.findIndex((p) => p.id === winner.id);
+        const winnerIndex = fullState.players.findIndex((p) => p.id === winner.id);
         roundWins[winnerIndex]++;
       }
-      set({ phase: 'roundEnd', roundWins, turnCount: newTurnCount });
+      set({
+        players: fullState.players,
+        hiddenTreasures: fullState.hiddenTreasures,
+        phase: 'roundEnd',
+        roundWins,
+        turnCount: newTurnCount,
+      });
       return;
     }
 
-    // Apply Storm Rule - every 3rd turn, discard 2 random market cards
-    let newMarket = [...market];
-    let newDeck = [...deck];
-    let stormAction: ActionDisplay | null = null;
-    
-    if (optionalRules.stormRule && newTurnCount % 3 === 0 && newMarket.length >= 2) {
-      // Remove 2 random non-ship cards from market
-      const nonShipCards = newMarket.filter(c => c.type !== 'ships');
-      const cardsToRemove = shuffle(nonShipCards).slice(0, Math.min(2, nonShipCards.length));
-      
-      newMarket = newMarket.filter(c => !cardsToRemove.some(r => r.id === c.id));
-      
-      // Refill market from deck
-      const cardsNeeded = MARKET_SIZE - newMarket.length;
-      newMarket = [...newMarket, ...newDeck.slice(0, cardsNeeded)];
-      newDeck = newDeck.slice(cardsNeeded);
-      
-      stormAction = {
-        type: 'storm',
-        playerName: 'Storm',
-        description: `washes away ${cardsToRemove.length} cards!`,
-        cardsInvolved: cardsToRemove,
-      };
-    }
+    // Fire turn-end hooks (e.g. storm)
+    const turnCtx: TurnEndContext = {
+      ...buildCtx(fullState),
+      turnCount: newTurnCount,
+    };
+    rulesEngine.fireTurnEnd(turnCtx);
 
-    const nextIndex = currentPlayerIndex === 0 ? 1 : 0;
+    const nextIndex = fullState.currentPlayerIndex === 0 ? 1 : 0;
     const currentAction = get().lastAction;
     const { isMultiplayer } = get();
-    
-    set({ 
-      currentPlayerIndex: nextIndex, 
+    const { players } = fullState;
+
+    set({
+      currentPlayerIndex: nextIndex,
       turnCount: newTurnCount,
-      market: newMarket,
-      deck: newDeck,
-      lastAction: stormAction || currentAction,
+      market: fullState.market,
+      deck: fullState.deck,
+      lastAction: turnCtx.injectedAction || currentAction,
     });
 
     // If next player is AI and not multiplayer, trigger AI move
@@ -709,12 +732,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Create new hidden treasures for this round
-    const hiddenTreasures = optionalRules.treasureChest 
-      ? createHiddenTreasures(players.map(p => p.id))
-      : [];
-
-    set({
+    const newState: GameState = {
+      ...get(),
       phase: 'playing',
       deck: remainingDeck,
       market,
@@ -725,8 +744,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       round: round + 1,
       lastAction: null,
       turnCount: 0,
-      hiddenTreasures,
-    });
+      hiddenTreasures: [],
+    };
+
+    // Fire deal hooks (e.g. treasure chest creates hidden tokens)
+    const ctx = buildCtx(newState);
+    rulesEngine.fireDeal(ctx);
+
+    set(newState);
   },
 
   resetGame: () => {
