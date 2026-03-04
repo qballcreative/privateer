@@ -292,6 +292,43 @@
     animation: wave 4s ease-in-out infinite;
   }
 
+  .animate-shake {
+    animation: shake 0.4s ease-in-out;
+  }
+
+  /* Vignette overlay for deck-low tension */
+  .deck-low-vignette {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    box-shadow: inset 0 0 120px 40px hsl(0, 0%, 0%, 0.35);
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  /* Zone dimming for inactive turn */
+  .zone-dimmed {
+    opacity: 0.9;
+    filter: brightness(0.9);
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+
+  .zone-active {
+    opacity: 1;
+    filter: brightness(1.05);
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-6px) rotate(-1deg); }
+    30% { transform: translateX(5px) rotate(0.5deg); }
+    45% { transform: translateX(-4px) rotate(-0.5deg); }
+    60% { transform: translateX(3px) rotate(0.3deg); }
+    75% { transform: translateX(-2px); }
+    90% { transform: translateX(1px); }
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -14,6 +14,7 @@ import { ScoreBoard } from './ScoreBoard';
 import { ActionNotification } from './ActionNotification';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
+import { TurnBanner } from './TurnBanner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -46,6 +47,7 @@ export const GameBoard = () => {
     isMultiplayer,
     applyGameState,
     getSerializableState,
+    deck,
   } = useGameStore();
 
   const { actionNotificationDuration } = useSettingsStore();
@@ -72,6 +74,20 @@ export const GameBoard = () => {
   const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
   const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
   const [tradingPostCollapsed, setTradingPostCollapsed] = useState(false);
+
+  // Turn banner state
+  const [showTurnBanner, setShowTurnBanner] = useState(false);
+  const prevPlayerIndexRef = useRef(currentPlayerIndex);
+
+  // Invalid action shake state
+  const [shakeKey, setShakeKey] = useState(0);
+
+  // Deck low state
+  const isDeckLow = phase === 'playing' && deck.length <= 10;
+  const creakRef = useRef<HTMLAudioElement | null>(null);
+
+  // End-of-round flourish
+  const [roundFlourish, setRoundFlourish] = useState(false);
   
   // Keep ref in sync with state
   useEffect(() => {
@@ -139,6 +155,54 @@ export const GameBoard = () => {
       return () => clearTimeout(timer);
     }
   }, [lastAction, actionNotificationDuration, playActionSound]);
+
+  // Turn banner: show for 900ms when it becomes player's turn
+  useEffect(() => {
+    if (phase === 'playing' && currentPlayerIndex === 0 && prevPlayerIndexRef.current !== 0) {
+      setShowTurnBanner(true);
+      const timer = setTimeout(() => setShowTurnBanner(false), 900);
+      return () => clearTimeout(timer);
+    }
+    prevPlayerIndexRef.current = currentPlayerIndex;
+  }, [currentPlayerIndex, phase]);
+
+  // Deck-low creak ambience
+  useEffect(() => {
+    if (isDeckLow) {
+      if (!creakRef.current) {
+        const creak = new Audio('/sounds/sea_sounds.wav');
+        creak.loop = true;
+        creak.volume = 0.15;
+        creakRef.current = creak;
+      }
+      creakRef.current.play().catch(() => {});
+    } else {
+      if (creakRef.current) {
+        creakRef.current.pause();
+        creakRef.current.currentTime = 0;
+      }
+    }
+    return () => {
+      if (creakRef.current && !isDeckLow) {
+        creakRef.current.pause();
+      }
+    };
+  }, [isDeckLow]);
+
+  // End-of-round flourish
+  useEffect(() => {
+    if (phase === 'roundEnd' && prevPhase === 'playing') {
+      setRoundFlourish(true);
+      const timer = setTimeout(() => setRoundFlourish(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [phase, prevPhase]);
+
+  // Invalid action trigger
+  const triggerInvalidAction = useCallback(() => {
+    setShakeKey(prev => prev + 1);
+    playSound('error');
+  }, [playSound]);
 
   // Track previous multiplayer state to detect reconnection
   const prevMultiplayerStateRef = useRef(multiplayerState);
@@ -332,7 +396,27 @@ export const GameBoard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background p-2 sm:p-4 lg:p-6">
+    <motion.div
+      className="min-h-screen bg-background p-2 sm:p-4 lg:p-6 relative"
+      animate={roundFlourish ? { scale: [1, 1.008, 0.998, 1] } : { scale: 1 }}
+      transition={roundFlourish ? { duration: 1.2, ease: 'easeInOut' } : undefined}
+    >
+      {/* Deck-low vignette overlay */}
+      <AnimatePresence>
+        {isDeckLow && (
+          <motion.div
+            className="deck-low-vignette"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Turn Banner */}
+      <TurnBanner show={showTurnBanner} />
+
       {/* Action Notification */}
       <ActionNotification action={lastAction} show={showAction} />
       
@@ -479,13 +563,18 @@ export const GameBoard = () => {
           </div>
 
           {/* Ship's Hold — primary zone, thumb-reachable */}
-          {humanPlayer && (
-            <ShipsHold
-              player={humanPlayer}
-              isCurrentPlayer={currentPlayerIndex === 0}
-              layout="phone"
-            />
-          )}
+          <div className={cn(
+            'transition-all duration-400',
+            phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+          )}>
+            {humanPlayer && (
+              <ShipsHold
+                player={humanPlayer}
+                isCurrentPlayer={currentPlayerIndex === 0}
+                layout="phone"
+              />
+            )}
+          </div>
         </div>
 
         {/* ════════════════════════════════════════════════════════════════
@@ -515,7 +604,10 @@ export const GameBoard = () => {
 
             {/* Center column: Trading Post + Player Hold */}
             <motion.main
-              className="col-span-1 space-y-4"
+              className={cn(
+                "col-span-1 space-y-4",
+                phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+              )}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -559,7 +651,10 @@ export const GameBoard = () => {
 
             {/* Main game area — Trading Post top, Hold bottom */}
             <motion.main
-              className="col-span-2 space-y-6"
+              className={cn(
+                "col-span-2 space-y-6",
+                phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+              )}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -857,12 +952,28 @@ export const GameBoard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
               className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             >
+              {/* Decorative flourish lines */}
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
+                className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+              />
+              <motion.div
+                className="absolute bottom-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}
+              />
+
+              <motion.div
+                initial={{ scale: 0.85, y: 30, rotateX: 5 }}
+                animate={{ scale: 1, y: 0, rotateX: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                 className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
               >
                 <div className="text-center">
@@ -977,6 +1088,6 @@ export const GameBoard = () => {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 };
