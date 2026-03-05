@@ -56,19 +56,19 @@ export const stormRule: RulePlugin = {
 export const pirateRaidRule: RulePlugin = {
   id: 'pirate_raid',
   name: 'Pirate Raid',
-  description: "Once per game, steal one random cargo from your opponent's hold.",
+  description: "Once per game, steal one random cargo from an opponent's hold.",
   enableByDefault: false,
 
   hooks: {
     onGameStart(ctx: RuleContext) {
-      // Ensure both players start with raid available
+      // Ensure all players start with raid available
       ctx.state.players.forEach((p) => {
         p.hasUsedPirateRaid = false;
       });
     },
 
     onDeal(ctx: RuleContext) {
-      // Reset raid on new round
+      // Reset raid on new round for all players
       ctx.state.players.forEach((p) => {
         p.hasUsedPirateRaid = false;
       });

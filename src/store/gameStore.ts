@@ -11,6 +11,7 @@ import {
   OptionalRules,
   HiddenTreasure,
   ActionDisplay,
+  ActionValidation,
   INITIAL_TOKEN_VALUES,
   BONUS_THREE_VALUES,
   BONUS_FOUR_VALUES,
@@ -51,7 +52,7 @@ const buildCtx = (state: GameState): RuleContext => ({
   state,
   currentPlayerIndex: state.currentPlayerIndex,
   currentPlayer: state.players[state.currentPlayerIndex],
-  opponent: state.players[state.currentPlayerIndex === 0 ? 1 : 0],
+  opponents: state.players.filter((_, i) => i !== state.currentPlayerIndex),
   pushAction: (action) => { state.lastAction = action; },
   shuffle: secureShuffle,
   generateId: generateSecureId,
@@ -142,7 +143,7 @@ const createHiddenTreasures = (playerIds: string[]): HiddenTreasure[] => {
   }));
 };
 
-const createPlayer = (id: string, name: string, isAI = false): Player => ({
+const createPlayer = (id: string, name: string, isAI = false, isLocal = false): Player => ({
   id,
   name,
   hand: [],
@@ -150,6 +151,7 @@ const createPlayer = (id: string, name: string, isAI = false): Player => ({
   tokens: [],
   bonusTokens: [],
   isAI,
+  isLocal,
   hasUsedPirateRaid: false,
 });
 
@@ -165,6 +167,14 @@ const defaultOptionalRules: OptionalRules = {
   pirateRaid: false,
   treasureChest: false,
 };
+
+/** Helper: get the next player index using ring-buffer rotation. */
+const nextPlayerIndex = (current: number, total: number): number =>
+  (current + 1) % total;
+
+/** Helper: get the first opponent index (for 2-player compat). */
+const getOpponentIndex = (current: number, total: number): number =>
+  (current + 1) % total;
 
 interface GameStore extends GameState {
   // Actions
@@ -184,13 +194,21 @@ interface GameStore extends GameState {
   // AI
   makeAIMove: () => void;
   
-  // Computed
+  // Validators (return {ok, reason?})
+  canTakeOne: (cardId: string) => ActionValidation;
+  canTakeAllShips: () => ActionValidation;
+  canExchange: (handCardIds: string[], marketCardIds: string[]) => ActionValidation;
+  canSell: (cardIds: string[]) => ActionValidation;
+  
+  // Legacy compat (boolean wrappers)
   canTakeCard: (cardId: string) => boolean;
   canSellCards: (cardIds: string[]) => boolean;
-  canExchange: (handCardIds: string[], marketCardIds: string[]) => boolean;
   canUsePirateRaid: () => boolean;
+  
+  // Computed
   getCurrentPlayer: () => Player;
   getOpponent: () => Player;
+  getLocalPlayer: () => Player;
   isGameOver: () => boolean;
   isRoundOver: () => boolean;
   getWinner: () => Player | null;
@@ -204,7 +222,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   deck: [],
   tokenStacks: createTokenStacks(),
   bonusTokens: createBonusTokens(),
-  players: [createPlayer('1', 'Player'), createPlayer('2', getRandomPirateName(), true)],
+  players: [createPlayer('1', 'Player', false, true), createPlayer('2', getRandomPirateName(), true)],
   currentPlayerIndex: 0,
   round: 1,
   maxRounds: 3,
@@ -219,8 +237,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startGame: (playerName, difficulty, optionalRules = defaultOptionalRules) => {
     const deck = createDeck();
     const market: Card[] = [];
-    const players: [Player, Player] = [
-      createPlayer('1', playerName),
+    const players: Player[] = [
+      createPlayer('1', playerName, false, true),
       createPlayer('2', getRandomPirateName(), true),
     ];
 
@@ -242,20 +260,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Deal 5 cards to each player
     for (let i = 0; i < 5; i++) {
-      const card1 = remainingDeck.shift();
-      const card2 = remainingDeck.shift();
-      if (card1) {
-        if (card1.type === 'ships') {
-          players[0].ships.push(card1);
-        } else {
-          players[0].hand.push(card1);
-        }
-      }
-      if (card2) {
-        if (card2.type === 'ships') {
-          players[1].ships.push(card2);
-        } else {
-          players[1].hand.push(card2);
+      for (const player of players) {
+        const card = remainingDeck.shift();
+        if (card) {
+          if (card.type === 'ships') {
+            player.ships.push(card);
+          } else {
+            player.hand.push(card);
+          }
         }
       }
     }
@@ -273,7 +285,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       round: 1,
       maxRounds: 3,
-      roundWins: [0, 0],
+      roundWins: players.map(() => 0),
       lastAction: null,
       difficulty,
       optionalRules,
@@ -301,9 +313,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const market: Card[] = [];
     
     // Host is player 0, guest is player 1
-    const hostPlayer = createPlayer('1', playerName, false);
-    const guestPlayer = createPlayer('2', opponentName, false);
-    const players: [Player, Player] = [hostPlayer, guestPlayer];
+    const hostPlayer = createPlayer('1', playerName, false, true);
+    const guestPlayer = createPlayer('2', opponentName, false, false);
+    const players: Player[] = [hostPlayer, guestPlayer];
 
     // Deal initial market (3 ships + 2 from deck)
     let shipCount = 0;
@@ -321,15 +333,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Deal 5 cards to each player
     for (let i = 0; i < 5; i++) {
-      const card1 = remainingDeck.shift();
-      const card2 = remainingDeck.shift();
-      if (card1) {
-        if (card1.type === 'ships') players[0].ships.push(card1);
-        else players[0].hand.push(card1);
-      }
-      if (card2) {
-        if (card2.type === 'ships') players[1].ships.push(card2);
-        else players[1].hand.push(card2);
+      for (const player of players) {
+        const card = remainingDeck.shift();
+        if (card) {
+          if (card.type === 'ships') player.ships.push(card);
+          else player.hand.push(card);
+        }
       }
     }
 
@@ -345,7 +354,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       round: 1,
       maxRounds: 3,
-      roundWins: [0, 0],
+      roundWins: players.map(() => 0),
       lastAction: null,
       difficulty: 'medium',
       optionalRules,
@@ -367,6 +376,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Swap player order for guest's perspective
       const [player1, player2] = state.players;
       state.players = [player2, player1];
+      // Mark local player
+      state.players[0].isLocal = true;
+      state.players[1].isLocal = false;
       // Invert current player index for guest
       if (state.currentPlayerIndex !== undefined) {
         state.currentPlayerIndex = state.currentPlayerIndex === 0 ? 1 : 0;
@@ -422,7 +434,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newMarket.push(deck[0]);
     }
 
-    const newPlayers = [...players] as [Player, Player];
+    const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = { ...player };
 
     set({
@@ -453,7 +465,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const cardsNeeded = MARKET_SIZE - newMarket.length;
     newMarket = [...newMarket, ...deck.slice(0, cardsNeeded)];
 
-    const newPlayers = [...players] as [Player, Player];
+    const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = { ...player };
 
     set({
@@ -508,7 +520,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ...handShips,
     ];
 
-    const newPlayers = [...players] as [Player, Player];
+    const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = {
       ...player,
       hand: newHand,
@@ -563,7 +575,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Remove cards from hand
     const newHand = player.hand.filter((c) => !cardIds.includes(c.id));
 
-    const newPlayers = [...players] as [Player, Player];
+    const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = { ...player, hand: newHand };
 
     const tokensValue = tokens.reduce((sum, t) => sum + t.value, 0);
@@ -594,25 +606,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (player.hasUsedPirateRaid) return;
     if (player.hand.length >= HAND_LIMIT) return;
 
-    const opponentIndex = currentPlayerIndex === 0 ? 1 : 0;
-    const opponent = players[opponentIndex];
+    // Find which opponent has the target card
+    let targetOpponentIndex = -1;
+    let cardIndex = -1;
+    for (let i = 0; i < players.length; i++) {
+      if (i === currentPlayerIndex) continue;
+      const idx = players[i].hand.findIndex((c) => c.id === targetCardId);
+      if (idx !== -1) {
+        targetOpponentIndex = i;
+        cardIndex = idx;
+        break;
+      }
+    }
+    if (targetOpponentIndex === -1 || cardIndex === -1) return;
 
-    const cardIndex = opponent.hand.findIndex((c) => c.id === targetCardId);
-    if (cardIndex === -1) return;
-
+    const opponent = players[targetOpponentIndex];
     const stolenCard = opponent.hand[cardIndex];
     
     // Remove from opponent and add to player
     const newOpponentHand = opponent.hand.filter((c) => c.id !== targetCardId);
     const newPlayerHand = [...player.hand, stolenCard];
 
-    const newPlayers = [...players] as [Player, Player];
+    const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = { 
       ...player, 
       hand: newPlayerHand,
       hasUsedPirateRaid: true,
     };
-    newPlayers[opponentIndex] = { ...opponent, hand: newOpponentHand };
+    newPlayers[targetOpponentIndex] = { ...opponent, hand: newOpponentHand };
 
     set({
       players: newPlayers,
@@ -642,10 +663,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       rulesEngine.fireRoundEnd(roundCtx);
 
       const winner = get().getRoundWinner();
-      const roundWins = [...fullState.roundWins] as [number, number];
+      const roundWins = [...fullState.roundWins];
       if (winner) {
         const winnerIndex = fullState.players.findIndex((p) => p.id === winner.id);
-        roundWins[winnerIndex]++;
+        if (winnerIndex !== -1) roundWins[winnerIndex]++;
       }
       set({
         players: fullState.players,
@@ -664,13 +685,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
     rulesEngine.fireTurnEnd(turnCtx);
 
-    const nextIndex = fullState.currentPlayerIndex === 0 ? 1 : 0;
+    const nextIdx = nextPlayerIndex(fullState.currentPlayerIndex, fullState.players.length);
     const currentAction = get().lastAction;
     const { isMultiplayer } = get();
     const { players } = fullState;
 
     set({
-      currentPlayerIndex: nextIndex,
+      currentPlayerIndex: nextIdx,
       turnCount: newTurnCount,
       market: fullState.market,
       deck: fullState.deck,
@@ -678,16 +699,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     // If next player is AI and not multiplayer, trigger AI move
-    if (players[nextIndex].isAI && !isMultiplayer) {
+    if (players[nextIdx].isAI && !isMultiplayer) {
       setTimeout(() => get().makeAIMove(), 1000);
     }
   },
 
   nextRound: () => {
-    const { round, maxRounds, roundWins, optionalRules } = get();
+    const { round, maxRounds, roundWins, optionalRules, players: currentPlayers } = get();
     
-    // Check if game is over
-    if (round >= maxRounds || roundWins[0] >= 2 || roundWins[1] >= 2) {
+    // Check if game is over — any player has 2 wins or max rounds reached
+    const anyWinner = roundWins.some((w) => w >= 2);
+    if (round >= maxRounds || anyWinner) {
       set({ phase: 'gameEnd' });
       return;
     }
@@ -695,14 +717,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Start new round
     const deck = createDeck();
     const market: Card[] = [];
-    const players = get().players.map((p) => ({
+    const players: Player[] = currentPlayers.map((p) => ({
       ...p,
       hand: [],
       ships: [],
       tokens: [],
       bonusTokens: [],
-      hasUsedPirateRaid: false, // Reset pirate raid for new round
-    })) as [Player, Player];
+      hasUsedPirateRaid: false,
+    }));
 
     // Deal initial market
     let shipCount = 0;
@@ -718,17 +740,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     market.push(...remainingDeck.splice(0, 2));
 
-    // Deal cards
+    // Deal cards to all players in round-robin
     for (let i = 0; i < 5; i++) {
-      const card1 = remainingDeck.shift();
-      const card2 = remainingDeck.shift();
-      if (card1) {
-        if (card1.type === 'ships') players[0].ships.push(card1);
-        else players[0].hand.push(card1);
-      }
-      if (card2) {
-        if (card2.type === 'ships') players[1].ships.push(card2);
-        else players[1].hand.push(card2);
+      for (const player of players) {
+        const card = remainingDeck.shift();
+        if (card) {
+          if (card.type === 'ships') player.ships.push(card);
+          else player.hand.push(card);
+        }
       }
     }
 
@@ -761,7 +780,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       deck: [],
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      players: [createPlayer('1', 'Player'), createPlayer('2', 'Pirate AI', true)],
+      players: [createPlayer('1', 'Player', false, true), createPlayer('2', 'Pirate AI', true)],
       currentPlayerIndex: 0,
       round: 1,
       roundWins: [0, 0],
@@ -778,7 +797,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const ai = players[currentPlayerIndex];
     if (!ai.isAI) return;
 
-    const opponent = players[currentPlayerIndex === 0 ? 1 : 0];
+    // AI reads public state only — targets all opponents via players[]
+    const opponents = players.filter((_, i) => i !== currentPlayerIndex);
+    // For 2-player compat, pick the primary opponent
+    const opponent = opponents[0];
 
     // ============= STRATEGIC AI CONFIGURATION =============
     const difficultyWeights = {
@@ -791,40 +813,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // ============= HELPER FUNCTIONS =============
 
-    // Get card counts by type for a player
-    const getCardCounts = (player: Player): Record<GoodsType, number> => {
-      const counts: Record<GoodsType, number> = {} as Record<GoodsType, number>;
-      const goodsTypes: GoodsType[] = ['rum', 'cannonballs', 'silks', 'silver', 'gold', 'gemstones'];
-      goodsTypes.forEach(type => {
-        counts[type] = player.hand.filter(c => c.type === type).length;
-      });
-      return counts;
-    };
-
-    // Evaluate how urgently a goods type should be collected/sold (based on remaining high-value tokens)
+    // Evaluate how urgently a goods type should be collected/sold
     const evaluateTokenUrgency = (type: GoodsType): number => {
       const stack = tokenStacks[type];
       if (stack.length === 0) return 0;
-      
-      // Higher urgency when fewer tokens remain and they're still valuable
       const remainingValue = stack.slice(0, 3).reduce((sum, t) => sum + t.value, 0);
       const scarcityBonus = Math.max(0, (5 - stack.length) * 2);
       return (remainingValue / 3) + scarcityBonus;
     };
 
-    // Evaluate if opponent is collecting a type (blocking score)
+    // Evaluate blocking value across all opponents
     const evaluateBlockingValue = (type: GoodsType): number => {
-      const opponentCount = opponent.hand.filter(c => c.type === type).length;
-      if (opponentCount >= 3) return 8; // Critical - they're close to bonus
-      if (opponentCount >= 2) return 4; // Moderate threat
-      if (opponentCount >= 1) return 1;
-      return 0;
+      let maxBlock = 0;
+      for (const opp of opponents) {
+        const oppCount = opp.hand.filter(c => c.type === type).length;
+        let block = 0;
+        if (oppCount >= 3) block = 8;
+        else if (oppCount >= 2) block = 4;
+        else if (oppCount >= 1) block = 1;
+        maxBlock = Math.max(maxBlock, block);
+      }
+      return maxBlock;
     };
 
     // Evaluate bonus potential for selling X cards
     const evaluateBonusPotential = (cardCount: number): number => {
       if (cardCount >= 5 && bonusTokens.five.length > 0) {
-        return bonusTokens.five[0].value + 4; // 5-card bonus is huge
+        return bonusTokens.five[0].value + 4;
       }
       if (cardCount >= 4 && bonusTokens.four.length > 0) {
         return bonusTokens.four[0].value + 2;
@@ -840,15 +855,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const aiCardCount = ai.hand.filter(c => c.type === type).length;
       const stack = tokenStacks[type];
       
-      // If tokens are running out, sell now
       if (stack.length <= cardCount) return 3;
       
-      // Penalty for selling small amounts when we could wait for bonus
       if (cardCount < 3 && aiCardCount < 4) {
-        // Check if we might get more of this type
         const marketHas = market.filter(c => c.type === type).length;
         if (marketHas > 0 || stack.length > cardCount + 2) {
-          return -4 * weights.sellPatience; // Wait for bigger sale
+          return -4 * weights.sellPatience;
         }
       }
       
@@ -863,16 +875,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const aiCount = ai.hand.filter(c => c.type === type).length;
       let score = stack[0].value;
       
-      // Bonus for building toward 3/4/5 card bonuses
-      if (aiCount === 4) score += 10 * weights.bonusPursuit; // Getting to 5!
-      else if (aiCount === 3) score += 6 * weights.bonusPursuit; // Getting to 4
-      else if (aiCount === 2) score += 4 * weights.bonusPursuit; // Getting to 3
+      if (aiCount === 4) score += 10 * weights.bonusPursuit;
+      else if (aiCount === 3) score += 6 * weights.bonusPursuit;
+      else if (aiCount === 2) score += 4 * weights.bonusPursuit;
       else if (aiCount === 1) score += 2 * weights.bonusPursuit;
       
-      // Token urgency - prioritize scarce high-value tokens
       score += evaluateTokenUrgency(type) * weights.tokenUrgency;
-      
-      // Blocking value
       score += evaluateBlockingValue(type) * weights.blocking;
       
       return score;
@@ -887,32 +895,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (handCards.length + handShips.length !== marketCards.length) return -100;
       if (marketCards.length < 2) return -100;
       
-      // Check hand limit
       const nonShipMarketCards = marketCards.filter(c => c.type !== 'ships').length;
       const newHandSize = ai.hand.length - handCards.length + nonShipMarketCards;
       if (newHandSize > HAND_LIMIT) return -100;
       
-      // Calculate value of cards we're giving up
       let givenValue = 0;
       handCards.forEach(c => {
         if (c.type !== 'ships') {
           const type = c.type as GoodsType;
           const stack = tokenStacks[type];
-          givenValue += stack.length > 0 ? stack[0].value * 0.5 : 1; // Discount since not sold yet
+          givenValue += stack.length > 0 ? stack[0].value * 0.5 : 1;
         }
       });
-      // Ships have low opportunity cost
       givenValue += handShips.length * 0.5;
       
-      // Calculate value of cards we're getting
       let gainedValue = 0;
       let bonusOpportunity = 0;
+      const cardsByTypeLocal: Record<string, Card[]> = {};
+      ai.hand.forEach((card) => {
+        if (!cardsByTypeLocal[card.type]) cardsByTypeLocal[card.type] = [];
+        cardsByTypeLocal[card.type].push(card);
+      });
+      
       marketCards.forEach(c => {
         if (c.type !== 'ships') {
           const type = c.type as GoodsType;
           gainedValue += evaluateTakeValue(type);
           
-          // Check if this enables a bonus sale
           const aiCount = ai.hand.filter(hc => hc.type === type).length;
           const incomingCount = marketCards.filter(mc => mc.type === type).length;
           const futureCount = aiCount + incomingCount - handCards.filter(hc => hc.type === type).length;
@@ -926,28 +935,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ============= BUILD ACTION LIST =============
     const actions: { action: () => void; score: number; description: string }[] = [];
 
-    // --- PIRATE RAID ---
+    // --- PIRATE RAID --- target any opponent
     if (optionalRules.pirateRaid && !ai.hasUsedPirateRaid && ai.hand.length < HAND_LIMIT) {
-      opponent.hand.forEach((card) => {
-        if (card.type === 'ships') return;
-        
-        const type = card.type as GoodsType;
-        let score = evaluateTakeValue(type);
-        
-        // On hard, target cards opponent is collecting
-        const opponentCount = opponent.hand.filter(c => c.type === type).length;
-        if (opponentCount >= 3) score += 10 * weights.blocking; // Disrupt their bonus
-        
-        // Also consider what we need
-        const aiCount = ai.hand.filter(c => c.type === type).length;
-        if (aiCount >= 3) score += 8; // Complete our set
-        
-        actions.push({ 
-          action: () => get().pirateRaid(card.id), 
-          score: score + 5, // Raid has inherent value (one-time use)
-          description: `raid ${type}`
+      for (const opp of opponents) {
+        opp.hand.forEach((card) => {
+          if (card.type === 'ships') return;
+          
+          const type = card.type as GoodsType;
+          let score = evaluateTakeValue(type);
+          
+          const oppCount = opp.hand.filter(c => c.type === type).length;
+          if (oppCount >= 3) score += 10 * weights.blocking;
+          
+          const aiCount = ai.hand.filter(c => c.type === type).length;
+          if (aiCount >= 3) score += 8;
+          
+          actions.push({ 
+            action: () => get().pirateRaid(card.id), 
+            score: score + 5,
+            description: `raid ${type} from ${opp.name}`
+          });
         });
-      });
+      }
     }
 
     // --- TAKE SINGLE CARD ---
@@ -968,11 +977,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // --- TAKE ALL SHIPS ---
     const ships = market.filter((c) => c.type === 'ships');
     if (ships.length > 0) {
-      // Ships are valuable for exchanges and end-game bonus
       let score = ships.length * 2;
-      // More valuable when we have cards to exchange
       if (ai.hand.length >= 5) score += 3;
-      // Less valuable if we already have many
       if (ai.ships.length >= 5) score -= 2;
       
       actions.push({
@@ -997,21 +1003,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (cards.length >= minCards) {
         const stack = tokenStacks[goodsType];
         
-        // Calculate base token value
         let score = 0;
         for (let i = 0; i < Math.min(cards.length, stack.length); i++) {
           score += stack[i].value;
         }
         
-        // Add bonus token value
         score += evaluateBonusPotential(cards.length);
-        
-        // Sell timing adjustment
         score += evaluateSellTiming(goodsType, cards.length);
         
-        // Token urgency - sell if tokens running out
         if (stack.length <= cards.length + 1) {
-          score += 5 * weights.tokenUrgency; // Urgent sale
+          score += 5 * weights.tokenUrgency;
         }
         
         actions.push({
@@ -1023,13 +1024,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     // --- EXCHANGE CARDS ---
-    // Only evaluate on medium/hard or if we have ships to trade
     if (difficulty !== 'easy' || ai.ships.length >= 2) {
       const goodsInMarket = market.filter(c => c.type !== 'ships');
       
-      // Strategy: Trade ships + low-value goods for high-value market cards
       if (goodsInMarket.length >= 2) {
-        // Find valuable market cards worth getting
         const valuableMarket = goodsInMarket
           .filter(c => {
             const type = c.type as GoodsType;
@@ -1038,13 +1036,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           .slice(0, 3);
         
         if (valuableMarket.length >= 2) {
-          // Find low-value cards to give up
           const expendable: Card[] = [];
-          
-          // Ships are great for trading
           expendable.push(...ai.ships.slice(0, 2));
           
-          // Add low-value goods (where we only have 1 and token stack is low value)
           Object.entries(cardsByType).forEach(([type, cards]) => {
             if (cards.length === 1) {
               const stack = tokenStacks[type as GoodsType];
@@ -1055,7 +1049,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
           
           if (expendable.length >= 2) {
-            // Try exchange combinations
             const numToTrade = Math.min(expendable.length, valuableMarket.length, 3);
             
             const handToGive = expendable.slice(0, numToTrade).map(c => c.id);
@@ -1078,56 +1071,84 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ============= SELECT ACTION =============
     if (actions.length === 0) return;
 
-    // Sort by score descending
     actions.sort((a, b) => b.score - a.score);
 
     let chosenIndex = 0;
     
-    // Apply randomness based on difficulty
     if (weights.randomVariance > 0) {
       const random = secureRandom();
       if (random < weights.randomVariance) {
-        // Pick from top 3 instead of always best
         const topN = Math.min(3, actions.length);
         chosenIndex = secureRandomInt(topN);
       }
     }
 
-    // Execute chosen action
     actions[chosenIndex].action();
   },
 
-  canTakeCard: (cardId) => {
+  // ─── Action Validators ──────────────────────────────────────────
+  canTakeOne: (cardId) => {
     const { market, players, currentPlayerIndex } = get();
     const card = market.find((c) => c.id === cardId);
-    if (!card) return false;
+    if (!card) return { ok: false, reason: 'Card not in market' };
     
     const player = players[currentPlayerIndex];
-    if (card.type === 'ships') return true;
-    return player.hand.length < HAND_LIMIT;
+    if (card.type === 'ships') return { ok: true };
+    if (player.hand.length >= HAND_LIMIT) return { ok: false, reason: 'Hold is full' };
+    return { ok: true };
   },
 
-  canSellCards: (cardIds) => {
+  canTakeAllShips: () => {
+    const { market } = get();
+    const ships = market.filter((c) => c.type === 'ships');
+    if (ships.length === 0) return { ok: false, reason: 'No ships in market' };
+    return { ok: true };
+  },
+
+  canExchange: (handCardIds, marketCardIds) => {
+    if (handCardIds.length < 2 || marketCardIds.length < 2) 
+      return { ok: false, reason: 'Must exchange at least 2 cards' };
+    if (handCardIds.length !== marketCardIds.length) 
+      return { ok: false, reason: 'Must exchange equal number of cards' };
+    
+    const { players, currentPlayerIndex, market } = get();
+    const player = players[currentPlayerIndex];
+    const handCards = player.hand.filter((c) => handCardIds.includes(c.id));
+    const handShips = player.ships.filter((c) => handCardIds.includes(c.id));
+    const marketCards = market.filter((c) => marketCardIds.includes(c.id));
+    
+    if (handCards.length + handShips.length !== marketCards.length)
+      return { ok: false, reason: 'Card count mismatch' };
+    
+    const nonShipMarketCards = marketCards.filter((c) => c.type !== 'ships').length;
+    const newHandSize = player.hand.length - handCards.length + nonShipMarketCards;
+    if (newHandSize > HAND_LIMIT)
+      return { ok: false, reason: 'Would exceed hold capacity' };
+    
+    return { ok: true };
+  },
+
+  canSell: (cardIds) => {
     const { players, currentPlayerIndex } = get();
     const player = players[currentPlayerIndex];
     
     const cards = player.hand.filter((c) => cardIds.includes(c.id));
-    if (cards.length === 0) return false;
+    if (cards.length === 0) return { ok: false, reason: 'No cards selected' };
     
     const type = cards[0].type;
-    if (!cards.every((c) => c.type === type)) return false;
+    if (!cards.every((c) => c.type === type)) 
+      return { ok: false, reason: 'All cards must be same type' };
     
     const expensive = ['gold', 'silver', 'gemstones'];
-    if (expensive.includes(type) && cards.length < MIN_SELL_EXPENSIVE) return false;
+    if (expensive.includes(type) && cards.length < MIN_SELL_EXPENSIVE)
+      return { ok: false, reason: `Must sell at least ${MIN_SELL_EXPENSIVE} ${type}` };
     
-    return true;
+    return { ok: true };
   },
 
-  canExchange: (handCardIds, marketCardIds) => {
-    if (handCardIds.length < 2 || marketCardIds.length < 2) return false;
-    if (handCardIds.length !== marketCardIds.length) return false;
-    return true;
-  },
+  // Legacy boolean wrappers
+  canTakeCard: (cardId) => get().canTakeOne(cardId).ok,
+  canSellCards: (cardIds) => get().canSell(cardIds).ok,
 
   canUsePirateRaid: () => {
     const { players, currentPlayerIndex, optionalRules } = get();
@@ -1137,8 +1158,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (player.hasUsedPirateRaid) return false;
     if (player.hand.length >= HAND_LIMIT) return false;
     
-    const opponent = players[currentPlayerIndex === 0 ? 1 : 0];
-    return opponent.hand.length > 0;
+    // Check if any opponent has cards
+    const hasTargets = players.some((p, i) => i !== currentPlayerIndex && p.hand.length > 0);
+    return hasTargets;
   },
 
   getCurrentPlayer: () => {
@@ -1148,49 +1170,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   getOpponent: () => {
     const { players, currentPlayerIndex } = get();
-    return players[currentPlayerIndex === 0 ? 1 : 0];
+    return players[getOpponentIndex(currentPlayerIndex, players.length)];
+  },
+
+  getLocalPlayer: () => {
+    const { players } = get();
+    return players.find((p) => p.isLocal) || players[0];
   },
 
   isGameOver: () => {
     const { roundWins, round, maxRounds } = get();
-    return roundWins[0] >= 2 || roundWins[1] >= 2 || round > maxRounds;
+    return roundWins.some((w) => w >= 2) || round > maxRounds;
   },
 
   isRoundOver: () => {
     const { deck, tokenStacks, market } = get();
     
-    // Deck empty
     if (deck.length === 0 && market.length < MARKET_SIZE) return true;
     
-    // 3 token stacks empty
     const emptyStacks = Object.values(tokenStacks).filter((s) => s.length === 0).length;
     return emptyStacks >= 3;
   },
 
   getWinner: () => {
     const { players, roundWins } = get();
-    if (roundWins[0] >= 2) return players[0];
-    if (roundWins[1] >= 2) return players[1];
-    if (roundWins[0] > roundWins[1]) return players[0];
-    if (roundWins[1] > roundWins[0]) return players[1];
+    // Find player with most wins (>= 2)
+    let maxWins = 0;
+    let winnerIdx = -1;
+    roundWins.forEach((w, i) => {
+      if (w > maxWins) {
+        maxWins = w;
+        winnerIdx = i;
+      }
+    });
+    if (winnerIdx >= 0 && maxWins >= 2) return players[winnerIdx];
+    // Fallback: most wins
+    if (winnerIdx >= 0 && maxWins > 0) return players[winnerIdx];
     return null;
   },
 
   getRoundWinner: () => {
     const { players } = get();
-    const score0 = calculateScore(players[0]);
-    const score1 = calculateScore(players[1]);
+    const scores = players.map((p) => calculateScore(p));
     
-    if (score0 > score1) return players[0];
-    if (score1 > score0) return players[1];
+    const maxScore = Math.max(...scores);
+    const winners = scores.reduce<number[]>((acc, s, i) => s === maxScore ? [...acc, i] : acc, []);
+    
+    if (winners.length === 1) return players[winners[0]];
     
     // Tie breaker: most bonus tokens
-    if (players[0].bonusTokens.length > players[1].bonusTokens.length) return players[0];
-    if (players[1].bonusTokens.length > players[0].bonusTokens.length) return players[1];
+    const tiedPlayers = winners.map((i) => players[i]);
+    const maxBonus = Math.max(...tiedPlayers.map((p) => p.bonusTokens.length));
+    const bonusWinners = tiedPlayers.filter((p) => p.bonusTokens.length === maxBonus);
+    if (bonusWinners.length === 1) return bonusWinners[0];
     
     // Tie breaker: most goods tokens
-    if (players[0].tokens.length > players[1].tokens.length) return players[0];
-    if (players[1].tokens.length > players[0].tokens.length) return players[1];
+    const maxTokens = Math.max(...bonusWinners.map((p) => p.tokens.length));
+    const tokenWinners = bonusWinners.filter((p) => p.tokens.length === maxTokens);
+    if (tokenWinners.length === 1) return tokenWinners[0];
     
     return null;
   },

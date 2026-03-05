@@ -69,7 +69,7 @@ export const ScoreBoard = () => {
                 </div>
                 {/* Voyage wins as wax seals */}
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: roundWins[index] }).map((_, i) => (
+                  {Array.from({ length: roundWins[index] || 0 }).map((_, i) => (
                     <div 
                       key={i} 
                       className="w-5 h-5 rounded-full bg-destructive/80 border border-destructive flex items-center justify-center"

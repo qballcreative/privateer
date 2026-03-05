@@ -26,7 +26,14 @@ export interface Player {
   tokens: Token[];
   bonusTokens: BonusToken[];
   isAI?: boolean;
+  isLocal?: boolean; // True for the local human player
   hasUsedPirateRaid?: boolean; // For Pirate Raid rule - once per game
+}
+
+/** Result of an action validator. */
+export interface ActionValidation {
+  ok: boolean;
+  reason?: string;
 }
 
 export interface OptionalRules {
@@ -66,11 +73,11 @@ export interface GameState {
     four: BonusToken[];
     five: BonusToken[];
   };
-  players: [Player, Player];
-  currentPlayerIndex: 0 | 1;
+  players: Player[];
+  currentPlayerIndex: number;
   round: number;
   maxRounds: number;
-  roundWins: [number, number];
+  roundWins: number[];
   lastAction: ActionDisplay | null;
   difficulty: Difficulty;
   optionalRules: OptionalRules;

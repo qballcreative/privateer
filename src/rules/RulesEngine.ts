@@ -16,11 +16,11 @@ export interface RuleContext {
   /** Full mutable game state — hooks may read and mutate freely. */
   state: GameState;
   /** Index of the player whose turn it is. */
-  currentPlayerIndex: 0 | 1;
+  currentPlayerIndex: number;
   /** Convenience accessor. */
   currentPlayer: Player;
-  /** Convenience accessor. */
-  opponent: Player;
+  /** All other players (supports N-player). */
+  opponents: Player[];
   /** Push an action display to show the player what happened. */
   pushAction: (action: ActionDisplay) => void;
   /** Utility: cryptographically-secure shuffle. */
