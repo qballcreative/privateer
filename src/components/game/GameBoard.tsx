@@ -96,8 +96,11 @@ export const GameBoard = () => {
 
   const currentPlayer = players[currentPlayerIndex];
   
-  const localPlayer = isMultiplayer ? players[0] : players.find((p) => !p.isAI)!;
-  const opponentPlayer = isMultiplayer ? players[1] : players.find((p) => p.isAI);
+  // Local player is always players[0] from this client's perspective
+  const localPlayerIndex = isMultiplayer ? 0 : players.findIndex((p) => !p.isAI);
+  const opponentIndex = isMultiplayer ? 1 : players.findIndex((p) => p.isAI);
+  const localPlayer = players[localPlayerIndex >= 0 ? localPlayerIndex : 0];
+  const opponentPlayer = opponentIndex >= 0 ? players[opponentIndex] : players[1];
   
   const humanPlayer = localPlayer;
   const aiPlayer = opponentPlayer;
@@ -158,13 +161,13 @@ export const GameBoard = () => {
 
   // Turn banner: show for 900ms when it becomes player's turn
   useEffect(() => {
-    if (phase === 'playing' && currentPlayerIndex === 0 && prevPlayerIndexRef.current !== 0) {
+    if (phase === 'playing' && currentPlayerIndex === localPlayerIndex && prevPlayerIndexRef.current !== localPlayerIndex) {
       setShowTurnBanner(true);
       const timer = setTimeout(() => setShowTurnBanner(false), 900);
       return () => clearTimeout(timer);
     }
     prevPlayerIndexRef.current = currentPlayerIndex;
-  }, [currentPlayerIndex, phase]);
+  }, [currentPlayerIndex, phase, localPlayerIndex]);
 
   // Deck-low creak ambience
   useEffect(() => {
@@ -274,9 +277,10 @@ export const GameBoard = () => {
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
     if (isMultiplayer && phase === 'playing' && lastAction && lastAction !== prevLastActionRef.current) {
-      if (currentPlayerIndex === 1) {
-        const gameState = getSerializableState();
-        sendMessage({ type: 'game-state', payload: { gameState } });
+      if (currentPlayerIndex !== localPlayerIndex) {
+        // Current player just changed away from local → send state
+        const gs = getSerializableState();
+        sendMessage({ type: 'game-state', payload: { gameState: gs } });
       }
       prevLastActionRef.current = lastAction;
     }
@@ -329,7 +333,7 @@ export const GameBoard = () => {
       />
 
       {/* Pirate Raid Button */}
-      {optionalRules.pirateRaid && currentPlayerIndex === 0 && phase === 'playing' && (
+      {optionalRules.pirateRaid && currentPlayerIndex === localPlayerIndex && phase === 'playing' && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -565,12 +569,12 @@ export const GameBoard = () => {
           {/* Ship's Hold — primary zone, thumb-reachable */}
           <div className={cn(
             'transition-all duration-400',
-            phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+            phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
           )}>
             {humanPlayer && (
               <ShipsHold
                 player={humanPlayer}
-                isCurrentPlayer={currentPlayerIndex === 0}
+                isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
                 layout="phone"
               />
             )}
@@ -592,9 +596,9 @@ export const GameBoard = () => {
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
-                  isCurrentPlayer={currentPlayerIndex === 1}
+                  isCurrentPlayer={currentPlayerIndex === opponentIndex}
                   isOpponent
-                  isRaidMode={isRaidMode && currentPlayerIndex === 0}
+                  isRaidMode={isRaidMode && currentPlayerIndex === localPlayerIndex}
                   onRaidCard={handlePirateRaid}
                   layout="tablet"
                 />
@@ -606,7 +610,7 @@ export const GameBoard = () => {
             <motion.main
               className={cn(
                 "col-span-1 space-y-4",
-                phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+                phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -616,7 +620,7 @@ export const GameBoard = () => {
               {humanPlayer && (
                 <ShipsHold
                   player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === 0}
+                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
                   layout="tablet"
                 />
               )}
@@ -653,7 +657,7 @@ export const GameBoard = () => {
             <motion.main
               className={cn(
                 "col-span-2 space-y-6",
-                phase === 'playing' && currentPlayerIndex === 0 ? 'zone-active' : 'zone-dimmed'
+                phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -666,7 +670,7 @@ export const GameBoard = () => {
               {humanPlayer && (
                 <ShipsHold
                   player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === 0}
+                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
                   layout="desktop"
                 />
               )}
@@ -682,9 +686,9 @@ export const GameBoard = () => {
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
-                  isCurrentPlayer={currentPlayerIndex === 1}
+                  isCurrentPlayer={currentPlayerIndex === opponentIndex}
                   isOpponent
-                  isRaidMode={isRaidMode && currentPlayerIndex === 0}
+                  isRaidMode={isRaidMode && currentPlayerIndex === localPlayerIndex}
                   onRaidCard={handlePirateRaid}
                   layout="desktop"
                 />
@@ -696,7 +700,7 @@ export const GameBoard = () => {
 
         {/* Turn indicator overlay */}
         <AnimatePresence>
-          {currentPlayerIndex === 1 && phase === 'playing' && (
+          {currentPlayerIndex !== localPlayerIndex && phase === 'playing' && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
