@@ -59,15 +59,24 @@ export function createAdProvider(_personalized: boolean): AdProvider {
 }
 
 // ── Cooldown Manager ──────────────────────────────────────────
-const INTERSTITIAL_COOLDOWN_MS = 120_000; // 120 seconds
+import { useRemoteConfigStore, parseInterstitialFrequency } from '@/store/remoteConfigStore';
+
 let lastInterstitialTime = 0;
 
 export async function requestInterstitial(provider: AdProvider): Promise<boolean> {
+  const { interstitialFrequency } = useRemoteConfigStore.getState().config;
+  const { cooldownMs } = parseInterstitialFrequency(interstitialFrequency);
+
   const now = Date.now();
-  if (now - lastInterstitialTime < INTERSTITIAL_COOLDOWN_MS) return false;
+  if (now - lastInterstitialTime < cooldownMs) return false;
   const shown = await provider.showInterstitial();
   if (shown) lastInterstitialTime = now;
   return shown;
+}
+
+/** Global remote kill-switch for ads */
+export function isAdsRemoteEnabled(): boolean {
+  return useRemoteConfigStore.getState().config.adsEnabled;
 }
 
 export async function requestRewarded(provider: AdProvider): Promise<boolean> {

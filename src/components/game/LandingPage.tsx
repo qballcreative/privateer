@@ -4,6 +4,7 @@ import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore } from '@/store/consentStore';
+import { useRemoteConfigStore } from '@/store/remoteConfigStore';
 import { Difficulty } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -80,9 +81,12 @@ export const LandingPage = () => {
   
   const { optionalRules } = useSettingsStore();
   const { hasConsented, restrictedMode } = useConsentStore();
+  const { config: remoteConfig } = useRemoteConfigStore();
   
   const [playerName, setPlayerName] = useState(savedPlayerName);
-  const [difficulty, setDifficulty] = useState<Difficulty>(restrictedMode ? 'easy' : lastDifficulty);
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    restrictedMode ? 'easy' : (lastDifficulty || remoteConfig.defaultAIDifficulty)
+  );
   const [showMultiplayer, setShowMultiplayer] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const {

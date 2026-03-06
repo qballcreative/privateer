@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useRemoteConfigStore } from './remoteConfigStore';
 
 export type AgeGroup = 'under13' | '13-15' | '16-17' | '18+';
 
@@ -13,6 +14,7 @@ interface ConsentState {
 
   // Derived
   shouldShowAds: () => boolean;
+  shouldShowRewarded: () => boolean;
 
   // Actions
   setConsent: (ageGroup: AgeGroup, personalizedAds: boolean) => void;
@@ -32,7 +34,15 @@ export const useConsentStore = create<ConsentState>()(
 
       shouldShowAds: () => {
         const s = get();
-        return s.adsEnabled && !s.paidAdFree;
+        // Check remote kill-switch
+        const remoteEnabled = useRemoteConfigStore.getState().config.adsEnabled;
+        return s.adsEnabled && !s.paidAdFree && remoteEnabled;
+      },
+
+      shouldShowRewarded: () => {
+        const s = get();
+        const rc = useRemoteConfigStore.getState().config;
+        return s.adsEnabled && !s.paidAdFree && rc.adsEnabled && rc.rewardedEnabled;
       },
 
       setConsent: (ageGroup, personalizedAds) => {
