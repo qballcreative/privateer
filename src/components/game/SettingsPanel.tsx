@@ -1,11 +1,14 @@
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { OptionalRules } from '@/types/game';
 import { cn } from '@/lib/utils';
+import { AgeConsentModal } from './AgeConsentModal';
 import {
   Sheet,
   SheetContent,
@@ -40,6 +43,13 @@ const optionalRulesConfig = [
   },
 ];
 
+const AGE_LABELS: Record<AgeGroup, string> = {
+  'under13': 'Under 13',
+  '13-15': '13–15',
+  '16-17': '16–17',
+  '18+': '18+',
+};
+
 export const SettingsPanel = () => {
   const {
     soundEnabled,
@@ -55,6 +65,19 @@ export const SettingsPanel = () => {
     setActionNotificationDuration,
     setOptionalRule,
   } = useSettingsStore();
+
+  const {
+    ageGroup,
+    adsEnabled,
+    personalizedAds,
+    paidAdFree,
+    restrictedMode,
+    hasConsented,
+    setPaidAdFree,
+    resetConsent,
+  } = useConsentStore();
+
+  const [showConsentModal, setShowConsentModal] = useState(false);
 
   return (
     <Sheet>
