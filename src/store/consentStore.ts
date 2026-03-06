@@ -14,6 +14,7 @@ interface ConsentState {
 
   // Derived
   shouldShowAds: () => boolean;
+  shouldShowRewarded: () => boolean;
 
   // Actions
   setConsent: (ageGroup: AgeGroup, personalizedAds: boolean) => void;

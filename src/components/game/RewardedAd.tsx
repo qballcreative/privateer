@@ -15,7 +15,7 @@ interface RewardedAdProps {
  * Only visible when ads are enabled and not yet claimed.
  */
 export const RewardedAd = ({ onRewardGranted }: RewardedAdProps) => {
-  const shouldShowAds = useConsentStore((s) => s.shouldShowAds());
+  const shouldShowAds = useConsentStore((s) => s.shouldShowRewarded());
   const personalized = useConsentStore((s) => s.personalizedAds);
   const [claimed, setClaimed] = useState(false);
   const [loading, setLoading] = useState(false);
