@@ -12,6 +12,7 @@ import { TreasureStack } from './TreasureStack';
 import { BonusTokens } from './BonusTokens';
 import { ScoreBoard } from './ScoreBoard';
 import { ActionNotification } from './ActionNotification';
+import { InterstitialAd } from './InterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';

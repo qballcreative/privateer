@@ -362,6 +362,11 @@ export const LandingPage = () => {
           </div>
         </section>}
 
+      {/* Ad Banner — lobby only, reserved space */}
+      <div className="relative px-4 py-3 max-w-4xl mx-auto w-full">
+        <AdBanner />
+      </div>
+
       {/* Footer */}
       <footer className="relative py-6 px-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50">
         <p>Privateer: Letters of Marque © 2025 • QBall Creative</p>
