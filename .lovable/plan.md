@@ -1,131 +1,280 @@
 
 
-# Ad System, Age Gate & Restricted Mode — Implementation Plan
+# Visual Redesign Plan: Privateer: Letters of Marque
 
-## Overview
-
-This adds a consent-driven ad system with age gating, restricted under-13 mode, and extensible ad provider architecture. All state is managed via Zustand with localStorage persistence, matching the existing pattern.
+## Vision Summary
+Transform "Plunder" into "Privateer: Letters of Marque" - a premium tactile experience where players handle physical cargo objects on a weathered dock table, rather than abstract cards. Every interaction should feel like physically placing, swapping, or unloading cargo under a Letter of Marque.
 
 ---
 
-## Architecture
+## Design Philosophy
+
+### Core Spatial Metaphors
+| Current Term | New Metaphor | Visual Representation |
+|--------------|--------------|----------------------|
+| Market | **Trading Post** | Weathered dock table with cargo crates |
+| Player Hand | **Ship's Hold** | Cargo bay with physical inventory slots |
+| Cards | **Cargo Objects** | 3D-style physical goods (crates, barrels, chests) |
+| Sell Action | **Unload Cargo** | Goods being offloaded → coins + commission medallions |
+| Token Stacks | **Coin Purses** | Stacked doubloons with leather pouch aesthetic |
+| Deck | **Supply Ship** | Silhouette of arriving cargo ship with count |
+
+### Visual Tone
+- Materials: Wood grain, brass fittings, rope texture, aged leather, parchment
+- Lighting: Warm lantern glow, harbor at dusk ambiance
+- Typography: Maintains `Pirata One` for headers, `Crimson Text` for body
+- No cartoonish elements - grounded, premium tabletop aesthetic
+
+---
+
+## Phase 1: Foundation and Core Components
+
+### 1.1 Rename and Rebrand
+- Update title from "Plunder" to "Privateer: Letters of Marque"
+- Update subtitle to "A Trading Duel"
+- Update footer credits
+
+**Files**: `LandingPage.tsx`, `GameBoard.tsx`, `index.html`
+
+### 1.2 New Component: CargoObject (replaces GameCard)
+Replace the card metaphor with physical cargo objects:
 
 ```text
-┌─────────────────────────────────────────────┐
-│  First Launch → AgeConsentModal (gate)      │
-│  ↓ stores age/consent in consentStore       │
-└──────────────┬──────────────────────────────┘
-               │
-  ┌────────────▼────────────┐
-  │    consentStore (zustand)│
-  │  ageGroup, adsEnabled,   │
-  │  personalized, paidAdFree│
-  │  restrictedMode, hasConsented │
-  └────────────┬────────────┘
-               │
-  ┌────────────▼────────────┐
-  │   Ad Provider Layer      │
-  │  NoopProvider (default)  │
-  │  NativeBridge (future)   │
-  └────────────┬────────────┘
-               │
-  ┌────────────▼─────────────────┐
-  │  Ad Surfaces (components)     │
-  │  - LobbyBanner               │
-  │  - InterstitialAd (roundEnd) │
-  │  - RewardedAd (treasure)     │
-  └──────────────────────────────┘
++------------------+
+|  ┌────────────┐  |  ← Wooden crate texture
+|  │   [ICON]   │  |  ← Cargo icon (barrel, chest, etc.)
+|  │    RUM     │  |  ← Brass label plate
+|  └────────────┘  |
++------------------+
 ```
 
----
+**Cargo visuals by type**:
+- **Rum**: Wooden barrel + bottle combo (single unit)
+- **Cannonballs**: Iron-bound crate with visible balls
+- **Silks**: Wrapped bale with fabric texture
+- **Silver**: Metal-banded strongbox
+- **Gold**: Ornate chest with gold trim
+- **Gemstones**: Velvet-lined jewelry case
+- **Ships**: Miniature ship model on stand
 
-## New Files
+**Files**: Create `src/components/game/CargoObject.tsx`
 
-### 1. `src/store/consentStore.ts` — Zustand persisted store
-- **State**: `ageGroup: 'under13' | '13-15' | '16-17' | '18+' | null`, `adsEnabled`, `personalizedAds`, `paidAdFree`, `restrictedMode`, `hasConsented`
-- **Derived**: `shouldShowAds` = adsEnabled && !paidAdFree
-- **Actions**: `setConsent(ageGroup, personalizedAds)` — sets all flags based on age logic; `setPaidAdFree(boolean)`; `resetConsent()` — clears for re-flow
-- Persisted to `privateer-consent` localStorage key
+### 1.3 Update CSS Variables and Textures
+Add new texture-based styling:
+- Wood plank backgrounds for containers
+- Rope border patterns
+- Brass button/badge styling
+- Parchment overlays for information panels
 
-### 2. `src/lib/adProvider.ts` — Ad provider abstraction
-- `AdProvider` interface: `showBanner()`, `hideBanner()`, `showInterstitial(): Promise<boolean>`, `showRewarded(): Promise<boolean>`
-- `NoopAdProvider` — all methods return safely, no-op
-- `NativeBridgeProvider` — checks `window.NativeAds`, delegates if available, falls back to noop
-- `createAdProvider(personalized: boolean): AdProvider` factory
-- `adCooldown` module-level tracker: `lastInterstitialTime`, enforces 120s cooldown
-- `requestInterstitial(provider)` — checks cooldown, calls provider, returns boolean
-- `requestRewarded(provider)` — calls provider, returns boolean for reward grant
-
-### 3. `src/lib/adAnalytics.ts` — Consent-aware analytics emitter
-- `emitAdEvent(event: 'ad_impression' | 'ad_click' | 'ad_reward_granted', data?)` — checks consentStore; suppresses if restrictedMode or under13
-- Logs only non-identifying errors for under-13
-
-### 4. `src/components/game/AgeConsentModal.tsx` — First-launch modal
-- Full-screen overlay, keyboard-navigable, no preselection
-- Step 1: Age selection (4 radio buttons: Under 13, 13–15, 16–17, 18+)
-- Step 2 (13+ only): Personalization opt-in (checkbox, only for 18+; hidden/forced-off for 13–17)
-- Under 13: shows notice about simplified mode, confirms consent
-- Calls `consentStore.setConsent()` on submit
-- Neutral language throughout; no nudging
-
-### 5. `src/components/game/AdBanner.tsx` — Lobby banner
-- Renders a reserved-height `div` (e.g. `h-[90px]`) in the lobby regardless of ad state — prevents layout shift
-- Only fills with ad content when `shouldShowAds` is true
-- Never renders during `phase !== 'lobby'`
-
-### 6. `src/components/game/InterstitialAd.tsx` — Round-end interstitial
-- Triggered by GameBoard when `phase === 'roundEnd'` and `shouldShowAds`
-- Max 1 per round (tracked via local ref), 120s global cooldown via adProvider
-- Shows overlay, auto-dismisses or user-dismisses
-- Emits `ad_impression` analytics
-
-### 7. `src/components/game/RewardedAd.tsx` — Treasure chest reward
-- Button component shown only when treasure chest rule fires AND `shouldShowAds`
-- User-initiated; on completion grants exactly one reward boost
-- Emits `ad_reward_granted`
+**Files**: `src/index.css`
 
 ---
 
-## Modified Files
+## Phase 2: Trading Post (Market)
 
-### 8. `src/components/game/LandingPage.tsx`
-- Import `consentStore`; if `!hasConsented`, render `AgeConsentModal` first
-- If `restrictedMode`: lock difficulty to `'easy'`, hide multiplayer button, hide optional rules, show neutral notice banner
-- Add `<AdBanner />` at bottom of hero section (reserved space)
+### 2.1 New Component: TradingPost (replaces Market)
+Transform from card display to dock table surface:
 
-### 9. `src/components/game/SettingsPanel.tsx`
-- Add new "Privacy & Ads" section at bottom:
-  - Display: current age group, ads on/off, personalization on/off, paid status
-  - "Change Age & Ad Preferences" button → reopens AgeConsentModal (via `resetConsent()`)
-  - "Remove Ads" toggle (simulates paid state for now)
+```text
+╔══════════════════════════════════════════════════╗
+║              TRADING POST                        ║
+║  ┌──────────────────────────────────────────┐   ║
+║  │   [WOOD PLANKS TEXTURE BACKGROUND]       │   ║
+║  │                                           │   ║
+║  │   🪵  🛢️  📦  💎  ⛵                      │   ║
+║  │  (cargo objects arranged on dock)        │   ║
+║  │                                           │   ║
+║  └──────────────────────────────────────────┘   ║
+║                                                  ║
+║  Supply Ship: ▓▓▓░░ 23 cargo remaining          ║
+╚══════════════════════════════════════════════════╝
+```
 
-### 10. `src/components/game/GameBoard.tsx`
-- After round-end state: conditionally render `<InterstitialAd />` if eligible
-- Pass reward trigger to treasure chest reveal flow for `<RewardedAd />`
+- Dock table surface with wood plank texture
+- Cargo objects sit on the table (not floating cards)
+- "Supply Ship" indicator replaces "Deck" count
+- Rope border framing
 
-### 11. `src/store/settingsStore.ts`
-- No structural changes; the consent store is separate. Optional rules remain here but the LandingPage will force them off when `restrictedMode` is true.
+**Files**: Create `src/components/game/TradingPost.tsx`, update `GameBoard.tsx`
+
+### 2.2 Action Mode Toggles
+Rename and restyle:
+- "Take" → "Claim Cargo" (hand reaching icon)
+- "Exchange" → "Trade Goods" (swap arrows over crates)
+- "Take All Ships" → "Commandeer Fleet" (nautical wheel icon)
 
 ---
 
-## Key Logic Rules
+## Phase 3: Ship's Hold (Player Hand)
 
-| Age Group | Ads Default | Personalization | Restricted Mode |
-|-----------|-------------|-----------------|-----------------|
-| Under 13  | OFF         | OFF             | YES             |
-| 13–15     | ON (unless paid) | OFF        | NO              |
-| 16–17     | ON (unless paid) | OFF        | NO              |
-| 18+       | ON (unless paid) | Opt-in only | NO             |
+### 3.1 New Component: ShipsHold (replaces PlayerHand)
+Transform player hand into cargo bay visualization:
 
-- `paidAdFree = true` → all ad surfaces immediately disabled (reactive via Zustand, no reload)
-- Restricted mode: easy-only, no multiplayer, no optional rules, no ads, no analytics
+```text
+╔══════════════════════════════════════════════════╗
+║  CAPTAIN'S HOLD                    ⚓ Fleet: 3   ║
+╠══════════════════════════════════════════════════╣
+║  ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐   ║
+║  │ 🛢️  │ 📦  │ 💎  │ 🥇  │     │     │     │   ║  ← 7 cargo slots
+║  │ Rum │Silk │ Gem │Gold │     │     │     │   ║
+║  └─────┴─────┴─────┴─────┴─────┴─────┴─────┘   ║
+║                                                  ║
+║  [UNLOAD CARGO]        Doubloons: 45 | Bonus: 8 ║
+╚══════════════════════════════════════════════════╝
+```
 
-## Acceptance Criteria Mapping
+- Visual slot system (7 slots for hand limit)
+- Empty slots show as wooden compartments
+- "Unload Cargo" replaces "Sell"
+- Fleet count shows ship collection
 
-- Interstitial: roundEnd only, ≤1/round, 120s cooldown → enforced in `adProvider` + `InterstitialAd` component
-- Rewarded: treasure chest only, one reward per view → `RewardedAd` guards with completion flag
-- Banner: lobby-only reserved space → `AdBanner` checks phase + fixed height div
-- Under 13 → restrictedMode + no ads/analytics → `consentStore` flags
-- Paid removal → immediate disable → reactive Zustand state
-- All ad calls safe when disabled → `NoopAdProvider` returns cleanly
+**Files**: Create `src/components/game/ShipsHold.tsx`, update `GameBoard.tsx`
+
+### 3.2 Opponent's Hold
+Show opponent's cargo as obscured/covered crates:
+- Tarp-covered cargo silhouettes
+- Count indicator visible
+- During Pirate Raid: tarps lift to reveal options
+
+---
+
+## Phase 4: Treasure Display
+
+### 4.1 New Component: TreasureChest (replaces TokenStack)
+Replace circular tokens with stacked doubloons:
+
+```text
+    ╭──────────╮
+    │   RUM    │  ← Leather label
+    ├──────────┤
+    │ ⬤ ⬤ ⬤   │  ← Stacked coins
+    │  ⬤ ⬤    │
+    │   ⬤     │
+    │   [4]   │  ← Top coin shows value
+    ╰──────────╯
+       5 left
+```
+
+**Files**: Create `src/components/game/TreasureStack.tsx`
+
+### 4.2 Update BonusTokens Display
+Transform to "Commission Medallions":
+- Bronze/Silver/Gold medallions for 3/4/5 card bonuses
+- Wax seal aesthetic
+
+**Files**: Update `src/components/game/BonusTokens.tsx`
+
+---
+
+## Phase 5: Scoreboard and UI Chrome
+
+### 5.1 Update ScoreBoard
+Rename to "Captain's Ledger":
+- Parchment texture background
+- Quill/ink aesthetic for scores
+- Round indicators become wax seals
+
+### 5.2 Header Updates
+- Game title: "Privateer: Letters of Marque"
+- Optional rules icons get thematic frames (rope circles)
+- Turn indicator: "Your Move, Captain" / "Opponent is trading..."
+
+### 5.3 Action Notification Updates
+Transform to "Harbor Master's Log":
+- Parchment scroll appearance
+- Handwritten-style descriptions
+- Cargo icons instead of card previews
+
+**Files**: Update `ScoreBoard.tsx`, `GameBoard.tsx`, `ActionNotification.tsx`
+
+---
+
+## Phase 6: Landing Page Redesign
+
+### 6.1 Title and Branding
+- Main title: "Privateer" (large, ornate)
+- Subtitle: "Letters of Marque" (smaller, elegant)
+- Tagline: "A Trading Duel" (replaces "A Pirate Trading Card Game")
+
+### 6.2 Goods Showcase
+Replace card icons with cargo object previews:
+- Mini 3D-style cargo representations
+- Tooltip: "Rum Barrels", "Silk Bales", etc.
+
+### 6.3 How to Play Section
+Update terminology:
+- "Take" → "Claim cargo from the Trading Post"
+- "Exchange" → "Trade goods with the harbor"
+- "Sell" → "Unload cargo for doubloons and commission"
+
+**Files**: Update `LandingPage.tsx`
+
+---
+
+## Phase 7: Victory/End Screens
+
+### 7.1 Round End Modal
+- "Voyage Complete" header
+- Score shown as "Treasure Manifest"
+- Ship comparison as fleet silhouettes
+
+### 7.2 Game End Modal
+- "Letters of Marque Awarded" for winner
+- Treasure chest animation opening
+- Final tally on aged parchment
+
+**Files**: Update modals in `GameBoard.tsx`
+
+---
+
+## Asset Requirements
+
+### New Images Needed
+1. Wood plank texture (dock surface)
+2. Cargo crate base texture
+3. Leather/rope border elements
+4. Parchment texture (for modals/scoreboard)
+5. Brass plate texture (for labels)
+
+### Cargo Object Icons (to replace card images)
+- Rum: Barrel + bottle combo
+- Cannonballs: Iron crate with visible balls
+- Silks: Wrapped fabric bale
+- Silver: Metal strongbox
+- Gold: Ornate treasure chest
+- Gemstones: Jewelry case
+- Ships: Miniature model
+
+---
+
+## Implementation Order
+
+1. **Foundation** (Phase 1): Rename, new CSS variables, CargoObject component
+2. **Core Gameplay** (Phase 2-3): TradingPost + ShipsHold
+3. **Scoring** (Phase 4-5): TreasureStack + Ledger updates
+4. **Polish** (Phase 6-7): Landing page + Victory screens
+
+---
+
+## Technical Notes
+
+### Component Mapping
+| Old Component | New Component | Status |
+|---------------|---------------|--------|
+| `GameCard.tsx` | `CargoObject.tsx` | Create new |
+| `Market.tsx` | `TradingPost.tsx` | Create new |
+| `PlayerHand.tsx` | `ShipsHold.tsx` | Create new |
+| `TokenStack.tsx` | `TreasureStack.tsx` | Create new |
+| `BonusTokens.tsx` | Update in place | Modify |
+| `ScoreBoard.tsx` | Update in place | Modify |
+
+### Backward Compatibility
+- Game logic in stores remains unchanged
+- Types remain the same (Card, Token, etc.)
+- Only visual/presentation layer changes
+
+### Animation Updates
+- Card flip → Crate lid opening
+- Card selection → Cargo glow/lift effect
+- Token collection → Coins dropping into purse
 

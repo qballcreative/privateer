@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useConsentStore } from '@/store/consentStore';
 import { Difficulty } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.jpg';
 import logoImage from '@/assets/Logo.png';
-import { Anchor, Swords, Users, Ship, Gem, Coins, Wine, CircleDot, Shirt, Trophy, Skull, RotateCcw } from 'lucide-react';
+import { Anchor, Swords, Users, Ship, Gem, Coins, Wine, CircleDot, Shirt, Trophy, Skull, RotateCcw, Info } from 'lucide-react';
 import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
+import { AgeConsentModal } from './AgeConsentModal';
+import { AdBanner } from './AdBanner';
 
 const difficultyConfig: Record<Difficulty, {
   label: string;
@@ -76,9 +79,10 @@ export const LandingPage = () => {
   } = usePlayerStore();
   
   const { optionalRules } = useSettingsStore();
+  const { hasConsented, restrictedMode } = useConsentStore();
   
   const [playerName, setPlayerName] = useState(savedPlayerName);
-  const [difficulty, setDifficulty] = useState<Difficulty>(lastDifficulty);
+  const [difficulty, setDifficulty] = useState<Difficulty>(restrictedMode ? 'easy' : lastDifficulty);
   const [showMultiplayer, setShowMultiplayer] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const {
@@ -92,6 +96,7 @@ export const LandingPage = () => {
   }, [savedPlayerName, lastDifficulty]);
 
   const handleDifficultyChange = (level: Difficulty) => {
+    if (restrictedMode && level !== 'easy') return;
     setDifficulty(level);
     setLastDifficulty(level);
   };
@@ -99,8 +104,21 @@ export const LandingPage = () => {
   const handleStart = () => {
     const name = playerName.trim() || 'Captain';
     savePlayerName(name);
-    startGame(name, difficulty, optionalRules);
+    const rules = restrictedMode
+      ? { stormRule: false, pirateRaid: false, treasureChest: false }
+      : optionalRules;
+    startGame(name, restrictedMode ? 'easy' : difficulty, rules);
   };
+  // Show age consent modal before anything else
+  if (!hasConsented) {
+    return <AgeConsentModal />;
+  }
+
+  // In restricted mode, force optional rules off for this session
+  const effectiveRules = restrictedMode
+    ? { stormRule: false, pirateRaid: false, treasureChest: false }
+    : optionalRules;
+
   return <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Hero Background */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
@@ -200,7 +218,8 @@ export const LandingPage = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {(Object.keys(difficultyConfig) as Difficulty[]).map(level => {
                   const config = difficultyConfig[level];
-                  return <button key={level} onClick={() => handleDifficultyChange(level)} className={cn('p-3 rounded-lg border-2 transition-all duration-200', difficulty === level ? config.color : 'border-border hover:border-primary/30 bg-muted/30')}>
+                  const locked = restrictedMode && level !== 'easy';
+                  return <button key={level} onClick={() => handleDifficultyChange(level)} disabled={locked} className={cn('p-3 rounded-lg border-2 transition-all duration-200', locked && 'opacity-40 cursor-not-allowed', difficulty === level ? config.color : 'border-border hover:border-primary/30 bg-muted/30')}>
                           <p className="font-bold text-sm">{config.label}</p>
                           <p className="text-xs text-muted-foreground mt-1 hidden lg:block">{config.description}</p>
                         </button>;
@@ -249,6 +268,16 @@ export const LandingPage = () => {
                     </div>
                   </div>}
 
+                {/* Restricted Mode Notice */}
+                {restrictedMode && (
+                  <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border flex items-start gap-2">
+                    <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      A simplified version is available for younger players. Full gameplay, multiplayer, advanced rules, and ad‑supported features are available for players 13+.
+                    </p>
+                  </div>
+                )}
+
                 {/* Start buttons */}
                 <div className="space-y-3">
                   <Button onClick={handleStart} variant="gold" size="xl" className="w-full font-pirate">
@@ -256,10 +285,12 @@ export const LandingPage = () => {
                     Battle the AI
                   </Button>
                   
-                  <Button variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/10" onClick={() => setShowMultiplayer(true)}>
-                    <Users className="w-5 h-5 mr-2" />
-                    Multiplayer (Host / Join)     
-                  </Button>
+                  {!restrictedMode && (
+                    <Button variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/10" onClick={() => setShowMultiplayer(true)}>
+                      <Users className="w-5 h-5 mr-2" />
+                      Multiplayer (Host / Join)     
+                    </Button>
+                  )}
                 </div>
               </motion.div>}
           </AnimatePresence>
@@ -330,6 +361,11 @@ export const LandingPage = () => {
             </motion.div>
           </div>
         </section>}
+
+      {/* Ad Banner — lobby only, reserved space */}
+      <div className="relative px-4 py-3 max-w-4xl mx-auto w-full">
+        <AdBanner />
+      </div>
 
       {/* Footer */}
       <footer className="relative py-6 px-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50">

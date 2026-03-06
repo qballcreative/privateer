@@ -12,6 +12,7 @@ import { TreasureStack } from './TreasureStack';
 import { BonusTokens } from './BonusTokens';
 import { ScoreBoard } from './ScoreBoard';
 import { ActionNotification } from './ActionNotification';
+import { InterstitialAd } from './InterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
@@ -423,6 +424,9 @@ export const GameBoard = () => {
 
       {/* Action Notification */}
       <ActionNotification action={lastAction} show={showAction} />
+
+      {/* Interstitial Ad — round end only */}
+      <InterstitialAd trigger={phase === 'roundEnd'} round={round} />
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
