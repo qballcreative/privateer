@@ -226,10 +226,78 @@ export const SettingsPanel = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Separator */}
+              <div className="border-t border-border" />
+
+              {/* Privacy & Ads Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  <Label className="text-base font-semibold">Privacy & Ads</Label>
+                </div>
+
+                {hasConsented && ageGroup && (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2 rounded bg-muted/50 border border-border">
+                        <span className="text-muted-foreground">Age Group</span>
+                        <p className="font-medium text-foreground">{AGE_LABELS[ageGroup]}</p>
+                      </div>
+                      <div className="p-2 rounded bg-muted/50 border border-border">
+                        <span className="text-muted-foreground">Ads</span>
+                        <p className="font-medium text-foreground">
+                          {paidAdFree ? 'Removed' : adsEnabled ? 'On' : 'Off'}
+                        </p>
+                      </div>
+                      <div className="p-2 rounded bg-muted/50 border border-border">
+                        <span className="text-muted-foreground">Personalization</span>
+                        <p className="font-medium text-foreground">{personalizedAds ? 'On' : 'Off'}</p>
+                      </div>
+                      <div className="p-2 rounded bg-muted/50 border border-border">
+                        <span className="text-muted-foreground">Mode</span>
+                        <p className="font-medium text-foreground">{restrictedMode ? 'Simplified' : 'Full'}</p>
+                      </div>
+                    </div>
+
+                    {/* Remove Ads toggle (13+ only) */}
+                    {adsEnabled && (
+                      <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                        <div>
+                          <Label className="text-sm font-medium">Remove Ads</Label>
+                          <p className="text-xs text-muted-foreground mt-0.5">Disable all ad surfaces</p>
+                        </div>
+                        <Switch
+                          checked={paidAdFree}
+                          onCheckedChange={setPaidAdFree}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    resetConsent();
+                    setShowConsentModal(true);
+                  }}
+                >
+                  <Eye className="w-4 h-4 mr-1" />
+                  Change Age & Ad Preferences
+                </Button>
+              </div>
             </div>
           </div>
         </ScrollArea>
       </SheetContent>
+
+      {/* Consent modal overlay */}
+      {showConsentModal && (
+        <AgeConsentModal onComplete={() => setShowConsentModal(false)} />
+      )}
     </Sheet>
   );
 };
