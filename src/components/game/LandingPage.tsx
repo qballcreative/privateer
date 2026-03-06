@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useConsentStore } from '@/store/consentStore';
 import { Difficulty } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.jpg';
 import logoImage from '@/assets/Logo.png';
-import { Anchor, Swords, Users, Ship, Gem, Coins, Wine, CircleDot, Shirt, Trophy, Skull, RotateCcw } from 'lucide-react';
+import { Anchor, Swords, Users, Ship, Gem, Coins, Wine, CircleDot, Shirt, Trophy, Skull, RotateCcw, Info } from 'lucide-react';
 import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
+import { AgeConsentModal } from './AgeConsentModal';
+import { AdBanner } from './AdBanner';
 
 const difficultyConfig: Record<Difficulty, {
   label: string;
@@ -76,9 +79,10 @@ export const LandingPage = () => {
   } = usePlayerStore();
   
   const { optionalRules } = useSettingsStore();
+  const { hasConsented, restrictedMode } = useConsentStore();
   
   const [playerName, setPlayerName] = useState(savedPlayerName);
-  const [difficulty, setDifficulty] = useState<Difficulty>(lastDifficulty);
+  const [difficulty, setDifficulty] = useState<Difficulty>(restrictedMode ? 'easy' : lastDifficulty);
   const [showMultiplayer, setShowMultiplayer] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const {
@@ -92,6 +96,7 @@ export const LandingPage = () => {
   }, [savedPlayerName, lastDifficulty]);
 
   const handleDifficultyChange = (level: Difficulty) => {
+    if (restrictedMode && level !== 'easy') return;
     setDifficulty(level);
     setLastDifficulty(level);
   };
@@ -101,6 +106,16 @@ export const LandingPage = () => {
     savePlayerName(name);
     startGame(name, difficulty, optionalRules);
   };
+  // Show age consent modal before anything else
+  if (!hasConsented) {
+    return <AgeConsentModal />;
+  }
+
+  // In restricted mode, force optional rules off for this session
+  const effectiveRules = restrictedMode
+    ? { stormRule: false, pirateRaid: false, treasureChest: false }
+    : optionalRules;
+
   return <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Hero Background */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
