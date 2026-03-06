@@ -87,6 +87,7 @@ export const LandingPage = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>(
     restrictedMode ? 'easy' : (lastDifficulty || remoteConfig.defaultAIDifficulty)
   );
+  const [showMultiplayer, setShowMultiplayer] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const {
     startGame
