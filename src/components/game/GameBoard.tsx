@@ -424,6 +424,9 @@ export const GameBoard = () => {
 
       {/* Action Notification */}
       <ActionNotification action={lastAction} show={showAction} />
+
+      {/* Interstitial Ad — round end only */}
+      <InterstitialAd trigger={phase === 'roundEnd'} round={round} />
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
