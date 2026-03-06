@@ -218,7 +218,8 @@ export const LandingPage = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {(Object.keys(difficultyConfig) as Difficulty[]).map(level => {
                   const config = difficultyConfig[level];
-                  return <button key={level} onClick={() => handleDifficultyChange(level)} className={cn('p-3 rounded-lg border-2 transition-all duration-200', difficulty === level ? config.color : 'border-border hover:border-primary/30 bg-muted/30')}>
+                  const locked = restrictedMode && level !== 'easy';
+                  return <button key={level} onClick={() => handleDifficultyChange(level)} disabled={locked} className={cn('p-3 rounded-lg border-2 transition-all duration-200', locked && 'opacity-40 cursor-not-allowed', difficulty === level ? config.color : 'border-border hover:border-primary/30 bg-muted/30')}>
                           <p className="font-bold text-sm">{config.label}</p>
                           <p className="text-xs text-muted-foreground mt-1 hidden lg:block">{config.description}</p>
                         </button>;
@@ -267,6 +268,16 @@ export const LandingPage = () => {
                     </div>
                   </div>}
 
+                {/* Restricted Mode Notice */}
+                {restrictedMode && (
+                  <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border flex items-start gap-2">
+                    <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      A simplified version is available for younger players. Full gameplay, multiplayer, advanced rules, and ad‑supported features are available for players 13+.
+                    </p>
+                  </div>
+                )}
+
                 {/* Start buttons */}
                 <div className="space-y-3">
                   <Button onClick={handleStart} variant="gold" size="xl" className="w-full font-pirate">
@@ -274,10 +285,12 @@ export const LandingPage = () => {
                     Battle the AI
                   </Button>
                   
-                  <Button variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/10" onClick={() => setShowMultiplayer(true)}>
-                    <Users className="w-5 h-5 mr-2" />
-                    Multiplayer (Host / Join)     
-                  </Button>
+                  {!restrictedMode && (
+                    <Button variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/10" onClick={() => setShowMultiplayer(true)}>
+                      <Users className="w-5 h-5 mr-2" />
+                      Multiplayer (Host / Join)     
+                    </Button>
+                  )}
                 </div>
               </motion.div>}
           </AnimatePresence>
