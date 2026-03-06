@@ -1,0 +1,8 @@
+{
+  "adsEnabled": true,
+  "interstitialFrequency": "round_end:capped=1;cooldown=120s",
+  "rewardedEnabled": true,
+  "defaultAIDifficulty": "easy",
+  "enabledRules": [],
+  "maxPlayers": 2
+}
