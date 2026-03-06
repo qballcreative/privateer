@@ -32,7 +32,15 @@ export const useConsentStore = create<ConsentState>()(
 
       shouldShowAds: () => {
         const s = get();
-        return s.adsEnabled && !s.paidAdFree;
+        // Check remote kill-switch
+        const remoteEnabled = useRemoteConfigStore.getState().config.adsEnabled;
+        return s.adsEnabled && !s.paidAdFree && remoteEnabled;
+      },
+
+      shouldShowRewarded: () => {
+        const s = get();
+        const rc = useRemoteConfigStore.getState().config;
+        return s.adsEnabled && !s.paidAdFree && rc.adsEnabled && rc.rewardedEnabled;
       },
 
       setConsent: (ageGroup, personalizedAds) => {
