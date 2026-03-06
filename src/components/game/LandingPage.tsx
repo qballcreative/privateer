@@ -104,7 +104,10 @@ export const LandingPage = () => {
   const handleStart = () => {
     const name = playerName.trim() || 'Captain';
     savePlayerName(name);
-    startGame(name, difficulty, optionalRules);
+    const rules = restrictedMode
+      ? { stormRule: false, pirateRaid: false, treasureChest: false }
+      : optionalRules;
+    startGame(name, restrictedMode ? 'easy' : difficulty, rules);
   };
   // Show age consent modal before anything else
   if (!hasConsented) {
