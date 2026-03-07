@@ -62,6 +62,7 @@ export function createAdProvider(_personalized: boolean): AdProvider {
 
 // ── Cooldown Manager ──────────────────────────────────────────
 import { useRemoteConfigStore, parseInterstitialFrequency } from '@/store/remoteConfigStore';
+import { debugLog } from '@/lib/debugLog';
 
 let lastInterstitialTime = 0;
 
@@ -70,9 +71,18 @@ export async function requestInterstitial(provider: AdProvider): Promise<boolean
   const { cooldownMs } = parseInterstitialFrequency(interstitialFrequency);
 
   const now = Date.now();
-  if (now - lastInterstitialTime < cooldownMs) return false;
+  const elapsed = now - lastInterstitialTime;
+  if (elapsed < cooldownMs) {
+    debugLog('ads', 'interstitial suppressed', `cooldown: ${Math.round((cooldownMs - elapsed) / 1000)}s remaining`);
+    return false;
+  }
   const shown = await provider.showInterstitial();
-  if (shown) lastInterstitialTime = now;
+  if (shown) {
+    lastInterstitialTime = now;
+    debugLog('ads', 'interstitial shown');
+  } else {
+    debugLog('ads', 'interstitial not shown', 'provider returned false');
+  }
   return shown;
 }
 
