@@ -16,6 +16,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
 import { AgeConsentModal } from './AgeConsentModal';
 import { AdBanner } from './AdBanner';
+import { InstallPrompt } from './InstallPrompt';
 
 const difficultyConfig: Record<Difficulty, {
   label: string;
