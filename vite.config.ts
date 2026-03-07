@@ -15,12 +15,14 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "Icons/**", "sounds/**"],
+      includeAssets: ["favicon.ico", "Icons/**"],
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,webp,mp3,wav}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,webp}"],
+        globIgnores: ["**/sounds/**"],
         navigateFallbackDenylist: [/^\/~oauth/],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
-      manifest: false, // use public/manifest.json
+      manifest: false,
     }),
   ].filter(Boolean),
   resolve: {
