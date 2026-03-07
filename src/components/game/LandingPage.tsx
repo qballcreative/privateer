@@ -16,6 +16,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
 import { AgeConsentModal } from './AgeConsentModal';
 import { AdBanner } from './AdBanner';
+import { InstallPrompt } from './InstallPrompt';
 
 const difficultyConfig: Record<Difficulty, {
   label: string;
@@ -124,6 +125,9 @@ export const LandingPage = () => {
     : optionalRules;
 
   return <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
+
       {/* Hero Background */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
       backgroundImage: `url(${heroBg})`
