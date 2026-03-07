@@ -100,6 +100,8 @@ export interface RulePlugin {
 
 // ─── Rules engine ───────────────────────────────────────────────────
 
+import { debugLog } from '@/lib/debugLog';
+
 export class RulesEngine {
   private plugins: RulePlugin[] = [];
   private enabledIds: Set<string> = new Set();
@@ -111,29 +113,29 @@ export class RulesEngine {
       return;
     }
     this.plugins.push(plugin);
+    debugLog('rules', 'register', plugin.id);
   }
 
   /** Set which rule ids are enabled for this game session. */
   setEnabled(ids: string[]): void {
     this.enabledIds = new Set(ids);
+    debugLog('rules', 'setEnabled', ids.join(', '));
   }
 
-  /** Enable a single rule by id. */
   enable(id: string): void {
     this.enabledIds.add(id);
+    debugLog('rules', 'enable', id);
   }
 
-  /** Disable a single rule by id. */
   disable(id: string): void {
     this.enabledIds.delete(id);
+    debugLog('rules', 'disable', id);
   }
 
-  /** Get all registered plugins. */
   getPlugins(): readonly RulePlugin[] {
     return this.plugins;
   }
 
-  /** Get only the currently enabled plugins. */
   private active(): RulePlugin[] {
     return this.plugins.filter((p) => this.enabledIds.has(p.id));
   }
@@ -141,41 +143,53 @@ export class RulesEngine {
   // ─── Hook dispatchers ──────────────────────────────────────────
 
   fireGameStart(ctx: RuleContext): void {
+    debugLog('rules', 'fireGameStart', `active: ${this.active().map((p) => p.id).join(', ')}`);
     for (const p of this.active()) p.hooks.onGameStart?.(ctx);
   }
 
   fireDeal(ctx: RuleContext): void {
+    debugLog('rules', 'fireDeal');
     for (const p of this.active()) p.hooks.onDeal?.(ctx);
   }
 
   fireBeforeAction(ctx: BeforeActionContext): void {
+    debugLog('rules', 'fireBeforeAction', ctx.actionType);
     for (const p of this.active()) {
       p.hooks.onBeforeAction?.(ctx);
-      if (ctx.cancelled) break; // stop once cancelled
+      if (ctx.cancelled) {
+        debugLog('rules', 'actionCancelled', `by ${p.id}: ${ctx.cancelReason}`);
+        break;
+      }
     }
   }
 
   fireAfterAction(ctx: AfterActionContext): void {
+    debugLog('rules', 'fireAfterAction', ctx.action.type);
     for (const p of this.active()) p.hooks.onAfterAction?.(ctx);
   }
 
   fireTurnStart(ctx: RuleContext): void {
+    debugLog('rules', 'fireTurnStart', `player ${ctx.currentPlayerIndex}`);
     for (const p of this.active()) p.hooks.onTurnStart?.(ctx);
   }
 
   fireTurnEnd(ctx: TurnEndContext): void {
+    debugLog('rules', 'fireTurnEnd', `turn ${ctx.turnCount}`);
     for (const p of this.active()) p.hooks.onTurnEnd?.(ctx);
   }
 
   fireSell(ctx: SellContext): void {
+    debugLog('rules', 'fireSell', `${ctx.soldCards.length} cards, ${ctx.tokensAwarded.length} tokens`);
     for (const p of this.active()) p.hooks.onSell?.(ctx);
   }
 
   fireRoundEnd(ctx: RoundEndContext): void {
+    debugLog('rules', 'fireRoundEnd', `round ${ctx.round}`);
     for (const p of this.active()) p.hooks.onRoundEnd?.(ctx);
   }
 
   fireGameEnd(ctx: RuleContext): void {
+    debugLog('rules', 'fireGameEnd');
     for (const p of this.active()) p.hooks.onGameEnd?.(ctx);
   }
 }
