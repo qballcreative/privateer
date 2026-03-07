@@ -51,8 +51,10 @@ export class NativeBridgeProvider implements AdProvider {
 }
 
 // ── Factory ───────────────────────────────────────────────────
+import { platform } from '@/lib/platform';
+
 export function createAdProvider(_personalized: boolean): AdProvider {
-  if (typeof window !== 'undefined' && window.NativeAds) {
+  if (platform.isNative && typeof window !== 'undefined' && window.NativeAds) {
     return new NativeBridgeProvider();
   }
   return new NoopAdProvider();
