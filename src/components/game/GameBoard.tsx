@@ -569,7 +569,7 @@ export const GameBoard = () => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <TradingPost layout="phone" />
+                  <TradingPost layout="phone" onModeChange={setIsExchangeMode} />
                 </motion.div>
               )}
             </AnimatePresence>
