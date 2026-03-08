@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
@@ -39,6 +40,7 @@ export const LandingPage = () => {
   const [showMultiplayer, setShowMultiplayer] = useState(false);
 
   const { startGame } = useGameStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setDifficulty(lastDifficulty);
@@ -67,8 +69,14 @@ export const LandingPage = () => {
       {!hasConsented && <AgeConsentModal />}
       <InstallPrompt />
 
-      {/* Settings — top right */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Settings & How to Play — top right */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <button
+          onClick={() => navigate('/how-to-play')}
+          className="text-xs font-serif text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+        >
+          How to Play
+        </button>
         <SettingsPanel />
       </div>
 

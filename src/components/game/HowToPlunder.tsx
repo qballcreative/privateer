@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-
+import { useNavigate } from 'react-router-dom';
 const steps = [
   {
     img: '/Icons/Claim.png',
@@ -22,13 +22,21 @@ const steps = [
 ];
 
 export const HowToPlunder = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-center mb-8">
+        <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-center mb-2">
           How to Play
         </h2>
-
+        <p className="text-center mb-8">
+          <button
+            onClick={() => navigate('/how-to-play')}
+            className="text-sm text-accent hover:text-accent/80 underline underline-offset-2 transition-colors"
+          >
+            Full instructions &amp; interactive tutorial →
+          </button>
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {steps.map((step, i) => (
             <motion.div
