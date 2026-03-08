@@ -78,10 +78,6 @@ export const ShipsHold = ({
   const isPhone = layout === 'phone';
   const cargoSize = isPhone ? 'sm' : layout === 'tablet' ? 'md' : 'md';
 
-  // Determine entry animation based on last action
-  const wasShipTake = lastAction?.type === 'take-ships';
-  const wasExchange = lastAction?.type === 'exchange';
-
   return (
     <div className={cn(
       'rounded-xl border-2 transition-all duration-200',
