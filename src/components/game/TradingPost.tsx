@@ -220,7 +220,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
         {/* Commandeer Fleet */}
         {ships.length > 0 && isPlayerTurn && phase === 'playing' && mode === 'take' && (
           <motion.div
-            className="mt-3 sm:mt-4 flex justify-center relative z-20"
+            className="mt-3 sm:mt-4 flex justify-end relative z-20"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
