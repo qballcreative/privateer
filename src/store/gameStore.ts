@@ -846,6 +846,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
+  restartGame: () => {
+    const { difficulty, optionalRules, players } = get();
+    const playerName = players.find((p) => !p.isAI && p.isLocal)?.name || 'Player';
+    get().startGame(playerName, difficulty, optionalRules);
+  },
+
   makeAIMove: () => {
     const { market, players, currentPlayerIndex, tokenStacks, bonusTokens, difficulty, optionalRules } = get();
     const ai = players[currentPlayerIndex];
