@@ -118,6 +118,7 @@ export const ScoreBoard = () => {
           );
         })}
       </div>
+      </div>
     </div>
   );
 };
