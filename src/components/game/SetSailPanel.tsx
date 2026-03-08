@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
-import { Swords, Users, Anchor, Crown, Shield } from 'lucide-react';
+import { Swords, Users, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
+import deckhandImg from '@/assets/difficulty/deckhand.png';
+import bosunImg from '@/assets/difficulty/bosun.png';
+import privateerImg from '@/assets/difficulty/privateer.png';
+import admiralImg from '@/assets/difficulty/admiral.png';
 
 interface SetSailPanelProps {
   mode: 'aai' | 'multiplayer';
@@ -18,11 +22,11 @@ interface SetSailPanelProps {
   restrictedMode: boolean;
 }
 
-const difficultyLevels: { key: Difficulty; label: string; icon: typeof Shield }[] = [
-  { key: 'easy', label: 'Deckhand', icon: Shield },
-  { key: 'medium', label: 'Bosun', icon: Anchor },
-  { key: 'hard', label: 'Privateer', icon: Swords },
-  { key: 'expert', label: 'Admiral', icon: Crown },
+const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
+  { key: 'easy', label: 'Deckhand', img: deckhandImg },
+  { key: 'medium', label: 'Bosun', img: bosunImg },
+  { key: 'hard', label: 'Privateer', img: privateerImg },
+  { key: 'expert', label: 'Admiral', img: admiralImg },
 ];
 
 export const SetSailPanel = ({
