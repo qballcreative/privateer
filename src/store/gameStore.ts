@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useRemoteConfigStore } from './remoteConfigStore';
+import { useSettingsStore } from './settingsStore';
 import {
   GameState,
   Card,
