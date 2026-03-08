@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
-import { cn } from '@/lib/utils';
+
 import { Wine, CircleDot, Shirt, Coins, Gem } from 'lucide-react';
 
 interface TreasureStackProps {
