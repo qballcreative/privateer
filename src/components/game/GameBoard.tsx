@@ -667,17 +667,14 @@ export const GameBoard = () => {
                 />
               )}
               <ScoreBoard />
-            </motion.aside>
+            </aside>
 
             {/* Center column: Trading Post + Player Hold */}
-            <motion.main
+            <main
               className={cn(
                 "col-span-1 space-y-4",
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
               <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
               <AnimatePresence>
