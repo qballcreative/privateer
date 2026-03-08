@@ -192,7 +192,7 @@ export const Market = () => {
           
           <div className="flex flex-wrap gap-2 justify-center">
             {currentPlayer.hand.map((card) => (
-              <GameCard
+              <CargoObject
                 key={card.id}
                 card={card}
                 selected={selectedHandCards.includes(card.id)}
