@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tutorial } from '@/components/game/Tutorial';
 import { useTutorialStore } from '@/store/tutorialStore';
@@ -19,21 +19,23 @@ const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'canno
 const TutorialPage = () => {
   const navigate = useNavigate();
   const { isActive, start, skip } = useTutorialStore();
-  const { startGame, resetGame, players, tokenStacks, bonusTokens, optionalRules, phase } = useGameStore();
+  const { startGame, resetGame, players, tokenStacks, bonusTokens } = useGameStore();
   const isMobile = useIsMobile();
+  const hasStarted = useRef(false);
 
   // Start a real game to populate the store, then start tutorial
   useEffect(() => {
     startGame('Captain', 'easy', { stormRule: true, pirateRaid: true, treasureChest: true });
     start();
+    hasStarted.current = true;
     return () => {
       resetGame();
     };
   }, []);
 
-  // Navigate home when tutorial ends
+  // Navigate home when tutorial ends — only after it has been started
   useEffect(() => {
-    if (!isActive) {
+    if (hasStarted.current && !isActive) {
       const t = setTimeout(() => navigate('/'), 200);
       return () => clearTimeout(t);
     }
@@ -61,6 +63,26 @@ const TutorialPage = () => {
       {/* Real game board — pointer-events-none to prevent interaction */}
       <div className="flex-1 pointer-events-none p-2 sm:p-4 lg:p-6">
         <div className="max-w-7xl mx-auto">
+
+          {/* ═══ ACTION ICONS BAR (for tutorial highlighting) ═══ */}
+          <div data-tutorial-id="tutorial-actions" className="mb-3 flex items-center justify-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
+              <img src="/Icons/Claim.png" alt="Claim" className="w-6 h-6 object-contain" />
+              <span className="text-xs font-bold text-primary">Claim Cargo</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
+              <img src="/Icons/take.png" alt="Commandeer" className="w-6 h-6 object-contain" />
+              <span className="text-xs font-bold text-primary">Commandeer</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
+              <img src="/Icons/Trade.png" alt="Trade" className="w-6 h-6 object-contain" />
+              <span className="text-xs font-bold text-primary">Trade Goods</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
+              <img src="/Icons/Sell.png" alt="Sell" className="w-6 h-6 object-contain" />
+              <span className="text-xs font-bold text-primary">Sell Cargo</span>
+            </div>
+          </div>
 
           {/* ═══ PHONE LAYOUT ═══ */}
           <div className="block md:hidden space-y-3">
