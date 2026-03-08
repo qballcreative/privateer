@@ -1162,7 +1162,6 @@ export const GameBoard = () => {
                   <span className="text-primary font-bold">{getWinner()?.name}</span>{' '}
                   {getWinner()?.isAI ? 'claims victory!' : 'has been named Admiral!'}
                 </p>
-                </p>
 
                 <Button onClick={resetGame} className="game-button w-full">
                   <Home className="w-5 h-5 mr-2" />
