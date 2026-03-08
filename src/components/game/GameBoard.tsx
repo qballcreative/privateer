@@ -150,8 +150,6 @@ const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, on
 ));
 OpponentPanel.displayName = 'OpponentPanel';
 
-const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
-
 export const GameBoard = () => {
   const { 
     players, 
