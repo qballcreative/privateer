@@ -292,14 +292,6 @@ export const UnloadChest = ({
         </AnimatePresence>
       </motion.div>
 
-      {/* Score summary with ticking animation */}
-      <div className={cn(
-        'mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between',
-        isPhone ? 'text-xs' : 'text-sm'
-      )}>
-        <TickingScore value={doubloonTotal} label="Doubloons" />
-        <TickingScore value={bonusTotal} label="Comm" />
-      </div>
     </div>
   );
 };
