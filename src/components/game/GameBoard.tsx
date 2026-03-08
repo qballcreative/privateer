@@ -1152,15 +1152,16 @@ export const GameBoard = () => {
                 </motion.div>
                 
                 <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-1">
-                  {getWinner()?.isAI ? 'Defeated!' : 'Letters of Marque'}
+                  {getWinner()?.isAI ? 'Defeated!' : 'Admiral Appointed!'}
                 </h2>
                 <h3 className="font-pirate text-lg sm:text-xl text-primary/80 mb-4">
-                  {getWinner()?.isAI ? '' : 'Awarded!'}
+                  {getWinner()?.isAI ? '' : 'Letters of Marque Awarded'}
                 </h3>
                 
                 <p className="text-lg sm:text-xl mb-6">
                   <span className="text-primary font-bold">{getWinner()?.name}</span>{' '}
-                  {getWinner()?.isAI ? 'claims victory!' : 'is the champion privateer!'}
+                  {getWinner()?.isAI ? 'claims victory!' : 'has been named Admiral!'}
+                </p>
                 </p>
 
                 <Button onClick={resetGame} className="game-button w-full">
