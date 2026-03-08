@@ -282,6 +282,13 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               <span>Trade would exceed hold limit of {HAND_LIMIT}.</span>
             </div>
           )}
+
+          {hasSameTypeSwap && (
+            <div className="flex items-center gap-2 text-destructive text-xs sm:text-sm mb-3 p-2 bg-destructive/10 rounded">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>You cannot trade a goods type for the same type.</span>
+            </div>
+          )}
           
           {/* Exchange swap lane visualization */}
           <div className="relative">
