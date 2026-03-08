@@ -222,7 +222,7 @@ const HowToPlay = () => {
             />
             <ActionCard
               icon={<img src="/Icons/bonus.png" alt="Treasure Chest" className="w-8 h-8 object-contain" />}
-              title="Treasure Chest 💰"
+              title="Treasure Chest"
               desc="When enabled, each player accumulates hidden treasure tokens throughout the round. These are revealed at the end and added to your doubloon total — an exciting surprise that can swing the outcome!"
             />
           </div>
