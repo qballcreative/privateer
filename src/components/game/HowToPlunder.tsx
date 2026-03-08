@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-
+import { useNavigate } from 'react-router-dom';
 const steps = [
   {
     img: '/Icons/Claim.png',
