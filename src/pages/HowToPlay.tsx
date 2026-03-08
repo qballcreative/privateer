@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import {
-  ArrowLeft, Anchor, Ship, Swords, ArrowLeftRight, Coins,
-  Award, Package, CloudLightning, Skull, Gem
-} from 'lucide-react';
+import { ArrowLeft, Anchor } from 'lucide-react';
+import bannerLogo from '@/assets/BannerLogo.png';
 
 // Token images
 import rumTokens from '@/assets/tokens/rum.png';
