@@ -19,7 +19,7 @@ export const HeroSection = () => {
         <motion.img
           src={privateerLogo}
           alt="Privateer: Letters of Marque"
-          className="w-44 h-44 md:w-56 md:h-56 lg:w-72 lg:h-72 object-contain drop-shadow-[0_0_20px_hsl(var(--brass)/0.5)]"
+          className="w-[55vw] max-w-[22rem] md:w-[40vw] md:max-w-[26rem] lg:w-[30vw] lg:max-w-[30rem] object-contain drop-shadow-[0_0_30px_hsl(var(--brass)/0.5)]"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
