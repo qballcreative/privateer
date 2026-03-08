@@ -667,17 +667,7 @@ export const GameBoard = () => {
             DESKTOP LAYOUT — Trading Post top, Hold bottom, sidebars
             ════════════════════════════════════════════════════════════════ */}
         <div className="hidden lg:block">
-          <div className="grid grid-cols-4 gap-6">
-            {/* Left sidebar - Treasure & Bonuses (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <TreasureSupplyPanel />
-            </motion.aside>
-
+          <div className="grid grid-cols-3 gap-6">
             {/* Main game area — Trading Post top, Hold bottom */}
             <motion.main
               className={cn(
@@ -701,7 +691,7 @@ export const GameBoard = () => {
               )}
             </motion.main>
 
-            {/* Right sidebar — Opponent & Scoreboard (fixed) */}
+            {/* Right sidebar — Opponent & Scoreboard */}
             <motion.aside
               className="col-span-1 space-y-4"
               initial={{ opacity: 0, x: 20 }}
