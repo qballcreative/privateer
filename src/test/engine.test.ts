@@ -183,23 +183,40 @@ describe('Bonus token awards', () => {
 // ═════════════════════════════════════════════════════════════════
 
 describe('Score calculation', () => {
-  it('sums tokens + bonus tokens + ship bonus', () => {
-    const player = makePlayer({
+  it('awards 5 doubloons to player with most ships (largest fleet)', () => {
+    const player1 = makePlayer({
       tokens: [makeToken('rum', 4), makeToken('rum', 3), makeToken('gold', 6)],
       bonusTokens: [makeBonus(3, 2)],
-      ships: [makeCard('ships')], // 1 ship = 5 points
+      ships: [makeCard('ships'), makeCard('ships')], // 2 ships
+    });
+    const player2 = makePlayer({
+      tokens: [],
+      ships: [makeCard('ships')], // 1 ship
     });
 
-    const score = calculateScore(player);
-    expect(score).toBe(4 + 3 + 6 + 2 + 5); // 20
+    const score = calculateScore(player1, [player1, player2]);
+    expect(score).toBe(4 + 3 + 6 + 2 + 5); // 20 (tokens + bonus + fleet bonus)
   });
 
-  it('no ship bonus with 0 ships', () => {
+  it('no fleet bonus when tied on ships', () => {
+    const player1 = makePlayer({
+      tokens: [makeToken('silks', 5)],
+      ships: [makeCard('ships')],
+    });
+    const player2 = makePlayer({
+      tokens: [],
+      ships: [makeCard('ships')],
+    });
+    expect(calculateScore(player1, [player1, player2])).toBe(5); // no fleet bonus
+  });
+
+  it('no fleet bonus with 0 ships', () => {
     const player = makePlayer({
       tokens: [makeToken('silks', 5)],
       ships: [],
     });
-    expect(calculateScore(player)).toBe(5);
+    const player2 = makePlayer({ tokens: [], ships: [makeCard('ships')] });
+    expect(calculateScore(player, [player, player2])).toBe(5);
   });
 });
 
