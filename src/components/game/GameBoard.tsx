@@ -282,23 +282,31 @@ export const GameBoard = () => {
     prevPlayerIndexRef.current = currentPlayerIndex;
   }, [currentPlayerIndex, phase, localPlayerIndex]);
 
-  // Deck-low creak ambience
+  // Deck-low creak ambience (respects sound settings)
   useEffect(() => {
-    if (isDeckLow) {
-      if (!creakRef.current) {
-        const creak = new Audio('/sounds/sea_sounds.wav');
-        creak.loop = true;
-        creak.volume = 0.15;
-        creakRef.current = creak;
+    const updateCreak = () => {
+      const { soundEnabled, soundVolume } = useSettingsStore.getState();
+      if (isDeckLow && soundEnabled) {
+        if (!creakRef.current) {
+          const creak = new Audio('/sounds/sea_sounds.wav');
+          creak.loop = true;
+          creakRef.current = creak;
+        }
+        creakRef.current.volume = 0.15 * soundVolume;
+        creakRef.current.play().catch(() => {});
+      } else {
+        if (creakRef.current) {
+          creakRef.current.pause();
+          creakRef.current.currentTime = 0;
+        }
       }
-      creakRef.current.play().catch(() => {});
-    } else {
-      if (creakRef.current) {
-        creakRef.current.pause();
-        creakRef.current.currentTime = 0;
-      }
-    }
+    };
+
+    updateCreak();
+    const unsub = useSettingsStore.subscribe(updateCreak);
+
     return () => {
+      unsub();
       if (creakRef.current && !isDeckLow) {
         creakRef.current.pause();
       }
