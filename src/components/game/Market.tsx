@@ -130,15 +130,38 @@ export const Market = () => {
             {market.map((card, index) => (
               <motion.div
                 key={card.id}
-                initial={{ opacity: 0, y: -20, rotateY: 180 }}
-                animate={{ opacity: 1, y: 0, rotateY: 0 }}
-                exit={{ opacity: 0, scale: 0.8 }}
+                className="relative"
+                initial={{ opacity: 0, y: 40, scale: 0.85 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ 
+                  opacity: [1, 0.8, 0],
+                  y: [0, -40, 60],
+                  x: [0, 30, 80],
+                  scale: [1, 1.05, 0.7],
+                }}
                 transition={{ 
                   delay: index * 0.1,
-                  type: 'spring',
-                  stiffness: 200,
+                  duration: 0.45,
+                  ease: [0.2, 0.8, 0.2, 1],
+                  exit: {
+                    duration: 0.5,
+                    ease: [0.2, 0.8, 0.2, 1],
+                  },
                 }}
               >
+                {/* Dust puff effect on enter */}
+                <motion.div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(circle, hsl(var(--accent) / 0.3) 0%, transparent 70%)',
+                  }}
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ 
+                    opacity: [0, 0.6, 0],
+                    scale: [0.5, 1.5, 2],
+                  }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                />
                 <CargoObject
                   card={card}
                   selected={selectedMarketCards.includes(card.id)}
