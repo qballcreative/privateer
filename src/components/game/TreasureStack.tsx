@@ -1,42 +1,21 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
 
-import { Wine, CircleDot, Shirt, Coins, Gem } from 'lucide-react';
-
 interface TreasureStackProps {
   type: GoodsType;
   tokens: Token[];
 }
 
-// Token configuration with cargo-themed colors
 const treasureConfig: Record<GoodsType, { 
-  icon: React.ReactNode; 
+  image: string; 
   label: string;
 }> = {
-  rum: {
-    icon: <Wine className="w-3.5 h-3.5" />,
-    label: 'Rum',
-  },
-  cannonballs: {
-    icon: <CircleDot className="w-3.5 h-3.5" />,
-    label: 'Iron',
-  },
-  silks: {
-    icon: <Shirt className="w-3.5 h-3.5" />,
-    label: 'Silk',
-  },
-  silver: {
-    icon: <Coins className="w-3.5 h-3.5" />,
-    label: 'Silver',
-  },
-  gold: {
-    icon: <Coins className="w-3.5 h-3.5" />,
-    label: 'Gold',
-  },
-  gemstones: {
-    icon: <Gem className="w-3.5 h-3.5" />,
-    label: 'Gems',
-  },
+  rum: { image: '/Icons/rum.png', label: 'Rum' },
+  cannonballs: { image: '/Icons/cannonballs.png', label: 'Iron' },
+  silks: { image: '/Icons/silks.png', label: 'Silk' },
+  silver: { image: '/Icons/silver.png', label: 'Silver' },
+  gold: { image: '/Icons/gold.png', label: 'Gold' },
+  gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
 };
 
 export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
