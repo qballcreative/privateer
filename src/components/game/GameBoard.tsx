@@ -323,7 +323,7 @@ export const GameBoard = () => {
       <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
         <h3 className="font-pirate text-lg text-primary mb-4 text-center flex items-center justify-center gap-2">
           <img src="/images/doubloons.png" alt="Doubloons" className="w-10 h-10 object-contain -my-2" />
-          Doubloons
+          Market Prices
         </h3>
         <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
           {GOODS_ORDER.map((type) => (
