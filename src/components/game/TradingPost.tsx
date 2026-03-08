@@ -9,6 +9,7 @@ import { Anchor, ArrowLeftRight, Hand, AlertTriangle, Ship } from 'lucide-react'
 
 interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
+  onModeChange?: (isExchange: boolean) => void;
 }
 
 // Rise-from-dock animation for new cards arriving from deck
@@ -27,7 +28,7 @@ const shipFanExit = (index: number, total: number) => ({
   rotate: (index - (total - 1) / 2) * 8,
 });
 
-export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
+export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostProps) => {
   const { 
     market, 
     takeCard, 
@@ -88,6 +89,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
       setSelectedMarketCards([]);
       setSelectedHandCards([]);
       setMode('take');
+      onModeChange?.(false);
     }
   };
 
@@ -112,6 +114,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
               setMode('take');
               setSelectedMarketCards([]);
               setSelectedHandCards([]);
+              onModeChange?.(false);
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
@@ -121,7 +124,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
           <Button
             variant={mode === 'exchange' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setMode('exchange')}
+            onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
             <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
@@ -281,50 +284,73 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
               </motion.div>
             )}
 
-            <div className={cn(
-              isPhone
-                ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
-                : "flex flex-wrap gap-3 justify-center"
-            )}>
-              <AnimatePresence mode="popLayout">
-                {currentPlayer.hand.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 80 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className={cn(isPhone && "flex-shrink-0")}
-                  >
-                    <CargoObject
-                      card={card}
-                      selected={selectedHandCards.includes(card.id)}
-                      onClick={() => toggleHandCard(card.id)}
-                      size={isPhone ? 'sm' : 'sm'}
-                    />
-                  </motion.div>
-                ))}
-                {currentPlayer.ships.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 80 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className={cn(isPhone && "flex-shrink-0")}
-                  >
-                    <CargoObject
-                      card={card}
-                      selected={selectedHandCards.includes(card.id)}
-                      onClick={() => toggleHandCard(card.id)}
-                      size={isPhone ? 'sm' : 'sm'}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+            {/* Cargo row */}
+            {currentPlayer.hand.length > 0 && (
+              <div className="mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold">Cargo</p>
+                <div className={cn(
+                  isPhone
+                    ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                    : "flex flex-wrap gap-3 justify-center"
+                )}>
+                  <AnimatePresence mode="popLayout">
+                    {currentPlayer.hand.map((card) => (
+                      <motion.div
+                        key={card.id}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 80 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className={cn(isPhone && "flex-shrink-0")}
+                      >
+                        <CargoObject
+                          card={card}
+                          selected={selectedHandCards.includes(card.id)}
+                          onClick={() => toggleHandCard(card.id)}
+                          size="sm"
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+
+            {/* Ships row */}
+            {currentPlayer.ships.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold flex items-center gap-1">
+                  <Ship className="w-3 h-3" /> Ships
+                </p>
+                <div className={cn(
+                  isPhone
+                    ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                    : "flex flex-wrap gap-3 justify-center"
+                )}>
+                  <AnimatePresence mode="popLayout">
+                    {currentPlayer.ships.map((card) => (
+                      <motion.div
+                        key={card.id}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 80 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className={cn(isPhone && "flex-shrink-0")}
+                      >
+                        <CargoObject
+                          card={card}
+                          selected={selectedHandCards.includes(card.id)}
+                          onClick={() => toggleHandCard(card.id)}
+                          size="sm"
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-3 sm:mt-4 flex justify-center gap-2">
@@ -342,10 +368,11 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                setSelectedMarketCards([]);
-                setSelectedHandCards([]);
-                setMode('take');
-              }}
+              setSelectedMarketCards([]);
+              setSelectedHandCards([]);
+              setMode('take');
+              onModeChange?.(false);
+            }}
               className="text-xs sm:text-sm"
             >
               Cancel

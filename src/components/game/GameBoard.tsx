@@ -76,6 +76,7 @@ export const GameBoard = () => {
   const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
   const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
   const [tradingPostCollapsed, setTradingPostCollapsed] = useState(false);
+  const [isExchangeMode, setIsExchangeMode] = useState(false);
 
   // Turn banner state
   const [showTurnBanner, setShowTurnBanner] = useState(false);
@@ -568,25 +569,35 @@ export const GameBoard = () => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <TradingPost layout="phone" />
+                  <TradingPost layout="phone" onModeChange={setIsExchangeMode} />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Ship's Hold — primary zone, thumb-reachable */}
-          <div className={cn(
-            'transition-all duration-400',
-            phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
-          )}>
-            {humanPlayer && (
-              <ShipsHold
-                player={humanPlayer}
-                isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                layout="phone"
-              />
+          {/* Ship's Hold — hidden during exchange mode */}
+          <AnimatePresence>
+            {!isExchangeMode && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                  'overflow-hidden transition-all duration-400',
+                  phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
+                )}
+              >
+                {humanPlayer && (
+                  <ShipsHold
+                    player={humanPlayer}
+                    isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                    layout="phone"
+                  />
+                )}
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
 
         {/* ════════════════════════════════════════════════════════════════
@@ -624,14 +635,23 @@ export const GameBoard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <TradingPost layout="tablet" />
-              {humanPlayer && (
-                <ShipsHold
-                  player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                  layout="tablet"
-                />
-              )}
+              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
+              <AnimatePresence>
+                {!isExchangeMode && humanPlayer && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ShipsHold
+                      player={humanPlayer}
+                      isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                      layout="tablet"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.main>
 
             {/* Right column: Treasure Supply + Bonuses */}
@@ -672,16 +692,25 @@ export const GameBoard = () => {
               transition={{ delay: 0.3 }}
             >
               {/* Trading Post — top center */}
-              <TradingPost layout="desktop" />
+              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
 
-              {/* Player's Hold — bottom center */}
-              {humanPlayer && (
-                <ShipsHold
-                  player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                  layout="desktop"
-                />
-              )}
+              {/* Player's Hold — hidden during exchange */}
+              <AnimatePresence>
+                {!isExchangeMode && humanPlayer && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ShipsHold
+                      player={humanPlayer}
+                      isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                      layout="desktop"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.main>
 
             {/* Right sidebar — Opponent & Scoreboard (fixed) */}
