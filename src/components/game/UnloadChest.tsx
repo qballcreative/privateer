@@ -208,12 +208,25 @@ export const UnloadChest = ({
           {/* Validation hints */}
           <div className="flex items-center gap-2">
             {hasSelection && !allSameType && (
-              <span className="text-[10px] text-destructive">Same type only</span>
+              <span className={cn(
+                'text-destructive font-bold',
+                isPhone ? 'text-xs' : 'text-sm'
+              )}>Same type only</span>
             )}
             {hasSelection && allSameType && selectedType && (
-              <span className="text-[10px] text-muted-foreground">
-                {selectedCards.length}× {selectedType}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src={`/Icons/${selectedType}.png`}
+                  alt={selectedType}
+                  className={cn('object-contain', isPhone ? 'w-6 h-6' : 'w-7 h-7')}
+                />
+                <span className={cn(
+                  'text-foreground font-bold',
+                  isPhone ? 'text-xs' : 'text-sm'
+                )}>
+                  {selectedCards.length}× {selectedType}
+                </span>
+              </div>
             )}
           </div>
 
