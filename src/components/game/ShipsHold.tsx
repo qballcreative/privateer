@@ -96,7 +96,7 @@ export const ShipsHold = ({
         <div className="flex items-center gap-1.5 sm:gap-2">
           <h3 className={cn(
             "font-pirate text-primary",
-            isPhone ? "text-base" : "text-lg"
+            isPhone ? "text-sm" : "text-sm"
           )}>
             {isOpponent ? `${player.name}'s Hold` : "Captain's Hold"}
           </h3>
@@ -122,10 +122,19 @@ export const ShipsHold = ({
 
       {/* Cargo Hold */}
       <div className={cn(
-        "relative rounded-lg bg-muted/30 border border-border",
+        "relative rounded-lg border border-border overflow-hidden",
         isPhone ? "p-2 min-h-[80px]" : "p-3 min-h-[120px]"
-      )}>
+      )}
+        style={{
+          backgroundImage: `url('/images/cargo-hold-bg.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Subdued overlay */}
+        <div className="absolute inset-0 rounded-lg bg-card/80 pointer-events-none" />
         <div className={cn(
+          "relative z-[1]",
           isPhone
             ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
             : "flex flex-wrap gap-4 items-end justify-center"
