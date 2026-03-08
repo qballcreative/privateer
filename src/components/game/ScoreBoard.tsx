@@ -82,7 +82,7 @@ export const ScoreBoard = () => {
               </div>
 
               {/* Score breakdown */}
-              <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="grid grid-cols-3 gap-2 text-sm overflow-visible">
                 <div className="flex items-center gap-1.5" title="Doubloons">
                   <img src="/images/doubloons.png" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary">{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
