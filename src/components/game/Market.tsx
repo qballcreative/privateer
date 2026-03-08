@@ -173,7 +173,7 @@ export const Market = () => {
         {/* Ship action */}
         {ships.length > 0 && isPlayerTurn && phase === 'playing' && mode === 'take' && (
           <motion.div
-            className="mt-4 flex justify-center"
+            className="mt-4 flex justify-end"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
