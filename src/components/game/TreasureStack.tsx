@@ -45,9 +45,9 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
                 transform: 'translateX(-50%)',
                 zIndex: index,
               }}
-              initial={{ scale: 0, y: -20 }}
+              initial={false}
               animate={{ scale: 1, y: 0 }}
-              transition={{ delay: index * 0.1, type: 'spring', stiffness: 300 }}
+              layout
             >
               <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
               {index === tokens.slice(0, 4).length - 1 && topToken && (
