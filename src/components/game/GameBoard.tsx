@@ -698,7 +698,7 @@ export const GameBoard = () => {
             {/* Right column: Treasure Supply + Bonuses */}
             <aside className="col-span-1 space-y-4">
               <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
-            </motion.aside>
+            </aside>
           </div>
         </div>
 
@@ -708,12 +708,7 @@ export const GameBoard = () => {
         <div className="hidden lg:block">
           <div className="grid grid-cols-4 gap-6">
             {/* Left sidebar - Treasure & Bonuses (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <aside className="col-span-1 space-y-4">
               <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
             </motion.aside>
 
