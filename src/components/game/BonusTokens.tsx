@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { BonusToken } from '@/types/game';
 import { cn } from '@/lib/utils';
-import { Medal } from 'lucide-react';
 
 interface BonusTokensProps {
   threeCards: BonusToken[];
@@ -9,23 +8,16 @@ interface BonusTokensProps {
   fiveCards: BonusToken[];
 }
 
-// Commission medallion styling by tier
-const medallionConfig = {
-  three: {
-    label: '3+',
-    colorClass: 'from-amber-700 to-amber-900 border-amber-600',
-    tierLabel: 'Bronze',
-  },
-  four: {
-    label: '4+',
-    colorClass: 'from-gray-300 to-gray-500 border-gray-200',
-    tierLabel: 'Silver',
-  },
-  five: {
-    label: '5+',
-    colorClass: 'from-yellow-400 to-yellow-600 border-yellow-300',
-    tierLabel: 'Gold',
-  },
+const sealImages = {
+  three: '/Icons/RedSeal.png',
+  four: '/Icons/SilverSeal.png',
+  five: '/Icons/GoldSeal.png',
+};
+
+const tierLabels = {
+  three: '3+',
+  four: '4+',
+  five: '5+',
 };
 
 const MedallionStack = ({ 
@@ -35,24 +27,19 @@ const MedallionStack = ({
   tier: 'three' | 'four' | 'five'; 
   tokens: BonusToken[] 
 }) => {
-  const config = medallionConfig[tier];
   const isEmpty = tokens.length === 0;
+  const sealSrc = sealImages[tier];
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] text-muted-foreground">{config.label} cargo</span>
+      <span className="text-[10px] text-muted-foreground">{tierLabels[tier]} cargo</span>
       
       <div className="relative w-10 h-10">
-        {/* Stacked medallions */}
+        {/* Stacked seals */}
         {tokens.slice(0, 3).reverse().map((token, index) => (
           <motion.div
             key={token.id}
-            className={cn(
-              'absolute w-8 h-8 rounded-full border-2',
-              'bg-gradient-to-br shadow-md',
-              'flex items-center justify-center',
-              config.colorClass
-            )}
+            className="absolute w-10 h-10"
             style={{
               bottom: index * 2,
               left: '50%',
@@ -63,17 +50,14 @@ const MedallionStack = ({
             animate={{ scale: 1 }}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Show medal icon on top medallion */}
-            {index === tokens.slice(0, 3).length - 1 && (
-              <Medal className="w-4 h-4 text-primary-foreground drop-shadow-sm" />
-            )}
+            <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain drop-shadow-md" />
           </motion.div>
         ))}
 
         {/* Empty state */}
         {isEmpty && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full border border-dashed border-muted-foreground/30" />
+            <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain opacity-20" />
           </div>
         )}
       </div>
