@@ -139,7 +139,7 @@ export const Market = () => {
                   stiffness: 200,
                 }}
               >
-                <GameCard
+                <CargoObject
                   card={card}
                   selected={selectedMarketCards.includes(card.id)}
                   onClick={() => handleCardClick(card.id)}
