@@ -41,7 +41,7 @@ export const ShipsHold = ({
   layout = 'desktop',
 }: ShipsHoldProps) => {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
-  const { sellCards, canSellCards, phase, lastAction } = useGameStore();
+  const { sellCards, canSellCards, phase } = useGameStore();
 
   const toggleCard = (cardId: string) => {
     if (!isCurrentPlayer || isOpponent) return;
