@@ -42,7 +42,7 @@ export const LandingPage = () => {
   const { hasConsented, restrictedMode } = useConsentStore();
   const { config: remoteConfig } = useRemoteConfigStore();
 
-  const [playerName] = useState(savedPlayerName || 'Captain');
+  const [playerName, setPlayerName] = useState(savedPlayerName || 'Captain');
   const [difficulty, setDifficulty] = useState<Difficulty>(
     restrictedMode ? 'easy' : (lastDifficulty || remoteConfig.defaultAIDifficulty)
   );
