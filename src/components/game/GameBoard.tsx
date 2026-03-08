@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
-import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
+import { Home, Swords, CloudLightning, Crosshair, Gift, X, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import bannerLogo from '@/assets/BannerLogo.png';
 
