@@ -2,38 +2,99 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tutorial } from '@/components/game/Tutorial';
 import { useTutorialStore } from '@/store/tutorialStore';
-import { useGameStore } from '@/store/gameStore';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { TradingPost } from '@/components/game/TradingPost';
-import { ShipsHold } from '@/components/game/ShipsHold';
-import { ScoreBoard } from '@/components/game/ScoreBoard';
-import { BonusTokens } from '@/components/game/BonusTokens';
-import { TreasureStack } from '@/components/game/TreasureStack';
-import { GoodsType } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import bannerLogo from '@/assets/BannerLogo.png';
 
-const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
+/**
+ * Hotspot regions positioned as percentages over each screenshot.
+ * Each key matches a `data-tutorial-id` used in tutorialStore steps.
+ */
+interface HotspotRect {
+  top: string;
+  left: string;
+  width: string;
+  height: string;
+}
+
+type HotspotMap = Record<string, HotspotRect>;
+
+// Desktop (1920×1080 image) — 3-column layout
+const DESKTOP_HOTSPOTS: HotspotMap = {
+  'tutorial-actions':       { top: '0%',  left: '15%', width: '70%', height: '10%' },
+  'tutorial-trading-post':  { top: '12%', left: '25%', width: '50%', height: '45%' },
+  'tutorial-ships-hold':    { top: '55%', left: '25%', width: '50%', height: '40%' },
+  'tutorial-market-prices': { top: '10%', left: '0%',  width: '23%', height: '85%' },
+  'tutorial-bonus':         { top: '10%', left: '77%', width: '23%', height: '45%' },
+  'tutorial-storm':         { top: '85%', left: '0%',  width: '8%',  height: '10%' },
+  'tutorial-raid':          { top: '85%', left: '8%',  width: '8%',  height: '10%' },
+  'tutorial-treasure':      { top: '85%', left: '16%', width: '8%',  height: '10%' },
+};
+
+// Tablet (768×1024 image) — 3-column layout
+const TABLET_HOTSPOTS: HotspotMap = {
+  'tutorial-actions':       { top: '0%',  left: '10%', width: '80%', height: '8%' },
+  'tutorial-trading-post':  { top: '10%', left: '20%', width: '45%', height: '40%' },
+  'tutorial-ships-hold':    { top: '50%', left: '20%', width: '45%', height: '35%' },
+  'tutorial-market-prices': { top: '10%', left: '65%', width: '35%', height: '50%' },
+  'tutorial-bonus':         { top: '60%', left: '65%', width: '35%', height: '20%' },
+  'tutorial-storm':         { top: '85%', left: '65%', width: '12%', height: '8%' },
+  'tutorial-raid':          { top: '85%', left: '77%', width: '12%', height: '8%' },
+  'tutorial-treasure':      { top: '85%', left: '89%', width: '11%', height: '8%' },
+};
+
+// Mobile (512×1024 image) — single column stacked
+const MOBILE_HOTSPOTS: HotspotMap = {
+  'tutorial-actions':       { top: '5%',  left: '5%',  width: '90%', height: '6%' },
+  'tutorial-trading-post':  { top: '12%', left: '5%',  width: '90%', height: '25%' },
+  'tutorial-ships-hold':    { top: '38%', left: '5%',  width: '90%', height: '25%' },
+  'tutorial-market-prices': { top: '64%', left: '5%',  width: '90%', height: '20%' },
+  'tutorial-bonus':         { top: '85%', left: '5%',  width: '90%', height: '10%' },
+  'tutorial-storm':         { top: '95%', left: '5%',  width: '30%', height: '5%' },
+  'tutorial-raid':          { top: '95%', left: '35%', width: '30%', height: '5%' },
+  'tutorial-treasure':      { top: '95%', left: '65%', width: '30%', height: '5%' },
+};
+
+type Breakpoint = 'mobile' | 'tablet' | 'desktop';
+
+const IMAGES: Record<Breakpoint, string> = {
+  mobile:  '/images/tutorial/game-mobile.png',
+  tablet:  '/images/tutorial/game-tablet.png',
+  desktop: '/images/tutorial/game-desktop.png',
+};
+
+const HOTSPOT_SETS: Record<Breakpoint, HotspotMap> = {
+  mobile:  MOBILE_HOTSPOTS,
+  tablet:  TABLET_HOTSPOTS,
+  desktop: DESKTOP_HOTSPOTS,
+};
+
+function useBreakpoint(): Breakpoint {
+  const isMobile = useIsMobile();
+  // useIsMobile returns true for <768px
+  if (isMobile) return 'mobile';
+  // Check for tablet vs desktop
+  if (typeof window !== 'undefined' && window.innerWidth < 1024) return 'tablet';
+  return 'desktop';
+}
 
 const TutorialPage = () => {
   const navigate = useNavigate();
   const { isActive, start, skip } = useTutorialStore();
-  const { startGame, resetGame, players, tokenStacks, bonusTokens } = useGameStore();
-  const isMobile = useIsMobile();
   const hasStarted = useRef(false);
+  const breakpoint = useBreakpoint();
 
-  // Start a real game to populate the store, then start tutorial
+  const imageSrc = IMAGES[breakpoint];
+  const hotspots = HOTSPOT_SETS[breakpoint];
+
+  // Start tutorial on mount (no game state needed)
   useEffect(() => {
-    startGame('Captain', 'easy', { stormRule: true, pirateRaid: true, treasureChest: true });
     start();
     hasStarted.current = true;
-    return () => {
-      resetGame();
-    };
   }, []);
 
-  // Navigate home when tutorial ends — only after it has been started
+  // Navigate home when tutorial ends
   useEffect(() => {
     if (hasStarted.current && !isActive) {
       const t = setTimeout(() => navigate('/'), 200);
@@ -41,233 +102,46 @@ const TutorialPage = () => {
     }
   }, [isActive, navigate]);
 
-  const humanPlayer = players[0];
-  const opponentPlayer = players[1];
-
   return (
     <div
-      className="min-h-screen w-screen overflow-y-auto flex flex-col"
+      className="min-h-screen w-screen overflow-y-auto flex flex-col bg-background"
       style={{ backgroundImage: 'url(/images/wood-bg.png)', backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}
     >
       {/* Tutorial overlay */}
       <Tutorial />
 
       {/* Header */}
-      <header className="flex items-center justify-between py-2 px-4 border-b border-border bg-card/80 flex-shrink-0">
+      <header className="flex items-center justify-between py-2 px-4 border-b border-border bg-card/80 flex-shrink-0 z-10 pointer-events-auto">
         <img src={bannerLogo} alt="Privateer" className="h-8 object-contain" />
         <Button variant="ghost" size="sm" onClick={skip} className="text-muted-foreground">
           <X className="w-4 h-4 mr-1" /> Skip
         </Button>
       </header>
 
-      {/* Real game board — pointer-events-none to prevent interaction */}
-      <div className="flex-1 pointer-events-none p-2 sm:p-4 lg:p-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Game board screenshot with hotspot overlays */}
+      <div className="flex-1 relative">
+        {/* Screenshot image */}
+        <img
+          src={imageSrc}
+          alt="Game board preview"
+          className="w-full h-auto block"
+          draggable={false}
+        />
 
-          {/* ═══ ACTION ICONS BAR (for tutorial highlighting) ═══ */}
-          <div data-tutorial-id="tutorial-actions" className="mb-3 flex items-center justify-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
-              <img src="/Icons/Claim.png" alt="Claim" className="w-6 h-6 object-contain" />
-              <span className="text-xs font-bold text-primary">Claim Cargo</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
-              <img src="/Icons/take.png" alt="Commandeer" className="w-6 h-6 object-contain" />
-              <span className="text-xs font-bold text-primary">Commandeer</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
-              <img src="/Icons/Trade.png" alt="Trade" className="w-6 h-6 object-contain" />
-              <span className="text-xs font-bold text-primary">Trade Goods</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-card/80">
-              <img src="/Icons/Sell.png" alt="Sell" className="w-6 h-6 object-contain" />
-              <span className="text-xs font-bold text-primary">Sell Cargo</span>
-            </div>
-          </div>
-
-          {/* ═══ PHONE LAYOUT ═══ */}
-          <div className="block md:hidden space-y-3">
-            {/* Trading Post */}
-            <div data-tutorial-id="tutorial-trading-post">
-              <TradingPost layout="phone" />
-            </div>
-
-            {/* Player's Hold */}
-            <div data-tutorial-id="tutorial-ships-hold">
-              {humanPlayer && (
-                <ShipsHold player={humanPlayer} isCurrentPlayer={true} layout="phone" />
-              )}
-            </div>
-
-            {/* Market Prices */}
-            <div data-tutorial-id="tutorial-market-prices">
-              <div className="p-3 rounded-xl border border-primary/20 relative overflow-hidden" style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
-                <div className="absolute inset-0 bg-background/40" />
-                <div className="relative z-10">
-                  <h3 className="font-pirate text-lg text-primary mb-3 text-center">Market Prices</h3>
-                  <div className="grid grid-cols-3 gap-3 place-items-center">
-                    {GOODS_ORDER.map((type) => (
-                      <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Commission Seals */}
-            <div data-tutorial-id="tutorial-bonus">
-              <BonusTokens threeCards={bonusTokens.three} fourCards={bonusTokens.four} fiveCards={bonusTokens.five} />
-            </div>
-
-            {/* Opponent Hold */}
-            <div>
-              {opponentPlayer && (
-                <ShipsHold player={opponentPlayer} isCurrentPlayer={false} isOpponent layout="phone" />
-              )}
-            </div>
-
-            {/* Scoreboard */}
-            <div>
-              <ScoreBoard />
-            </div>
-
-            {/* Optional Rules */}
-            <div className="grid grid-cols-3 gap-2">
-              <div data-tutorial-id="tutorial-storm" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                <img src="/Icons/Storm.png" alt="Storm" className="w-7 h-7 object-contain mx-auto mb-1" />
-                <span className="text-[10px] font-bold text-primary">Storm</span>
-              </div>
-              <div data-tutorial-id="tutorial-raid" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                <img src="/Icons/Raid.png" alt="Raid" className="w-7 h-7 object-contain mx-auto mb-1" />
-                <span className="text-[10px] font-bold text-primary">Raid</span>
-              </div>
-              <div data-tutorial-id="tutorial-treasure" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                <img src="/Icons/bonus.png" alt="Treasure" className="w-7 h-7 object-contain mx-auto mb-1" />
-                <span className="text-[10px] font-bold text-primary">Treasure</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ═══ TABLET LAYOUT ═══ */}
-          <div className="hidden md:block lg:hidden">
-            <div className="grid grid-cols-3 gap-4">
-              {/* Left: Opponent + ScoreBoard */}
-              <aside className="col-span-1 space-y-4">
-                {opponentPlayer && (
-                  <ShipsHold player={opponentPlayer} isCurrentPlayer={false} isOpponent layout="tablet" />
-                )}
-                <ScoreBoard />
-              </aside>
-
-              {/* Center: Trading Post + Player Hold */}
-              <main className="col-span-1 space-y-4">
-                <div data-tutorial-id="tutorial-trading-post">
-                  <TradingPost layout="tablet" />
-                </div>
-                <div data-tutorial-id="tutorial-ships-hold">
-                  {humanPlayer && (
-                    <ShipsHold player={humanPlayer} isCurrentPlayer={true} layout="tablet" />
-                  )}
-                </div>
-              </main>
-
-              {/* Right: Market + Bonuses */}
-              <aside className="col-span-1 space-y-4">
-                <div data-tutorial-id="tutorial-market-prices">
-                  <div className="p-3 rounded-xl border border-primary/20 relative overflow-hidden" style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
-                    <div className="absolute inset-0 bg-background/40" />
-                    <div className="relative z-10">
-                      <h3 className="font-pirate text-lg text-primary mb-3 text-center">Market Prices</h3>
-                      <div className="grid grid-cols-2 gap-3 place-items-center">
-                        {GOODS_ORDER.map((type) => (
-                          <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div data-tutorial-id="tutorial-bonus">
-                  <BonusTokens threeCards={bonusTokens.three} fourCards={bonusTokens.four} fiveCards={bonusTokens.five} />
-                </div>
-                {/* Optional rules */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div data-tutorial-id="tutorial-storm" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/Storm.png" alt="Storm" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Storm</span>
-                  </div>
-                  <div data-tutorial-id="tutorial-raid" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/Raid.png" alt="Raid" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Raid</span>
-                  </div>
-                  <div data-tutorial-id="tutorial-treasure" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/bonus.png" alt="Treasure" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Treasure</span>
-                  </div>
-                </div>
-              </aside>
-            </div>
-          </div>
-
-          {/* ═══ DESKTOP LAYOUT ═══ */}
-          <div className="hidden lg:block">
-            <div className="grid grid-cols-4 gap-6">
-              {/* Left sidebar: Market + Bonuses */}
-              <aside className="col-span-1 space-y-4">
-                <div data-tutorial-id="tutorial-market-prices">
-                  <div className="p-4 rounded-xl border border-primary/20 relative overflow-hidden" style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
-                    <div className="absolute inset-0 bg-background/40" />
-                    <div className="relative z-10">
-                      <h3 className="font-pirate text-lg text-primary mb-4 text-center">Market Prices</h3>
-                      <div className="grid grid-cols-2 gap-4 place-items-center">
-                        {GOODS_ORDER.map((type) => (
-                          <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div data-tutorial-id="tutorial-bonus">
-                  <BonusTokens threeCards={bonusTokens.three} fourCards={bonusTokens.four} fiveCards={bonusTokens.five} />
-                </div>
-                {/* Optional rules */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div data-tutorial-id="tutorial-storm" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/Storm.png" alt="Storm" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Storm</span>
-                  </div>
-                  <div data-tutorial-id="tutorial-raid" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/Raid.png" alt="Raid" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Raid</span>
-                  </div>
-                  <div data-tutorial-id="tutorial-treasure" className="p-2 rounded-lg border border-primary/20 bg-card text-center">
-                    <img src="/Icons/bonus.png" alt="Treasure" className="w-7 h-7 object-contain mx-auto mb-1" />
-                    <span className="text-[10px] font-bold text-primary">Treasure</span>
-                  </div>
-                </div>
-              </aside>
-
-              {/* Center: Trading Post + Player Hold */}
-              <main className="col-span-2 space-y-6">
-                <div data-tutorial-id="tutorial-trading-post">
-                  <TradingPost layout="desktop" />
-                </div>
-                <div data-tutorial-id="tutorial-ships-hold">
-                  {humanPlayer && (
-                    <ShipsHold player={humanPlayer} isCurrentPlayer={true} layout="desktop" />
-                  )}
-                </div>
-              </main>
-
-              {/* Right sidebar: Opponent + Scoreboard */}
-              <aside className="col-span-1 space-y-4">
-                {opponentPlayer && (
-                  <ShipsHold player={opponentPlayer} isCurrentPlayer={false} isOpponent layout="desktop" />
-                )}
-                <ScoreBoard />
-              </aside>
-            </div>
-          </div>
-
-        </div>
+        {/* Transparent hotspot overlays for tutorial spotlight targeting */}
+        {Object.entries(hotspots).map(([id, rect]) => (
+          <div
+            key={id}
+            data-tutorial-id={id}
+            className="absolute pointer-events-none"
+            style={{
+              top: rect.top,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+            }}
+          />
+        ))}
       </div>
     </div>
   );
