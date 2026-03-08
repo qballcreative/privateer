@@ -368,10 +368,11 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               variant="ghost"
               size="sm"
               onClick={() => {
-                setSelectedMarketCards([]);
-                setSelectedHandCards([]);
-                setMode('take');
-              }}
+              setSelectedMarketCards([]);
+              setSelectedHandCards([]);
+              setMode('take');
+              onModeChange?.(false);
+            }}
               className="text-xs sm:text-sm"
             >
               Cancel
