@@ -710,17 +710,14 @@ export const GameBoard = () => {
             {/* Left sidebar - Treasure & Bonuses (fixed) */}
             <aside className="col-span-1 space-y-4">
               <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
-            </motion.aside>
+            </aside>
 
             {/* Main game area — Trading Post top, Hold bottom */}
-            <motion.main
+            <main
               className={cn(
                 "col-span-2 space-y-6",
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
               {/* Trading Post — top center */}
               <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
