@@ -585,7 +585,7 @@ export const GameBoard = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-[85vw] max-w-sm bg-card border-accent/20 p-4 overflow-y-auto">
                 <SheetTitle className="font-pirate text-accent text-lg mb-4">Opponent & Ledger</SheetTitle>
-                <OpponentPanel />
+                <OpponentPanel {...opponentPanelProps} />
               </SheetContent>
             </Sheet>
           </div>
