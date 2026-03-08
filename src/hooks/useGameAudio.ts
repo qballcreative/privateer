@@ -14,7 +14,7 @@ const SOUND_URLS: Record<SoundType, string> = {
   'round-win': '/sounds/victory.mp3',
   'round-lose': '/sounds/defeat.mp3',
   'game-win': '/sounds/victory-fanfare.mp3',
-  'game-lose': '/sounds/defeat-horn.mp3',
+  'game-lose': '/sounds/defeat.mp3',
   'click': '/sounds/click.mp3',
   'error': '/sounds/error.mp3',
   'message': '/sounds/message.mp3',

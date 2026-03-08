@@ -16,6 +16,7 @@ import { InterstitialAd } from './InterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
+import { VictoryScreen } from './VictoryScreen';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -556,6 +557,21 @@ export const GameBoard = () => {
             ════════════════════════════════════════════════════════════════ */}
         <div className="block md:hidden space-y-3">
           {/* Drawer triggers bar */}
+          {/* Mini scoreboard bar */}
+          <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-card/60 border border-border text-xs">
+            <div className="flex items-center gap-1.5">
+              <Coins className="w-3 h-3 text-primary" />
+              <span className="text-foreground font-medium">{humanPlayer?.name?.split(' ')[0]}</span>
+              <span className="text-primary font-pirate">{calculateScore(humanPlayer, players)}</span>
+            </div>
+            <span className="text-muted-foreground">vs</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-foreground font-medium">{opponentPlayer?.name?.split(' ')[0]}</span>
+              <span className="text-accent font-pirate">{calculateScore(opponentPlayer, players)}</span>
+            </div>
+          </div>
+
+          {/* Drawer triggers bar */}
           <div className="flex items-center justify-between gap-2">
             {/* Left: Treasure drawer */}
             <Sheet open={treasureDrawerOpen} onOpenChange={setTreasureDrawerOpen}>
@@ -581,12 +597,15 @@ export const GameBoard = () => {
               </div>
             )}
 
-            {/* Right: Opponent drawer */}
+            {/* Right: Opponent drawer with badges */}
             <Sheet open={opponentDrawerOpen} onOpenChange={setOpponentDrawerOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-accent/30 text-accent">
                   <Eye className="w-4 h-4" />
                   <span className="text-xs">Opponent</span>
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-[10px] font-bold">
+                    {opponentPlayer?.hand.length}/{7}
+                  </span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[85vw] max-w-sm bg-card border-accent/20 p-4 overflow-y-auto">
@@ -1108,49 +1127,20 @@ export const GameBoard = () => {
           )}
         </AnimatePresence>
 
-        {/* Game End Modal */}
-        <AnimatePresence>
-          {phase === 'gameEnd' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full text-center"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', delay: 0.2 }}
-                >
-                  <Trophy className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
-                </motion.div>
-                
-                <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-1">
-                  {getWinner()?.isAI ? 'Defeated!' : 'Admiral Appointed!'}
-                </h2>
-                <h3 className="font-pirate text-lg sm:text-xl text-primary/80 mb-4">
-                  {getWinner()?.isAI ? '' : 'Letters of Marque Awarded'}
-                </h3>
-                
-                <p className="text-lg sm:text-xl mb-6">
-                  <span className="text-primary font-bold">{getWinner()?.name}</span>{' '}
-                  {getWinner()?.isAI ? 'claims victory!' : 'has been named Admiral!'}
-                </p>
-
-                <Button onClick={resetGame} className="game-button w-full">
-                  <Home className="w-5 h-5 mr-2" />
-                  Return to Port
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Game End — Victory Screen */}
+        {phase === 'gameEnd' && (
+          <VictoryScreen
+            players={players}
+            roundWins={useGameStore.getState().roundWins}
+            winner={getWinner()}
+            maxRounds={3}
+            onPlayAgain={() => {
+              resetGame();
+              // Could auto-start a new game here if desired
+            }}
+            onReturnHome={resetGame}
+          />
+        )}
       </div>
     </motion.div>
   );
