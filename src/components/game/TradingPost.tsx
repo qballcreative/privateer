@@ -288,11 +288,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             {currentPlayer.hand.length > 0 && (
               <div className="mb-2">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold">Cargo</p>
-                <div className={cn(
-                  isPhone
-                    ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
-                    : "flex flex-wrap gap-3 justify-center"
-                )}>
+                <div className="flex flex-wrap gap-2 justify-center pb-2">
                   <AnimatePresence mode="popLayout">
                     {currentPlayer.hand.map((card) => (
                       <motion.div
