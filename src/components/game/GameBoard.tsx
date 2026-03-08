@@ -406,7 +406,7 @@ export const GameBoard = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-background p-2 sm:p-4 lg:p-6 relative"
+      className="min-h-screen p-2 sm:p-4 lg:p-6 relative" style={{ backgroundImage: 'url(/images/wood-bg.png)', backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}
       animate={roundFlourish ? { scale: [1, 1.008, 0.998, 1] } : { scale: 1 }}
       transition={roundFlourish ? { duration: 1.2, ease: 'easeInOut' } : undefined}
     >
