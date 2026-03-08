@@ -89,4 +89,5 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
       <span className="text-xs text-primary font-bold">{tokens.length} left</span>
     </div>
   );
-};
+});
+TreasureStack.displayName = 'TreasureStack';

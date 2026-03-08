@@ -128,4 +128,5 @@ export const ScoreBoard = memo(() => {
       </div>
     </div>
   );
-};
+});
+ScoreBoard.displayName = 'ScoreBoard';

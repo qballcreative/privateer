@@ -67,7 +67,7 @@ const MedallionStack = ({
   );
 };
 
-export const BonusTokens = ({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
+export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
     <div className="flex items-center gap-4 p-3 rounded-lg bg-card/50 border border-border">
       <span className="text-lg font-pirate text-primary">
@@ -78,4 +78,5 @@ export const BonusTokens = ({ threeCards, fourCards, fiveCards }: BonusTokensPro
       <MedallionStack tier="five" tokens={fiveCards} />
     </div>
   );
-};
+});
+BonusTokens.displayName = 'BonusTokens';
