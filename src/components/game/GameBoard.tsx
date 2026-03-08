@@ -17,14 +17,15 @@ import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
 import { VictoryScreen } from './VictoryScreen';
+import { DisconnectModal } from './DisconnectModal';
+import { RoundEndModal } from './RoundEndModal';
+import { MultiplayerChat } from './MultiplayerChat';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
-import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown, Coins, Medal, ChevronUp, ChevronDown, Eye } from 'lucide-react';
+import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { sanitizeChatMessage, sanitizePlayerName, isValidChatPayload, CHAT_MESSAGE_MAX_LENGTH } from '@/lib/security';
 import bannerLogo from '@/assets/BannerLogo.png';
 
 // ─── Preload static images at module level ───
