@@ -557,6 +557,21 @@ export const GameBoard = () => {
             ════════════════════════════════════════════════════════════════ */}
         <div className="block md:hidden space-y-3">
           {/* Drawer triggers bar */}
+          {/* Mini scoreboard bar */}
+          <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-card/60 border border-border text-xs">
+            <div className="flex items-center gap-1.5">
+              <Coins className="w-3 h-3 text-primary" />
+              <span className="text-foreground font-medium">{humanPlayer?.name?.split(' ')[0]}</span>
+              <span className="text-primary font-pirate">{calculateScore(humanPlayer, players)}</span>
+            </div>
+            <span className="text-muted-foreground">vs</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-foreground font-medium">{opponentPlayer?.name?.split(' ')[0]}</span>
+              <span className="text-accent font-pirate">{calculateScore(opponentPlayer, players)}</span>
+            </div>
+          </div>
+
+          {/* Drawer triggers bar */}
           <div className="flex items-center justify-between gap-2">
             {/* Left: Treasure drawer */}
             <Sheet open={treasureDrawerOpen} onOpenChange={setTreasureDrawerOpen}>
@@ -582,12 +597,15 @@ export const GameBoard = () => {
               </div>
             )}
 
-            {/* Right: Opponent drawer */}
+            {/* Right: Opponent drawer with badges */}
             <Sheet open={opponentDrawerOpen} onOpenChange={setOpponentDrawerOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-accent/30 text-accent">
                   <Eye className="w-4 h-4" />
                   <span className="text-xs">Opponent</span>
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-[10px] font-bold">
+                    {opponentPlayer?.hand.length}/{7}
+                  </span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[85vw] max-w-sm bg-card border-accent/20 p-4 overflow-y-auto">
