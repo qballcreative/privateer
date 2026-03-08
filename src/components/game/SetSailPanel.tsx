@@ -19,10 +19,10 @@ interface SetSailPanelProps {
 }
 
 const difficultyLevels: { key: Difficulty; label: string; icon: typeof Shield }[] = [
-  { key: 'easy', label: 'Cabin Boy', icon: Shield },
-  { key: 'medium', label: 'First Mate', icon: Anchor },
-  { key: 'hard', label: 'Dread Pirate', icon: Swords },
-  { key: 'expert', label: 'Pirate Lord', icon: Crown },
+  { key: 'easy', label: 'Deckhand', icon: Shield },
+  { key: 'medium', label: 'Bosun', icon: Anchor },
+  { key: 'hard', label: 'Privateer', icon: Swords },
+  { key: 'expert', label: 'Admiral', icon: Crown },
 ];
 
 export const SetSailPanel = ({
