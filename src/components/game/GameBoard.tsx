@@ -452,7 +452,6 @@ export const GameBoard = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-2 sm:gap-3">
-            <img src={privateerLogo} alt="Privateer" className="h-10 sm:h-12 lg:h-14 object-contain drop-shadow-[0_0_10px_hsl(var(--brass)/0.4)]" />
             
             {activeRulesCount > 0 && (
               <div className="flex items-center gap-1">
