@@ -223,20 +223,11 @@ const HowToPlay = () => {
           </div>
         </motion.section>
 
-        {/* Tutorial CTA */}
+        {/* Back CTA */}
         <motion.section {...sectionAnim} className="text-center py-8">
-          <div className="game-box-card p-8 inline-block">
-            <h2 className="font-serif text-2xl font-bold text-primary mb-3">Ready to Learn by Doing?</h2>
-            <p className="text-foreground/70 mb-5 max-w-md mx-auto">
-              Start the interactive tutorial to see each action demonstrated on a mock game board.
-            </p>
-            <Button size="lg" onClick={() => navigate('/tutorial')} className="mr-3">
-              <Anchor className="w-5 h-5 mr-2" /> Start Tutorial
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate('/')}>
-              Back to Game
-            </Button>
-          </div>
+          <Button variant="outline" size="lg" onClick={() => navigate('/')}>
+            Back to Game
+          </Button>
         </motion.section>
       </main>
 
