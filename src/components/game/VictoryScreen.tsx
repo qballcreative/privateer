@@ -2,7 +2,8 @@ import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Home, RotateCcw, Anchor, Crown, Ship, Coins } from 'lucide-react';
 import { Player } from '@/types/game';
-import { calculateScore } from '@/store/gameStore';
+import { calculateScore, useGameStore } from '@/store/gameStore';
+import { getScoreBreakdown } from '@/lib/scoring';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
