@@ -12,7 +12,7 @@ export const VictoryConditions = () => {
     <section className="relative py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <motion.div
-          className="rounded-xl border-2 border-[hsl(var(--brass-light)/0.4)] bg-card/90 p-6 md:p-8 shadow-[var(--shadow-brass)]"
+          className="cargo-slot p-6 md:p-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -21,21 +21,23 @@ export const VictoryConditions = () => {
             Victory Conditions
           </h2>
 
-          <div className="space-y-4">
+          <div className="flex flex-col">
             {conditions.map(({ icon: Icon, text }, i) => (
-              <motion.div
-                key={i}
-                className="flex items-center gap-4 p-3 rounded-lg bg-muted/30"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/15 border border-primary/20">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-foreground/80 text-sm md:text-base">{text}</p>
-              </motion.div>
+              <div key={i}>
+                {i > 0 && <hr className="wood-separator my-1" />}
+                <motion.div
+                  className="flex items-center gap-4 p-3 cargo-slot"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-[hsl(var(--brass)/0.2)] border border-[hsl(var(--brass-light)/0.3)] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-foreground/80 text-sm md:text-base">{text}</p>
+                </motion.div>
+              </div>
             ))}
           </div>
         </motion.div>
