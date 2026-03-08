@@ -3,7 +3,7 @@ import { Trophy, Target, AlertTriangle } from 'lucide-react';
 
 const conditions = [
   { icon: Trophy, text: 'Most doubloons wins the voyage' },
-  { icon: Target, text: 'Win 2 of 3 voyages to become Privateer Lord' },
+  { icon: Target, text: 'Win 2 of 3 voyages to become Admiral' },
   { icon: AlertTriangle, text: 'Voyage ends when Supply Ship empties or 3 cargo stacks are depleted' },
 ];
 
