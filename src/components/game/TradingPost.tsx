@@ -81,10 +81,27 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
 
   const wouldExceedHandLimit = getExchangeHandSize() > HAND_LIMIT;
 
+  // Check for same-type swap violation
+  const hasSameTypeSwap = (() => {
+    if (selectedHandCards.length === 0 || selectedMarketCards.length === 0) return false;
+    const handTypes = new Set([
+      ...currentPlayer.hand.filter(c => selectedHandCards.includes(c.id)).map(c => c.type),
+      ...currentPlayer.ships.filter(c => selectedHandCards.includes(c.id)).map(c => c.type),
+    ]);
+    const marketTypes = new Set(
+      market.filter(c => selectedMarketCards.includes(c.id)).map(c => c.type)
+    );
+    for (const t of handTypes) {
+      if (marketTypes.has(t)) return true;
+    }
+    return false;
+  })();
+
   const handleExchange = () => {
     if (selectedMarketCards.length >= 2 && 
         selectedMarketCards.length === selectedHandCards.length &&
-        !wouldExceedHandLimit) {
+        !wouldExceedHandLimit &&
+        !hasSameTypeSwap) {
       exchangeCards(selectedHandCards, selectedMarketCards);
       setSelectedMarketCards([]);
       setSelectedHandCards([]);
@@ -265,6 +282,13 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               <span>Trade would exceed hold limit of {HAND_LIMIT}.</span>
             </div>
           )}
+
+          {hasSameTypeSwap && (
+            <div className="flex items-center gap-2 text-destructive text-xs sm:text-sm mb-3 p-2 bg-destructive/10 rounded">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>You cannot trade a goods type for the same type.</span>
+            </div>
+          )}
           
           {/* Exchange swap lane visualization */}
           <div className="relative">
@@ -354,7 +378,8 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               onClick={handleExchange}
               disabled={selectedMarketCards.length < 2 || 
                        selectedHandCards.length !== selectedMarketCards.length ||
-                       wouldExceedHandLimit}
+                       wouldExceedHandLimit ||
+                       hasSameTypeSwap}
               className="ocean-button text-xs sm:text-sm"
               size="sm"
             >

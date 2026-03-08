@@ -108,7 +108,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/exchange.png" alt="Trade" className="w-8 h-8 object-contain" />}
               title="Trade Goods"
-              desc="Exchange 2 or more goods between your Hold and the Trading Post. You can use ships from your fleet as part of the trade — great for upgrading cheap goods to expensive ones!"
+              desc="Exchange 2 or more goods between your Hold and the Trading Post. You cannot trade a goods type for the same type (e.g., trading away rum to take rum). You can use ships from your fleet as part of the trade — great for upgrading cheap goods to expensive ones!"
             />
             <ActionCard
               icon={<img src="/Icons/sell.png" alt="Sell" className="w-8 h-8 object-contain" />}
