@@ -284,50 +284,73 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               </motion.div>
             )}
 
-            <div className={cn(
-              isPhone
-                ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
-                : "flex flex-wrap gap-3 justify-center"
-            )}>
-              <AnimatePresence mode="popLayout">
-                {currentPlayer.hand.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 80 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className={cn(isPhone && "flex-shrink-0")}
-                  >
-                    <CargoObject
-                      card={card}
-                      selected={selectedHandCards.includes(card.id)}
-                      onClick={() => toggleHandCard(card.id)}
-                      size={isPhone ? 'sm' : 'sm'}
-                    />
-                  </motion.div>
-                ))}
-                {currentPlayer.ships.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 80 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className={cn(isPhone && "flex-shrink-0")}
-                  >
-                    <CargoObject
-                      card={card}
-                      selected={selectedHandCards.includes(card.id)}
-                      onClick={() => toggleHandCard(card.id)}
-                      size={isPhone ? 'sm' : 'sm'}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+            {/* Cargo row */}
+            {currentPlayer.hand.length > 0 && (
+              <div className="mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold">Cargo</p>
+                <div className={cn(
+                  isPhone
+                    ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                    : "flex flex-wrap gap-3 justify-center"
+                )}>
+                  <AnimatePresence mode="popLayout">
+                    {currentPlayer.hand.map((card) => (
+                      <motion.div
+                        key={card.id}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 80 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className={cn(isPhone && "flex-shrink-0")}
+                      >
+                        <CargoObject
+                          card={card}
+                          selected={selectedHandCards.includes(card.id)}
+                          onClick={() => toggleHandCard(card.id)}
+                          size="sm"
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+
+            {/* Ships row */}
+            {currentPlayer.ships.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold flex items-center gap-1">
+                  <Ship className="w-3 h-3" /> Ships
+                </p>
+                <div className={cn(
+                  isPhone
+                    ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                    : "flex flex-wrap gap-3 justify-center"
+                )}>
+                  <AnimatePresence mode="popLayout">
+                    {currentPlayer.ships.map((card) => (
+                      <motion.div
+                        key={card.id}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 80 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className={cn(isPhone && "flex-shrink-0")}
+                      >
+                        <CargoObject
+                          card={card}
+                          selected={selectedHandCards.includes(card.id)}
+                          onClick={() => toggleHandCard(card.id)}
+                          size="sm"
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-3 sm:mt-4 flex justify-center gap-2">
