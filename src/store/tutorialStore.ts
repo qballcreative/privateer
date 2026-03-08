@@ -66,8 +66,8 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'bonus-medallions',
-    title: 'Commission Medallions',
-    description: 'Sell 3, 4, or 5+ goods at once to earn a bonus Commission Medallion! These are worth extra doubloons — the more you sell at once, the bigger the bonus.',
+    title: 'Commission Seals',
+    description: 'Sell 3, 4, or 5+ goods at once to earn a bonus Commission Seal! These are worth extra doubloons — the more you sell at once, the bigger the bonus.',
     highlightId: 'tutorial-bonus',
     position: 'top',
   },
