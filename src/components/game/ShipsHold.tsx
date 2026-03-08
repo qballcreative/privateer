@@ -144,7 +144,7 @@ export const ShipsHold = ({
               {player.hand.map((card, index) => (
                 <motion.div
                   key={card.id}
-                  layout
+                  layout="position"
                   initial={
                     wasExchange
                       ? { opacity: 0, x: -60, scale: 0.8 }
