@@ -43,6 +43,8 @@ export const ScoreBoard = () => {
       <div className="space-y-3">
         {players.map((player, index) => {
           const score = calculateScore(player, players);
+          const maxShips = Math.max(...players.map((p) => p.ships.length));
+          const hasFleetBonus = player.ships.length > 0 && player.ships.length === maxShips && players.filter((p) => p.ships.length === maxShips).length === 1;
           
           return (
             <motion.div
@@ -93,6 +95,15 @@ export const ScoreBoard = () => {
                   <img src="/images/commissions.png" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary">{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
+              </div>
+
+              {/* Fleet bonus row */}
+              <div className="flex items-center gap-1.5 mt-1 text-sm overflow-visible" title={`Fleet: ${player.ships.length} ships${hasFleetBonus ? ' — Largest Fleet +5' : ''}`}>
+                <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
+                <span className="text-muted-foreground">{player.ships.length}</span>
+                {hasFleetBonus && (
+                  <span className="text-xs font-bold text-primary ml-1">+5</span>
+                )}
               </div>
 
               {/* Total score */}
