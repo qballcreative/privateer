@@ -328,33 +328,8 @@ export const GameBoard = () => {
     playSound('error');
   }, [playSound]);
 
-  // Track previous multiplayer state to detect reconnection
+  // Track previous multiplayer state for reconnection sync
   const prevMultiplayerStateRef = useRef(multiplayerState);
-  
-  // Detect multiplayer disconnect
-  useEffect(() => {
-    if (isMultiplayer && multiplayerState === 'disconnected' && phase === 'playing') {
-      setShowDisconnectModal(true);
-      setDisconnectTimer(0);
-      disconnectTimerRef.current = setInterval(() => {
-        setDisconnectTimer((prev) => prev + 1);
-      }, 1000);
-    } else {
-      if (disconnectTimerRef.current) {
-        clearInterval(disconnectTimerRef.current);
-        disconnectTimerRef.current = null;
-      }
-      if (multiplayerState === 'connected') {
-        setShowDisconnectModal(false);
-        setDisconnectTimer(0);
-      }
-    }
-    return () => {
-      if (disconnectTimerRef.current) {
-        clearInterval(disconnectTimerRef.current);
-      }
-    };
-  }, [isMultiplayer, multiplayerState, phase]);
 
   // Host: Send game state to reconnecting guest
   useEffect(() => {
@@ -368,22 +343,11 @@ export const GameBoard = () => {
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
-  // Listen for multiplayer messages
+  // Listen for multiplayer messages (game state sync only — chat handled by MultiplayerChat)
   useEffect(() => {
     if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
       const unsubscribe = registerMessageHandler((message) => {
-        if (message.type === 'chat' && isValidChatPayload(message.payload)) {
-          const payload = message.payload;
-          const sanitizedText = sanitizeChatMessage(payload.text);
-          const sanitizedSender = sanitizePlayerName(payload.sender);
-          if (sanitizedText) {
-            setChatMessages((prev) => [...prev, { sender: sanitizedSender, text: sanitizedText }]);
-            playSound('message');
-            if (!showChatRef.current) {
-              setUnreadMessages((prev) => prev + 1);
-            }
-          }
-        } else if (message.type === 'game-state') {
+        if (message.type === 'game-state') {
           const payload = message.payload as { gameState: any };
           applyGameState(payload.gameState, true);
         } else if (message.type === 'next-round') {
@@ -392,41 +356,19 @@ export const GameBoard = () => {
       });
       return unsubscribe;
     }
-  }, [isMultiplayer, phase, applyGameState, registerMessageHandler, playSound, nextRound]);
+  }, [isMultiplayer, phase, applyGameState, registerMessageHandler, nextRound]);
 
   // Sync game state after each action in multiplayer
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
     if (isMultiplayer && phase === 'playing' && lastAction && lastAction !== prevLastActionRef.current) {
       if (currentPlayerIndex !== localPlayerIndex) {
-        // Current player just changed away from local → send state
         const gs = getSerializableState();
         sendMessage({ type: 'game-state', payload: { gameState: gs } });
       }
       prevLastActionRef.current = lastAction;
     }
   }, [isMultiplayer, phase, lastAction, currentPlayerIndex, sendMessage, getSerializableState]);
-
-  // Auto-scroll chat
-  useEffect(() => {
-    if (chatScrollRef.current) {
-      setTimeout(() => {
-        if (chatScrollRef.current) {
-          chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-        }
-      }, 50);
-    }
-  }, [chatMessages]);
-
-  const sendChatMessage = () => {
-    if (!chatInput.trim()) return;
-    const sanitizedText = sanitizeChatMessage(chatInput);
-    if (!sanitizedText) return;
-    const message = { sender: localPlayer?.name || 'You', text: sanitizedText };
-    setChatMessages((prev) => [...prev, message]);
-    sendMessage({ type: 'chat', payload: message });
-    setChatInput('');
-  };
 
   const handlePirateRaid = (card: Card) => {
     pirateRaid(card.id);
