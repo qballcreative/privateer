@@ -186,8 +186,8 @@ const HowToPlay = () => {
 
         {/* End Conditions */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Anchor className="w-5 h-5" /> End of Round
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            End of Round
           </h2>
           <p className="text-foreground/80">
             The round ends when either: the <strong className="text-primary">Trading Post supply is empty</strong> (no cards left to deal),
