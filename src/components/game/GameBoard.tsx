@@ -704,7 +704,7 @@ export const GameBoard = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <TreasureSupplyPanel />
+              <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
             </motion.aside>
           </div>
         </div>
