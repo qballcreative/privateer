@@ -54,9 +54,8 @@ export const ScoreBoard = memo(() => {
                 'p-3 rounded-lg border overflow-visible',
                 player.isAI ? 'bg-muted/50 border-border' : 'bg-primary/5 border-primary/20'
               )}
-              initial={{ opacity: 0, x: -20 }}
+              initial={false}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
