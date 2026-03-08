@@ -8,6 +8,15 @@ import {
   Award, Package, CloudLightning, Skull, Gem
 } from 'lucide-react';
 
+// Token images
+import rumTokens from '@/assets/tokens/rum.png';
+import ironTokens from '@/assets/tokens/iron.png';
+import silverTokens from '@/assets/tokens/silver.png';
+import silkTokens from '@/assets/tokens/silk.png';
+import goldTokens from '@/assets/tokens/gold.png';
+import gemTokens from '@/assets/tokens/gems.png';
+import shipTokens from '@/assets/tokens/ship.png';
+
 const sectionAnim = {
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
@@ -113,7 +122,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/sell.png" alt="Sell" className="w-8 h-8 object-contain" />}
               title="Sell Cargo"
-              desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gemstones), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Medallions!"
+              desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gems), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Seals!"
             />
           </div>
         </motion.section>
@@ -141,16 +150,19 @@ const HowToPlay = () => {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
             {[
-              { name: 'Gemstones', values: '7, 7, 5, 5, 5', color: 'text-purple-400' },
-              { name: 'Gold', values: '6, 6, 5, 5, 5', color: 'text-yellow-400' },
-              { name: 'Silver', values: '5, 5, 5, 5, 5', color: 'text-gray-300' },
-              { name: 'Silks', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-pink-400' },
-              { name: 'Cannonballs', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400' },
-              { name: 'Rum', values: '4, 3, 2, 1, 1, 1, 1, 1, 1', color: 'text-amber-500' },
+              { name: 'Gems', values: '7, 7, 5, 5, 5', color: 'text-purple-400', img: gemTokens },
+              { name: 'Gold', values: '6, 6, 5, 5, 5', color: 'text-yellow-400', img: goldTokens },
+              { name: 'Silver', values: '5, 5, 5, 5, 5', color: 'text-gray-300', img: silverTokens },
+              { name: 'Silk', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-pink-400', img: silkTokens },
+              { name: 'Iron', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400', img: ironTokens },
+              { name: 'Rum', values: '4, 3, 2, 1, 1, 1, 1, 1, 1', color: 'text-amber-500', img: rumTokens },
             ].map((g) => (
-              <div key={g.name} className="bg-muted/50 rounded-lg p-2">
-                <span className={`font-bold ${g.color}`}>{g.name}</span>
-                <div className="text-muted-foreground text-xs mt-1">{g.values}</div>
+              <div key={g.name} className="bg-muted/50 rounded-lg p-2 flex items-center gap-2">
+                <img src={g.img} alt={g.name} className="w-8 h-8 object-contain" />
+                <div>
+                  <span className={`font-bold ${g.color}`}>{g.name}</span>
+                  <div className="text-muted-foreground text-xs mt-0.5">{g.values}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -261,17 +273,17 @@ const ActionCard = ({ icon, title, desc }: { icon: React.ReactNode; title: strin
 
 /* Mock game board rendered at bottom of page — tutorial overlay highlights these elements */
 const TutorialMockBoard = () => {
-  const mockMarket = ['rum', 'gold', 'silks', 'ships', 'cannonballs'];
-  const mockHand = ['silver', 'rum', 'gemstones', 'gold'];
+  const mockMarket = ['rum', 'gold', 'silk', 'ships', 'iron'];
+  const mockHand = ['silver', 'rum', 'gems', 'gold'];
 
   const goodsIcons: Record<string, string> = {
-    rum: '/Icons/rum.png',
-    gold: '/Icons/gold.png',
-    silver: '/Icons/silver.png',
-    silks: '/Icons/silks.png',
-    cannonballs: '/Icons/cannonballs.png',
-    gemstones: '/Icons/gemstones.png',
-    ships: '/images/fleet.png',
+    rum: rumTokens,
+    gold: goldTokens,
+    silver: silverTokens,
+    silk: silkTokens,
+    iron: ironTokens,
+    gems: gemTokens,
+    ships: shipTokens,
   };
 
   return (
@@ -304,7 +316,7 @@ const TutorialMockBoard = () => {
       <div data-tutorial-id="tutorial-market-prices" className="game-box-card p-4">
         <h3 className="font-serif text-lg font-bold text-primary mb-3">Market Prices</h3>
         <div className="flex gap-4 flex-wrap">
-          {['rum', 'cannonballs', 'silks', 'silver', 'gold', 'gemstones'].map((type) => (
+          {['rum', 'iron', 'silk', 'silver', 'gold', 'gems'].map((type) => (
             <div key={type} className="text-center">
               <img src={goodsIcons[type]} alt={type} className="w-8 h-8 object-contain mx-auto mb-1" />
               <div className="text-xs text-muted-foreground capitalize">{type}</div>
