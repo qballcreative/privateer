@@ -292,7 +292,7 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
       
       // Check if we've missed too many pings
       if (missedPings + 1 >= MAX_MISSED_PINGS) {
-        console.log('Too many missed pings, marking as disconnected');
+        debugLog('engine', 'Heartbeat', 'Too many missed pings, marking as disconnected');
         get().stopHeartbeat();
         set({ state: 'disconnected', latency: null });
       }
