@@ -39,7 +39,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'claim-cargo',
     title: 'Action: Claim Cargo',
-    description: 'Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Supply Ship. Simple and effective!',
+    description: 'Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Trading Post supply. Simple and effective!',
     highlightId: 'tutorial-claim',
     position: 'bottom',
   },
