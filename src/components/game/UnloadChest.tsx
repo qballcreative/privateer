@@ -96,7 +96,8 @@ const TickingScore = ({ value, label }: { value: number; label: string }) => {
   return (
     <span className="text-muted-foreground flex items-center gap-1">
       {label === 'Doubloons' && <img src="/images/doubloons.png" alt="Doubloons" className="w-7 h-7 object-contain -my-2" />}
-      {label !== 'Doubloons' && <>{label}: </>}
+      {label === 'Comm' && <img src="/images/commissions.png" alt="Commissions" className="w-7 h-7 object-contain -my-2" />}
+      {label !== 'Doubloons' && label !== 'Comm' && <>{label}: </>}
       <span className="font-bold text-primary">{display}</span>
     </span>
   );
