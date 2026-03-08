@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import Peer, { DataConnection } from 'peerjs';
 import { generateSecureShortCode, sanitizePlayerName } from '@/lib/security';
+import { debugLog } from '@/lib/debugLog';
 
 export type MultiplayerState = 'idle' | 'hosting' | 'joining' | 'connected' | 'disconnected' | 'error';
 
@@ -292,7 +293,7 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
       
       // Check if we've missed too many pings
       if (missedPings + 1 >= MAX_MISSED_PINGS) {
-        console.log('Too many missed pings, marking as disconnected');
+        debugLog('engine', 'Heartbeat', 'Too many missed pings, marking as disconnected');
         get().stopHeartbeat();
         set({ state: 'disconnected', latency: null });
       }

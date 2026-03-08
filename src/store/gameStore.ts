@@ -24,6 +24,7 @@ import {
   MIN_SELL_EXPENSIVE,
 } from '@/types/game';
 import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
+import { validateGameState } from '@/lib/validateGameState';
 import {
   RulesEngine,
   RuleContext,
@@ -408,23 +409,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   // Apply game state received from network (for multiplayer sync)
   applyGameState: (state, swapPlayers = false) => {
-    if (swapPlayers && state.players) {
+    // Validate incoming state before applying
+    const validated = validateGameState(state);
+    if (!validated) {
+      console.warn('Rejected invalid game state from peer');
+      return;
+    }
+
+    if (swapPlayers && validated.players) {
       // Swap player order for guest's perspective
-      const [player1, player2] = state.players;
-      state.players = [player2, player1];
+      const [player1, player2] = validated.players;
+      validated.players = [player2, player1];
       // Mark local player
-      state.players[0].isLocal = true;
-      state.players[1].isLocal = false;
+      validated.players[0].isLocal = true;
+      validated.players[1].isLocal = false;
       // Invert current player index for guest
-      if (state.currentPlayerIndex !== undefined) {
-        state.currentPlayerIndex = state.currentPlayerIndex === 0 ? 1 : 0;
+      if (validated.currentPlayerIndex !== undefined) {
+        validated.currentPlayerIndex = validated.currentPlayerIndex === 0 ? 1 : 0;
       }
       // Swap round wins too
-      if (state.roundWins) {
-        state.roundWins = [state.roundWins[1], state.roundWins[0]];
+      if (validated.roundWins) {
+        validated.roundWins = [validated.roundWins[1], validated.roundWins[0]];
       }
     }
-    set(state as GameState);
+    set(validated as GameState);
   },
 
   // Get serializable state to send over network
