@@ -752,9 +752,7 @@ export const GameBoard = () => {
                     )}
                   </motion.div>
                   <span className="font-pirate text-lg sm:text-xl text-primary">
-                    {isMultiplayer 
-                      ? `Waiting for ${opponentName || 'opponent'}...` 
-                      : `${opponentPlayer?.name || 'The Captain'} is pondering their next move…`}
+                    {`${opponentPlayer?.name || opponentName || 'The Captain'} is pondering their next move…`}
                   </span>
                 </div>
               </div>
