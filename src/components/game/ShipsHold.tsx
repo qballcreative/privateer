@@ -222,54 +222,6 @@ export const ShipsHold = ({
         />
       )}
 
-      {/* Ships display */}
-      {!isOpponent && player.ships.length > 0 && (
-        <div className={cn(
-          "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border",
-          isPhone
-            ? "flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-            : "flex flex-wrap gap-3 items-center justify-center"
-        )}>
-          <LayoutGroup id="ships-display">
-            <AnimatePresence mode="sync">
-              {player.ships.map((card, index) => (
-                <motion.div
-                  key={card.id}
-                  layout
-                  initial={shipFanIn(index)}
-                  animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.6 }}
-                  transition={{
-                    delay: index * 0.05,
-                    type: 'spring',
-                    stiffness: 280,
-                    damping: 22,
-                  }}
-                  className={cn(isPhone && "flex-shrink-0")}
-                >
-                  <CargoObject
-                    card={card}
-                    disabled
-                    size={isPhone ? 'sm' : 'sm'}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </LayoutGroup>
-        </div>
-      )}
-
-      {(!isCurrentPlayer || isOpponent || phase !== 'playing') && (
-        <div className={cn(
-          "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between",
-          isPhone ? "text-xs" : "text-sm"
-        )}>
-          <span className="text-muted-foreground flex items-center gap-1">
-            <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
-            <span className="font-bold text-accent">{player.ships.length}</span>
-          </span>
-        </div>
-      )}
     </div>
   );
 };
