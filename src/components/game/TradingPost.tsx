@@ -118,7 +118,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Icons/Claim.png" alt="Claim" className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 object-contain" />
+            <img src="/Icons/Claim.png" alt="Claim" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Claim Cargo
           </Button>
           <Button
