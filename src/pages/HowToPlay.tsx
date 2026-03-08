@@ -273,17 +273,17 @@ const ActionCard = ({ icon, title, desc }: { icon: React.ReactNode; title: strin
 
 /* Mock game board rendered at bottom of page — tutorial overlay highlights these elements */
 const TutorialMockBoard = () => {
-  const mockMarket = ['rum', 'gold', 'silks', 'ships', 'cannonballs'];
-  const mockHand = ['silver', 'rum', 'gemstones', 'gold'];
+  const mockMarket = ['rum', 'gold', 'silk', 'ships', 'iron'];
+  const mockHand = ['silver', 'rum', 'gems', 'gold'];
 
   const goodsIcons: Record<string, string> = {
-    rum: '/Icons/rum.png',
-    gold: '/Icons/gold.png',
-    silver: '/Icons/silver.png',
-    silks: '/Icons/silks.png',
-    cannonballs: '/Icons/cannonballs.png',
-    gemstones: '/Icons/gemstones.png',
-    ships: '/images/fleet.png',
+    rum: rumTokens,
+    gold: goldTokens,
+    silver: silverTokens,
+    silk: silkTokens,
+    iron: ironTokens,
+    gems: gemTokens,
+    ships: shipTokens,
   };
 
   return (
