@@ -512,7 +512,23 @@ export const GameBoard = () => {
           </div>
         </motion.header>
 
-        {/* ════════════════════════════════════════════════════════════════
+        {/* ── Centered Logo + Treasure Supply (tablet/desktop) ── */}
+        <div className="hidden md:block mb-4 lg:mb-6">
+          {/* Prominent Logo */}
+          <div className="flex justify-center mb-4">
+            <motion.img
+              src={privateerLogo}
+              alt="Privateer: Letters of Marque"
+              className="h-16 sm:h-20 lg:h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--brass)/0.5)]"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          {/* Framed Treasure Supply */}
+          <TreasureSupplyPanel framed />
+        </div>
+
             PHONE LAYOUT — stacked, drawers for treasure/opponent
             ════════════════════════════════════════════════════════════════ */}
         <div className="block md:hidden space-y-3">
