@@ -47,9 +47,8 @@ const MedallionStack = ({
               transform: 'translateX(-50%)',
               zIndex: index,
             }}
-            initial={{ scale: 0 }}
+            initial={false}
             animate={{ scale: 1 }}
-            transition={{ delay: index * 0.1 }}
           >
             <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain drop-shadow-md" />
           </motion.div>
