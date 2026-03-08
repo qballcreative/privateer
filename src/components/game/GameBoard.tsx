@@ -477,14 +477,31 @@ export const GameBoard = () => {
             
             <SettingsPanel />
             
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={resetGame}
-              className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
-            >
-              <Home className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
+                >
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-pirate text-primary">Abandon Voyage?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Your current game progress will be lost. Are you sure you want to return to port?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Continue Playing</AlertDialogCancel>
+                  <AlertDialogAction onClick={resetGame} className="bg-destructive hover:bg-destructive/90">
+                    Return to Port
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </header>
 
