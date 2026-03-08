@@ -635,14 +635,23 @@ export const GameBoard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <TradingPost layout="tablet" />
-              {humanPlayer && (
-                <ShipsHold
-                  player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                  layout="tablet"
-                />
-              )}
+              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
+              <AnimatePresence>
+                {!isExchangeMode && humanPlayer && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ShipsHold
+                      player={humanPlayer}
+                      isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                      layout="tablet"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.main>
 
             {/* Right column: Treasure Supply + Bonuses */}
