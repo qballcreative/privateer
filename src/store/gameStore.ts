@@ -720,7 +720,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // If next player is AI and not multiplayer, trigger AI move
     if (players[nextIdx].isAI && !isMultiplayer) {
-      setTimeout(() => get().makeAIMove(), 1000);
+      const notifDuration = useSettingsStore.getState().actionNotificationDuration;
+      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
     }
   },
 
