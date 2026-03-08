@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';
-import { CargoObject } from './CargoObject';
+import CargoObject from './CargoObject';
 import { UnloadChest } from './UnloadChest';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
