@@ -83,17 +83,17 @@ export const ScoreBoard = () => {
 
               {/* Score breakdown */}
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="flex items-center gap-1 text-muted-foreground" title="Doubloons">
-                  <img src="/images/doubloons.png" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
-                  <span>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
+                <div className="flex items-center gap-1.5" title="Doubloons">
+                  <img src="/images/doubloons.png" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
+                  <span className="font-bold text-primary">{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground" title="Commissions">
-                  <img src="/images/commissions.png" alt="Commissions" className="w-6 h-6 object-contain -my-1" />
-                  <span>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
+                <div className="flex items-center gap-1.5 overflow-visible" title="Commissions">
+                  <img src="/images/commissions.png" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
+                  <span className="font-bold text-primary">{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground" title="Fleet">
-                  <Anchor className="w-3 h-3" />
-                  <span>{player.ships.length}</span>
+                <div className="flex items-center gap-1.5" title="Fleet">
+                  <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
+                  <span className="font-bold text-primary">{player.ships.length}</span>
                 </div>
               </div>
 
