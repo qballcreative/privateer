@@ -109,7 +109,7 @@ export class RulesEngine {
   /** Register a plugin. */
   register(plugin: RulePlugin): void {
     if (this.plugins.some((p) => p.id === plugin.id)) {
-      console.warn(`[RulesEngine] Plugin "${plugin.id}" already registered — skipping.`);
+      if (import.meta.env.DEV) console.warn(`[RulesEngine] Plugin "${plugin.id}" already registered — skipping.`);
       return;
     }
     this.plugins.push(plugin);

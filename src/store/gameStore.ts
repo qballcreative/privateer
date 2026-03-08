@@ -412,7 +412,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Validate incoming state before applying
     const validated = validateGameState(state);
     if (!validated) {
-      console.warn('Rejected invalid game state from peer');
+      debugLog('engine', 'P2P Validation', 'Rejected invalid game state from peer');
       return;
     }
 

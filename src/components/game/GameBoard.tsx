@@ -989,7 +989,7 @@ export const GameBoard = () => {
                               setShowDisconnectModal(false);
                               setDisconnectTimer(0);
                             } catch (err) {
-                              console.error('Reconnect failed:', err);
+                              if (import.meta.env.DEV) console.error('Reconnect failed:', err);
                             } finally {
                               setIsReconnecting(false);
                             }
