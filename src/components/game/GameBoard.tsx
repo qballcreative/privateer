@@ -151,6 +151,7 @@ const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, on
 OpponentPanel.displayName = 'OpponentPanel';
 
 export const GameBoard = () => {
+  const [ready, setReady] = useState(false);
   const { 
     players, 
     currentPlayerIndex, 
