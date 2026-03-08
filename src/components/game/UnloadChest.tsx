@@ -205,37 +205,16 @@ export const UnloadChest = ({
           'relative flex items-center gap-2',
           isPhone ? 'flex-col' : 'justify-between'
         )}>
-          {/* Chest icon + label */}
+          {/* Validation hints */}
           <div className="flex items-center gap-2">
-            <motion.div
-              className={cn(
-                'p-1.5 rounded-lg',
-                canUnload ? 'bg-primary/20' : 'bg-muted/40'
-              )}
-              animate={isUnloading ? { rotate: [0, -5, 5, -3, 0] } : {}}
-            >
-              <img src="/images/supply.png" alt="Sell Cargo" className={cn(
-                'object-contain',
-                isPhone ? 'w-6 h-6' : 'w-7 h-7'
-              )} />
-            </motion.div>
-            
-            <div>
-              <span className={cn(
-                'font-pirate text-primary block',
-                isPhone ? 'text-sm' : 'text-base'
-              )}>
-                Sell Cargo
+            {hasSelection && !allSameType && (
+              <span className="text-[10px] text-destructive">Same type only</span>
+            )}
+            {hasSelection && allSameType && selectedType && (
+              <span className="text-[10px] text-muted-foreground">
+                {selectedCards.length}× {selectedType}
               </span>
-              {hasSelection && !allSameType && (
-                <span className="text-[10px] text-destructive">Same type only</span>
-              )}
-              {hasSelection && allSameType && selectedType && (
-                <span className="text-[10px] text-muted-foreground">
-                  {selectedCards.length}× {selectedType}
-                </span>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Action buttons */}
