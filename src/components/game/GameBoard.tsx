@@ -76,6 +76,7 @@ export const GameBoard = () => {
   const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
   const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
   const [tradingPostCollapsed, setTradingPostCollapsed] = useState(false);
+  const [isExchangeMode, setIsExchangeMode] = useState(false);
 
   // Turn banner state
   const [showTurnBanner, setShowTurnBanner] = useState(false);
