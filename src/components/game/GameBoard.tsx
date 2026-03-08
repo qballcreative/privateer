@@ -451,9 +451,18 @@ export const GameBoard = () => {
 
   return (
     <motion.div
-      className="min-h-screen p-2 sm:p-4 lg:p-6 relative" style={{ backgroundImage: 'url(/images/wood-bg.png)', backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}
+      className="min-h-screen p-2 sm:p-4 lg:p-6 relative"
+      style={{
+        backgroundImage: 'url(/images/wood-bg.png)',
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'repeat-y',
+        opacity: ready ? 1 : 0,
+        transition: 'opacity 0.3s ease-in',
+      }}
       animate={roundFlourish ? { scale: [1, 1.008, 0.998, 1] } : { scale: 1 }}
       transition={roundFlourish ? { duration: 1.2, ease: 'easeInOut' } : undefined}
+      onAnimationComplete={() => { if (!ready) setReady(true); }}
+      ref={() => { if (!ready) requestAnimationFrame(() => setReady(true)); }}
     >
       {/* Deck-low vignette overlay */}
       <AnimatePresence>
