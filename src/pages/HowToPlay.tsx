@@ -141,16 +141,19 @@ const HowToPlay = () => {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
             {[
-              { name: 'Gemstones', values: '7, 7, 5, 5, 5', color: 'text-purple-400' },
-              { name: 'Gold', values: '6, 6, 5, 5, 5', color: 'text-yellow-400' },
-              { name: 'Silver', values: '5, 5, 5, 5, 5', color: 'text-gray-300' },
-              { name: 'Silks', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-pink-400' },
-              { name: 'Cannonballs', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400' },
-              { name: 'Rum', values: '4, 3, 2, 1, 1, 1, 1, 1, 1', color: 'text-amber-500' },
+              { name: 'Gems', values: '7, 7, 5, 5, 5', color: 'text-purple-400', img: gemTokens },
+              { name: 'Gold', values: '6, 6, 5, 5, 5', color: 'text-yellow-400', img: goldTokens },
+              { name: 'Silver', values: '5, 5, 5, 5, 5', color: 'text-gray-300', img: silverTokens },
+              { name: 'Silk', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-pink-400', img: silkTokens },
+              { name: 'Iron', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400', img: ironTokens },
+              { name: 'Rum', values: '4, 3, 2, 1, 1, 1, 1, 1, 1', color: 'text-amber-500', img: rumTokens },
             ].map((g) => (
-              <div key={g.name} className="bg-muted/50 rounded-lg p-2">
-                <span className={`font-bold ${g.color}`}>{g.name}</span>
-                <div className="text-muted-foreground text-xs mt-1">{g.values}</div>
+              <div key={g.name} className="bg-muted/50 rounded-lg p-2 flex items-center gap-2">
+                <img src={g.img} alt={g.name} className="w-8 h-8 object-contain" />
+                <div>
+                  <span className={`font-bold ${g.color}`}>{g.name}</span>
+                  <div className="text-muted-foreground text-xs mt-0.5">{g.values}</div>
+                </div>
               </div>
             ))}
           </div>
