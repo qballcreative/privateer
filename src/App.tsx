@@ -29,6 +29,14 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route
+            path="/how-to-play"
+            element={
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading…</div>}>
+                <HowToPlay />
+              </Suspense>
+            }
+          />
           {import.meta.env.DEV && (
             <Route
               path="/debug"

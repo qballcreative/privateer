@@ -81,10 +81,7 @@ export const Tutorial = () => {
     const y = highlightRect.top - p;
     const w = highlightRect.width + p * 2;
     const h = highlightRect.height + p * 2;
-    const r = 12;
     return {
-      background: 'transparent',
-      boxShadow: `0 0 0 9999px rgba(0,0,0,0.75), inset 0 0 0 0 transparent`,
       clipPath: `polygon(
         0% 0%, 0% 100%, ${x}px 100%, ${x}px ${y}px,
         ${x + w}px ${y}px, ${x + w}px ${y + h}px,
