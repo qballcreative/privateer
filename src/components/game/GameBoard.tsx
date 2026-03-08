@@ -739,15 +739,10 @@ export const GameBoard = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.main>
+            </main>
 
             {/* Right sidebar — Opponent & Scoreboard (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
+            <aside className="col-span-1 space-y-4">
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
