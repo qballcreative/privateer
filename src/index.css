@@ -196,6 +196,59 @@
       inset 0 1px 0 hsl(var(--wood-plank-light) / 0.3);
   }
 
+  /* Trading post market stall surface */
+  .trading-post-surface {
+    background:
+      /* Burlap weave crosshatch */
+      repeating-linear-gradient(
+        0deg,
+        hsl(25, 20%, 18%, 0.08) 0px,
+        transparent 1px,
+        transparent 6px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        hsl(25, 20%, 18%, 0.08) 0px,
+        transparent 1px,
+        transparent 6px
+      ),
+      /* Warm lantern glow from center */
+      radial-gradient(
+        ellipse at 50% 40%,
+        hsl(35, 60%, 40%, 0.12) 0%,
+        transparent 70%
+      ),
+      /* Canvas awning gradient at top */
+      linear-gradient(
+        180deg,
+        hsl(25, 30%, 22%) 0%,
+        hsl(25, 35%, 16%) 15%,
+        hsl(20, 30%, 13%) 50%,
+        hsl(20, 35%, 10%) 100%
+      );
+    border: 3px solid hsl(var(--rope));
+    box-shadow:
+      inset 0 4px 12px hsl(0, 0%, 0%, 0.5),
+      inset 0 -2px 6px hsl(0, 0%, 0%, 0.3),
+      inset 0 1px 0 hsl(var(--rope) / 0.2),
+      0 4px 16px hsl(0, 0%, 0%, 0.4);
+    border-radius: 0.75rem;
+  }
+
+  /* Cargo slot — inset tile for object-based UI */
+  .cargo-slot {
+    background: hsl(var(--wood-plank) / 0.6);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), inset 0 -1px 3px rgba(0,0,0,0.2);
+    border-radius: 0.5rem;
+  }
+
+  /* Wood/rope separator line */
+  .wood-separator {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--rope)), transparent);
+  }
+
   .gold-text {
     @apply text-primary;
     text-shadow: 0 0 10px hsl(var(--gold) / 0.5);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Player, Card } from '@/types/game';
-import { GameCard } from './GameCard';
+import CargoObject from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
@@ -92,7 +92,7 @@ export const PlayerHand = ({
         
         {/* Ships count */}
         <div className="flex items-center gap-1 text-accent">
-          <Anchor className="w-4 h-4" />
+          <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -ml-1 -my-2" />
           <span className="text-sm font-bold">{player.ships.length}</span>
         </div>
       </div>
@@ -109,12 +109,12 @@ export const PlayerHand = ({
               transition={{ delay: index * 0.05 }}
               className={cn(isRaidMode && isOpponent && 'cursor-crosshair')}
             >
-              <GameCard
+              <CargoObject
                 card={card}
                 selected={selectedCards.includes(card.id)}
                 onClick={() => handleCardClick(card)}
                 disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
-                faceDown={isOpponent && !isRaidMode}
+                hidden={isOpponent && !isRaidMode}
                 size="md"
                 className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-red-500 hover:scale-105 transition-all')}
               />
