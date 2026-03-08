@@ -57,7 +57,7 @@ const CardRow = ({ cards, label }: { cards: Card[]; label?: string }) => (
 export const ActionNotification = ({ action, show }: ActionNotificationProps) => {
   if (!action) return null;
 
-  const Icon = actionIcons[action.type];
+  const iconSrc = actionIcons[action.type];
   const colorClass = actionColors[action.type];
   const iconColor = actionIconColors[action.type];
 
