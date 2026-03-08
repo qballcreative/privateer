@@ -439,95 +439,14 @@ export const GameBoard = () => {
 
   const activeRulesCount = Object.values(optionalRules).filter(Boolean).length;
 
-  // ─── Treasure Supply Panel (reusable across layouts) ───
-  const TreasureSupplyPanel = ({ compact = false }: { compact?: boolean }) => (
-    <div className="space-y-4">
-      <div className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
-        <div className="absolute inset-0 bg-background/40 pointer-events-none" />
-        <div className="relative z-10">
-          <h3 className="font-pirate text-lg text-primary mb-4 text-center">
-            Market Prices
-          </h3>
-          <div className={cn("grid gap-4 place-items-center", compact ? "grid-cols-3" : "grid-cols-2")}>
-            {GOODS_ORDER.map((type) => (
-              <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-            ))}
-          </div>
-        </div>
-      </div>
+  // ─── Stable props for extracted panels ───
+  const treasureSupplyProps = useMemo(() => ({
+    tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid,
+  }), [tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid]);
 
-      <BonusTokens
-        threeCards={bonusTokens.three}
-        fourCards={bonusTokens.four}
-        fiveCards={bonusTokens.five}
-      />
-
-      {/* Pirate Raid Button */}
-      {optionalRules.pirateRaid && currentPlayerIndex === localPlayerIndex && phase === 'playing' && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-card border border-red-500/20"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Crosshair className="w-5 h-5 text-red-400" />
-            <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
-          </div>
-          
-          {humanPlayer.hasUsedPirateRaid ? (
-            <p className="text-xs text-muted-foreground">Already used this game</p>
-          ) : canUsePirateRaid() && !currentPlayer.isAI ? (
-            <>
-              <p className="text-xs text-muted-foreground mb-2">
-                Steal one card from your opponent!
-              </p>
-              <Button
-                size="sm"
-                variant={isRaidMode ? 'destructive' : 'outline'}
-                className={cn(
-                  'w-full',
-                  !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-                )}
-                onClick={() => setIsRaidMode(!isRaidMode)}
-              >
-                {isRaidMode ? (
-                  <>
-                    <X className="w-4 h-4 mr-1" />
-                    Cancel Raid
-                  </>
-                ) : (
-                  <>
-                    <Crosshair className="w-4 h-4 mr-1" />
-                    Activate Raid
-                  </>
-                )}
-              </Button>
-            </>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
-            </p>
-          )}
-        </motion.div>
-      )}
-    </div>
-  );
-
-  // ─── Opponent Panel (reusable) ───
-  const OpponentPanel = () => (
-    <div className="space-y-4">
-      {opponentPlayer && (
-        <ShipsHold
-          player={opponentPlayer}
-          isCurrentPlayer={currentPlayerIndex === 1}
-          isOpponent
-          isRaidMode={isRaidMode && currentPlayerIndex === 0}
-          onRaidCard={handlePirateRaid}
-        />
-      )}
-      <ScoreBoard />
-    </div>
-  );
+  const opponentPanelProps = useMemo(() => ({
+    opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid,
+  }), [opponentPlayer, currentPlayerIndex, isRaidMode]);
 
   return (
     <motion.div
