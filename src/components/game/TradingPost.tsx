@@ -320,8 +320,8 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             {/* Ships row */}
             {currentPlayer.ships.length > 0 && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold flex items-center gap-1">
-                  <Ship className="w-3 h-3" /> Ships
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-bold">
+                  Fleet
                 </p>
                 <div className={cn(
                   isPhone
