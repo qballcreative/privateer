@@ -70,8 +70,7 @@ const MedallionStack = ({
 export const BonusTokens = ({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
     <div className="flex items-center gap-4 p-3 rounded-lg bg-card/50 border border-border">
-      <span className="text-sm font-pirate text-primary flex items-center gap-1">
-        <img src="/images/commissions.png" alt="Commissions" className="w-7 h-7 object-contain -my-1" />
+      <span className="text-lg font-pirate text-primary">
         Commissions
       </span>
       <MedallionStack tier="three" tokens={threeCards} />
