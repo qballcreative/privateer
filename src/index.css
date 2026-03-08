@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+/* Fonts loaded via index.html link tags for performance */
 
 @tailwind base;
 @tailwind components;
