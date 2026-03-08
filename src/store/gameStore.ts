@@ -735,6 +735,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         hiddenTreasures: fullState.hiddenTreasures,
         phase: skipRoundEnd ? 'gameEnd' : 'roundEnd',
         roundWins,
+        roundWinners,
         turnCount: newTurnCount,
       });
       return;
