@@ -110,10 +110,10 @@ export const LandingPage = () => {
 
       {/* Educational sections */}
       {!showMultiplayer && (
-        <>
+        <Suspense fallback={null}>
           <HowToPlunder />
           <VictoryConditions />
-        </>
+        </Suspense>
       )}
 
       {/* Ad Banner */}
