@@ -35,6 +35,24 @@ export default defineConfig(({ mode }) => ({
         globIgnores: ["**/sounds/**"],
         navigateFallbackDenylist: [/^\/~oauth/],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            urlPattern: /\/images\/.+\.(?:png|jpg|webp|svg)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'game-images',
+              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
+          },
+          {
+            urlPattern: /\/Icons\/.+\.(?:png|jpg|webp|svg)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'game-icons',
+              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
+          },
+        ],
       },
       manifest: false,
     }),

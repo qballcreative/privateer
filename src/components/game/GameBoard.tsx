@@ -151,6 +151,7 @@ const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, on
 OpponentPanel.displayName = 'OpponentPanel';
 
 export const GameBoard = () => {
+  const [ready, setReady] = useState(false);
   const { 
     players, 
     currentPlayerIndex, 
@@ -450,9 +451,18 @@ export const GameBoard = () => {
 
   return (
     <motion.div
-      className="min-h-screen p-2 sm:p-4 lg:p-6 relative" style={{ backgroundImage: 'url(/images/wood-bg.png)', backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}
+      className="min-h-screen p-2 sm:p-4 lg:p-6 relative"
+      style={{
+        backgroundImage: 'url(/images/wood-bg.png)',
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'repeat-y',
+        opacity: ready ? 1 : 0,
+        transition: 'opacity 0.3s ease-in',
+      }}
       animate={roundFlourish ? { scale: [1, 1.008, 0.998, 1] } : { scale: 1 }}
       transition={roundFlourish ? { duration: 1.2, ease: 'easeInOut' } : undefined}
+      onAnimationComplete={() => { if (!ready) setReady(true); }}
+      ref={() => { if (!ready) requestAnimationFrame(() => setReady(true)); }}
     >
       {/* Deck-low vignette overlay */}
       <AnimatePresence>
@@ -478,11 +488,7 @@ export const GameBoard = () => {
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.header
-          className="flex items-center justify-between mb-3 sm:mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <header className="flex items-center justify-between mb-3 sm:mb-6">
           <div className="flex items-center gap-2 sm:gap-3">
             <img src={bannerLogo} alt="Privateer: Letters of Marque" className="h-40 sm:h-48 lg:h-56 object-contain" />
             
@@ -543,7 +549,7 @@ export const GameBoard = () => {
               <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
-        </motion.header>
+        </header>
 
         {/* ════════════════════════════════════════════════════════════════
             PHONE LAYOUT — stacked, drawers for treasure/opponent
@@ -649,12 +655,7 @@ export const GameBoard = () => {
         <div className="hidden md:block lg:hidden">
           <div className="grid grid-cols-3 gap-4">
             {/* Left column: Opponent + ScoreBoard */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <aside className="col-span-1 space-y-4">
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
@@ -666,17 +667,14 @@ export const GameBoard = () => {
                 />
               )}
               <ScoreBoard />
-            </motion.aside>
+            </aside>
 
             {/* Center column: Trading Post + Player Hold */}
-            <motion.main
+            <main
               className={cn(
                 "col-span-1 space-y-4",
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
               <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
               <AnimatePresence>
@@ -695,17 +693,12 @@ export const GameBoard = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.main>
+            </main>
 
             {/* Right column: Treasure Supply + Bonuses */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
+            <aside className="col-span-1 space-y-4">
               <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
-            </motion.aside>
+            </aside>
           </div>
         </div>
 
@@ -715,24 +708,16 @@ export const GameBoard = () => {
         <div className="hidden lg:block">
           <div className="grid grid-cols-4 gap-6">
             {/* Left sidebar - Treasure & Bonuses (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <aside className="col-span-1 space-y-4">
               <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
-            </motion.aside>
+            </aside>
 
             {/* Main game area — Trading Post top, Hold bottom */}
-            <motion.main
+            <main
               className={cn(
                 "col-span-2 space-y-6",
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
               {/* Trading Post — top center */}
               <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
@@ -754,15 +739,10 @@ export const GameBoard = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.main>
+            </main>
 
             {/* Right sidebar — Opponent & Scoreboard (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
+            <aside className="col-span-1 space-y-4">
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
@@ -774,7 +754,7 @@ export const GameBoard = () => {
                 />
               )}
               <ScoreBoard />
-            </motion.aside>
+            </aside>
           </div>
         </div>
 
