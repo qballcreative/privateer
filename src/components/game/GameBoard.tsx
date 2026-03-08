@@ -24,6 +24,7 @@ import { GoodsType, Card } from '@/types/game';
 import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown, Coins, Medal, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sanitizeChatMessage, sanitizePlayerName, isValidChatPayload, CHAT_MESSAGE_MAX_LENGTH } from '@/lib/security';
+import bannerLogo from '@/assets/BannerLogo.png';
 
 const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
 
