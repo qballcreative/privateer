@@ -16,6 +16,7 @@ import { InterstitialAd } from './InterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
+import { VictoryScreen } from './VictoryScreen';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
