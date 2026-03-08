@@ -25,6 +25,7 @@ import {
 } from '@/types/game';
 import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
 import { validateGameState } from '@/lib/validateGameState';
+import { debugLog } from '@/lib/debugLog';
 import {
   RulesEngine,
   RuleContext,
