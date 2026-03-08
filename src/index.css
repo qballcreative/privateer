@@ -196,6 +196,20 @@
       inset 0 1px 0 hsl(var(--wood-plank-light) / 0.3);
   }
 
+  /* Cargo slot — inset tile for object-based UI */
+  .cargo-slot {
+    background: hsl(var(--wood-plank) / 0.6);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), inset 0 -1px 3px rgba(0,0,0,0.2);
+    border-radius: 0.5rem;
+  }
+
+  /* Wood/rope separator line */
+  .wood-separator {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--rope)), transparent);
+  }
+
   .gold-text {
     @apply text-primary;
     text-shadow: 0 0 10px hsl(var(--gold) / 0.5);
