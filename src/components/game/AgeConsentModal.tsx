@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { Shield, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import privateerLogo from '@/assets/Privateer.png';
 
 interface AgeConsentModalProps {
   onComplete?: () => void;
@@ -59,9 +60,12 @@ export const AgeConsentModal = ({ onComplete }: AgeConsentModalProps) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center gap-3 mb-6">
-          <Shield className="w-6 h-6 text-primary" />
-          <h2 className="font-pirate text-2xl text-primary">Welcome Aboard</h2>
+        <div className="flex flex-col items-center mb-6">
+          <img src={privateerLogo} alt="Privateer" className="w-48 mb-4" />
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-primary" />
+            <h2 className="font-pirate text-2xl text-primary">Welcome Aboard</h2>
+          </div>
         </div>
 
         {step === 1 ? (
