@@ -40,6 +40,7 @@ export const LandingPage = () => {
   const [showMultiplayer, setShowMultiplayer] = useState(false);
 
   const { startGame } = useGameStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setDifficulty(lastDifficulty);
