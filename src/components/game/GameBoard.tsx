@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -20,11 +20,133 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { GoodsType, Card } from '@/types/game';
+import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
 import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown, Coins, Medal, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sanitizeChatMessage, sanitizePlayerName, isValidChatPayload, CHAT_MESSAGE_MAX_LENGTH } from '@/lib/security';
 import bannerLogo from '@/assets/BannerLogo.png';
+
+// ─── Preload static images at module level ───
+const PRELOAD_IMAGES = [
+  '/images/doubloons.png', '/images/commissions.png', '/images/fleet.png',
+  '/images/supply.png', '/images/ledger-bg.png', '/images/trading-post-bg.png',
+  '/images/cargo-hold-bg.png', '/images/wood-bg.png',
+  '/Icons/Doubloon.png', '/Icons/rum.png', '/Icons/cannonballs.png',
+  '/Icons/silks.png', '/Icons/silver.png', '/Icons/gold.png', '/Icons/gemstones.png',
+  '/Icons/RedSeal.png', '/Icons/SilverSeal.png', '/Icons/GoldSeal.png',
+  '/Icons/Claim.png', '/Icons/Trade.png',
+];
+PRELOAD_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
+
+// ─── Extracted stable components ───
+
+interface TreasureSupplyPanelProps {
+  compact?: boolean;
+  tokenStacks: Record<GoodsType, Token[]>;
+  bonusTokens: { three: BonusToken[]; four: BonusToken[]; five: BonusToken[] };
+  optionalRules: { pirateRaid?: boolean; stormRule?: boolean; treasureChest?: boolean };
+  currentPlayerIndex: number;
+  localPlayerIndex: number;
+  phase: string;
+  humanPlayer: Player;
+  currentPlayer: Player;
+  canUsePirateRaid: () => boolean;
+  isRaidMode: boolean;
+  setIsRaidMode: (v: boolean) => void;
+}
+
+const TreasureSupplyPanel = memo(({ compact = false, tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid, isRaidMode, setIsRaidMode }: TreasureSupplyPanelProps) => (
+  <div className="space-y-4">
+    <div className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
+      <div className="absolute inset-0 bg-background/40 pointer-events-none" />
+      <div className="relative z-10">
+        <h3 className="font-pirate text-lg text-primary mb-4 text-center">
+          Market Prices
+        </h3>
+        <div className={cn("grid gap-4 place-items-center", compact ? "grid-cols-3" : "grid-cols-2")}>
+          {GOODS_ORDER.map((type) => (
+            <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <BonusTokens
+      threeCards={bonusTokens.three}
+      fourCards={bonusTokens.four}
+      fiveCards={bonusTokens.five}
+    />
+
+    {/* Pirate Raid Button */}
+    {optionalRules.pirateRaid && currentPlayerIndex === localPlayerIndex && phase === 'playing' && (
+      <div className="p-4 rounded-xl bg-card border border-red-500/20">
+        <div className="flex items-center gap-2 mb-2">
+          <Crosshair className="w-5 h-5 text-red-400" />
+          <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
+        </div>
+        
+        {humanPlayer.hasUsedPirateRaid ? (
+          <p className="text-xs text-muted-foreground">Already used this game</p>
+        ) : canUsePirateRaid() && !currentPlayer.isAI ? (
+          <>
+            <p className="text-xs text-muted-foreground mb-2">
+              Steal one card from your opponent!
+            </p>
+            <Button
+              size="sm"
+              variant={isRaidMode ? 'destructive' : 'outline'}
+              className={cn(
+                'w-full',
+                !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+              )}
+              onClick={() => setIsRaidMode(!isRaidMode)}
+            >
+              {isRaidMode ? (
+                <>
+                  <X className="w-4 h-4 mr-1" />
+                  Cancel Raid
+                </>
+              ) : (
+                <>
+                  <Crosshair className="w-4 h-4 mr-1" />
+                  Activate Raid
+                </>
+              )}
+            </Button>
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
+          </p>
+        )}
+      </div>
+    )}
+  </div>
+));
+TreasureSupplyPanel.displayName = 'TreasureSupplyPanel';
+
+interface OpponentPanelProps {
+  opponentPlayer: Player | undefined;
+  currentPlayerIndex: number;
+  isRaidMode: boolean;
+  onRaidCard: (card: Card) => void;
+}
+
+const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard }: OpponentPanelProps) => (
+  <div className="space-y-4">
+    {opponentPlayer && (
+      <ShipsHold
+        player={opponentPlayer}
+        isCurrentPlayer={currentPlayerIndex === 1}
+        isOpponent
+        isRaidMode={isRaidMode && currentPlayerIndex === 0}
+        onRaidCard={onRaidCard}
+      />
+    )}
+    <ScoreBoard />
+  </div>
+));
+OpponentPanel.displayName = 'OpponentPanel';
 
 const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
 
