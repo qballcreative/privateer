@@ -132,7 +132,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
       {/* Trading Post — Dock Table Surface */}
       <div className={cn(
-        "relative rounded-xl wood-plank-texture border-2 border-primary/30 rope-border overflow-visible mt-4",
+        "relative rounded-xl trading-post-surface overflow-visible mt-4",
         isPhone ? "p-3" : "p-6"
       )}>
         {/* Trading Post Label */}
