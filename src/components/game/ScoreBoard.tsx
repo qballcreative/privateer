@@ -84,7 +84,7 @@ export const ScoreBoard = () => {
               {/* Score breakdown */}
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="flex items-center gap-1 text-muted-foreground" title="Doubloons">
-                  <img src="/images/doubloons.png" alt="Doubloons" className="w-4 h-4 object-contain" />
+                  <img src="/images/doubloons.png" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
                   <span>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground" title="Commissions">
