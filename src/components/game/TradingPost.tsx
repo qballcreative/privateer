@@ -164,6 +164,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
         {/* Cargo on the dock */}
         <div className={cn(
+          "relative z-[1]",
           "min-h-[80px] sm:min-h-[140px]",
           isPhone 
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
