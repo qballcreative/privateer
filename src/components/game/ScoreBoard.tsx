@@ -42,7 +42,7 @@ export const ScoreBoard = () => {
       {/* Player manifests */}
       <div className="space-y-3">
         {players.map((player, index) => {
-          const score = calculateScore(player);
+          const score = calculateScore(player, players);
           
           return (
             <motion.div
