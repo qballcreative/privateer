@@ -24,11 +24,9 @@ const sectionAnim = {
 
 const HowToPlay = () => {
   const navigate = useNavigate();
-  const { start: startTutorial } = useTutorialStore();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Tutorial />
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border">
