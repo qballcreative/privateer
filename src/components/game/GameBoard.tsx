@@ -812,7 +812,7 @@ export const GameBoard = () => {
             players={players}
             roundWins={useGameStore.getState().roundWins}
             winner={getWinner()}
-            maxRounds={3}
+            maxRounds={useGameStore.getState().maxRounds}
             onPlayAgain={restartGame}
             onReturnHome={resetGame}
           />

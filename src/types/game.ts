@@ -84,6 +84,7 @@ export interface GameState {
   turnCount: number; // For storm rule
   hiddenTreasures: HiddenTreasure[]; // For treasure chest rule
   isMultiplayer: boolean; // For multiplayer mode
+  roundWinners: (string | null)[]; // Per-round winner player IDs
 }
 
 // Token values based on Jaipur rules

@@ -103,6 +103,9 @@ export const LandingPage = () => {
         ) : (
           <SetSailPanel
             key="setup"
+            playerName={playerName}
+            onNameChange={(name) => { setPlayerName(name); savePlayerName(name); }}
+            stats={usePlayerStore.getState().stats}
             mode={mode}
             setMode={setMode}
             difficulty={difficulty}

@@ -151,6 +151,15 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
             className="relative z-10 mb-5"
           >
             <h3 className="font-pirate text-sm text-muted-foreground mb-2 uppercase tracking-wider">Voyage Results</h3>
+            {/* Per-round voyage indicators */}
+            {roundWinners.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                {roundWinners.map((winnerId, idx) => {
+                  const winnerIdx = winnerId ? players.findIndex(p => p.id === winnerId) : -1;
+                  return <VoyageIndicator key={idx} roundIndex={idx} winnerIndex={winnerIdx} players={players} />;
+                })}
+              </div>
+            )}
             <div className="flex items-center justify-center gap-3 mb-3">
               {players.map((player, i) => (
                 <div key={player.id} className="flex items-center gap-2">

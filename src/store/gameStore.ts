@@ -848,6 +848,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       round: 1,
       roundWins: [0, 0],
+      roundWinners: [],
       lastAction: null,
       optionalRules: defaultOptionalRules,
       turnCount: 0,
