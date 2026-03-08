@@ -326,6 +326,36 @@
   .card-back {
     transform: rotateY(180deg);
   }
+
+  /* Board game box — clean card for landing page */
+  .game-box-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 24px hsl(0, 0%, 0%, 0.3), 0 1px 3px hsl(0, 0%, 0%, 0.2);
+  }
+
+  /* Info badge for hero section */
+  .game-box-badge {
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+
+  /* Numbered step circle */
+  .step-badge {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.875rem;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 2px 8px hsl(var(--gold) / 0.3);
+  }
 }
 
 @layer utilities {

@@ -121,7 +121,7 @@ export const LandingPage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="relative py-6 px-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50">
+      <footer className="relative py-6 px-4 text-center text-sm text-muted-foreground border-t border-border bg-card/80">
         <p>Privateer: Letters of Marque © 2025 • QBall Creative</p>
       </footer>
     </div>

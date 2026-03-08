@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Swords, Users, Anchor, Crown, Dices, Shield } from 'lucide-react';
+import { Swords, Users, Anchor, Crown, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
 
@@ -37,9 +37,9 @@ export const SetSailPanel = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.5 }}
     >
-      <div className="rounded-lg rope-border bg-[hsl(var(--wood-plank)/0.85)] backdrop-blur-md p-6 md:p-8 shadow-[var(--shadow-inset),var(--shadow-elevated)]">
+      <div className="game-box-card p-6 md:p-8">
         {/* Title */}
-        <h2 className="font-pirate text-3xl md:text-4xl text-primary text-center mb-6 drop-shadow-[0_0_10px_hsl(var(--gold)/0.3)]">
+        <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-center mb-6">
           Set Sail
         </h2>
 
@@ -48,7 +48,7 @@ export const SetSailPanel = ({
           <ModeButton
             active={mode === 'aai'}
             onClick={() => setMode('aai')}
-            icon={<Swords className="w-6 h-6" />}
+            icon={<Swords className="w-5 h-5" />}
             label="Battle the AAI"
             variant="gold"
           />
@@ -56,18 +56,17 @@ export const SetSailPanel = ({
             <ModeButton
               active={mode === 'multiplayer'}
               onClick={() => setMode('multiplayer')}
-              icon={<Users className="w-6 h-6" />}
+              icon={<Users className="w-5 h-5" />}
               label="Multiplayer"
               variant="ocean"
             />
           )}
         </div>
 
-        <hr className="wood-separator my-5" />
+        <hr className="my-5 border-border" />
 
         {/* Options Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-          {/* Best Of */}
           <OptionGroup label="Best of">
             <div className="flex gap-2">
               {([1, 3] as const).map((v) => (
@@ -75,10 +74,10 @@ export const SetSailPanel = ({
                   key={v}
                   onClick={() => setBestOf(v)}
                   className={cn(
-                    'flex-1 min-h-[44px] rounded-md font-bold text-sm transition-all',
+                    'flex-1 min-h-[44px] rounded-lg font-bold text-sm transition-all border',
                     bestOf === v
-                      ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                      : 'cargo-slot text-muted-foreground hover:text-primary/70'
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
                   )}
                 >
                   {v}
@@ -87,7 +86,6 @@ export const SetSailPanel = ({
             </div>
           </OptionGroup>
 
-          {/* First Player */}
           <OptionGroup label="First Player">
             <div className="flex gap-2">
               {(['host', 'random'] as const).map((v) => (
@@ -95,10 +93,10 @@ export const SetSailPanel = ({
                   key={v}
                   onClick={() => setFirstPlayer(v)}
                   className={cn(
-                    'flex-1 min-h-[44px] rounded-md font-bold text-sm transition-all capitalize',
+                    'flex-1 min-h-[44px] rounded-lg font-bold text-sm transition-all capitalize border',
                     firstPlayer === v
-                      ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                      : 'cargo-slot text-muted-foreground hover:text-primary/70'
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
                   )}
                 >
                   {v}
@@ -108,12 +106,12 @@ export const SetSailPanel = ({
           </OptionGroup>
         </div>
 
-        {/* Pirate Level — AAI only */}
+        {/* Difficulty — AAI only */}
         {mode === 'aai' && (
           <>
-            <hr className="wood-separator my-5" />
+            <hr className="my-5 border-border" />
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Pirate Level</p>
+              <p className="text-sm text-muted-foreground mb-2 font-semibold">Difficulty</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {difficultyLevels.map(({ key, label, icon: Icon }) => {
                   const locked = restrictedMode && key !== 'easy';
@@ -123,11 +121,11 @@ export const SetSailPanel = ({
                       onClick={() => onDifficultyChange(key)}
                       disabled={locked}
                       className={cn(
-                        'min-h-[44px] rounded-md p-2 transition-all flex flex-col items-center justify-center gap-1',
+                        'min-h-[44px] rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border',
                         locked && 'opacity-40 cursor-not-allowed',
                         difficulty === key
-                          ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                          : 'cargo-slot text-muted-foreground hover:text-primary/70'
+                          ? 'bg-primary/10 border-primary text-primary'
+                          : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
                       )}
                     >
                       <Icon className="w-4 h-4" />
@@ -140,14 +138,14 @@ export const SetSailPanel = ({
           </>
         )}
 
-        <hr className="wood-separator my-5" />
+        <hr className="my-5 border-border" />
 
         {/* Action Buttons */}
         <div className="space-y-3">
           {mode === 'aai' ? (
             <ActionButton onClick={onStartAAI} variant="gold">
-              <Swords className="w-6 h-6 mr-2" />
-              Start vs AAI
+              <Swords className="w-5 h-5 mr-2" />
+              Start Game
             </ActionButton>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -169,7 +167,7 @@ export const SetSailPanel = ({
 
 const OptionGroup = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>
-    <p className="text-sm text-muted-foreground mb-2">{label}</p>
+    <p className="text-sm text-muted-foreground mb-2 font-semibold">{label}</p>
     {children}
   </div>
 );
@@ -183,12 +181,12 @@ const ModeButton = ({
   <button
     onClick={onClick}
     className={cn(
-      'min-h-[56px] rounded-md p-4 flex items-center justify-center gap-3 font-pirate text-lg transition-all cargo-slot',
+      'min-h-[56px] rounded-lg p-4 flex items-center justify-center gap-3 font-bold text-base transition-all border',
       active
         ? variant === 'gold'
-          ? 'text-primary shadow-[inset_0_0_12px_hsl(var(--gold)/0.3),var(--shadow-gold)]'
-          : 'text-accent shadow-[inset_0_0_12px_hsl(var(--ocean)/0.3),0_0_15px_hsl(var(--ocean)/0.3)]'
-        : 'text-muted-foreground hover:text-primary/60'
+          ? 'bg-primary/10 border-primary text-primary shadow-[0_0_12px_hsl(var(--gold)/0.15)]'
+          : 'bg-accent/10 border-accent text-accent shadow-[0_0_12px_hsl(var(--ocean)/0.15)]'
+        : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
     )}
   >
     {icon}
@@ -204,9 +202,9 @@ const ActionButton = ({
   <button
     onClick={onClick}
     className={cn(
-      'w-full min-h-[52px] rounded-md rope-border font-pirate text-lg flex items-center justify-center transition-all active:scale-95',
+      'w-full min-h-[52px] rounded-lg font-bold text-lg flex items-center justify-center transition-all active:scale-95',
       variant === 'gold'
-        ? 'bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[var(--shadow-gold)] hover:shadow-[0_6px_25px_hsl(var(--gold)/0.6)]'
+        ? 'bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[0_4px_15px_hsl(var(--gold)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--gold)/0.5)]'
         : 'bg-gradient-to-b from-accent to-accent/80 text-accent-foreground shadow-[0_4px_15px_hsl(var(--ocean)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--ocean)/0.5)]'
     )}
   >
