@@ -101,7 +101,7 @@ export const ScoreBoard = () => {
               <div className="mt-2 pt-2 border-t border-border">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <img src="/images/doubloons.png" alt="Doubloons" className="w-4 h-4 object-contain" />
+                    <img src="/images/doubloons.png" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
                     Total
                   </span>
                   <span className={cn(

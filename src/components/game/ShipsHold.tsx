@@ -229,7 +229,7 @@ export const ShipsHold = ({
           isPhone ? "text-xs" : "text-sm"
         )}>
           <span className="text-muted-foreground flex items-center gap-1">
-            <img src="/images/doubloons.png" alt="Doubloons" className="w-5 h-5 object-contain" />
+            <img src="/images/doubloons.png" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
             <span className="font-bold text-primary">{player.tokens.reduce((sum, t) => sum + t.value, 0)}</span>
           </span>
           <span className="text-muted-foreground">
