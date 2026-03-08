@@ -96,7 +96,7 @@ export const ShipsHold = ({
         <div className="flex items-center gap-1.5 sm:gap-2">
           <h3 className={cn(
             "font-pirate text-primary",
-            isPhone ? "text-base" : "text-lg"
+            isPhone ? "text-sm" : "text-sm"
           )}>
             {isOpponent ? `${player.name}'s Hold` : "Captain's Hold"}
           </h3>
