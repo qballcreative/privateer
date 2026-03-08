@@ -180,7 +180,7 @@ export const ShipsHold = ({
               key={`empty-${index}`}
               layout
               className={cn(
-                "rounded-full border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
+                "rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
                 isPhone ? "w-12 h-12 flex-shrink-0" : "w-16 h-16"
               )}
               style={{
