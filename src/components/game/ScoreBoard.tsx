@@ -46,7 +46,7 @@ export const ScoreBoard = () => {
             <motion.div
               key={player.id}
               className={cn(
-                'p-3 rounded-lg border',
+                'p-3 rounded-lg border overflow-visible',
                 player.isAI ? 'bg-muted/50 border-border' : 'bg-primary/5 border-primary/20'
               )}
               initial={{ opacity: 0, x: -20 }}
