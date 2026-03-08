@@ -47,7 +47,7 @@ const CardRow = ({ cards, label }: { cards: Card[]; label?: string }) => (
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: idx * 0.1, type: 'spring', stiffness: 300 }}
         >
-          <GameCard card={card} size="sm" disabled />
+          <CargoObject card={card} size="sm" disabled />
         </motion.div>
       ))}
     </div>

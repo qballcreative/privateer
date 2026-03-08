@@ -203,7 +203,7 @@ export const Market = () => {
             
             {/* Ships can be used in exchange */}
             {currentPlayer.ships.map((card) => (
-              <GameCard
+              <CargoObject
                 key={card.id}
                 card={card}
                 selected={selectedHandCards.includes(card.id)}

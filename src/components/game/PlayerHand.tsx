@@ -109,12 +109,12 @@ export const PlayerHand = ({
               transition={{ delay: index * 0.05 }}
               className={cn(isRaidMode && isOpponent && 'cursor-crosshair')}
             >
-              <GameCard
+              <CargoObject
                 card={card}
                 selected={selectedCards.includes(card.id)}
                 onClick={() => handleCardClick(card)}
                 disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
-                faceDown={isOpponent && !isRaidMode}
+                hidden={isOpponent && !isRaidMode}
                 size="md"
                 className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-red-500 hover:scale-105 transition-all')}
               />
