@@ -50,8 +50,8 @@ const HowToPlay = () => {
 
         {/* Game Setup */}
         <motion.section {...sectionAnim}>
-          <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-            <Ship className="w-6 h-6" /> Game Setup
+          <h2 className="font-serif text-2xl font-bold text-primary mb-4">
+            Game Setup
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
