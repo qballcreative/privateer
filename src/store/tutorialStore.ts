@@ -81,7 +81,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'storm-rule',
     title: 'Optional: Storm Rule ⛈️',
-    description: 'When enabled, every 3rd turn a storm hits! 2 random goods are swept from the Trading Post and replaced from the Supply Ship. Keep your plans flexible!',
+    description: 'When enabled, every 3rd turn a storm hits! 2 random goods are swept from the Trading Post and replaced from the Trading Post supply. Keep your plans flexible!',
     highlightId: 'tutorial-storm',
     position: 'bottom',
     optional: true,
