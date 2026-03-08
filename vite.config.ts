@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: 'script-defer',
       includeAssets: ["favicon.ico", "Icons/**"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,webp}"],
