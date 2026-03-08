@@ -439,7 +439,7 @@ export const GameBoard = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-2 sm:gap-3">
-            <h1 className="font-pirate text-2xl sm:text-3xl lg:text-4xl text-primary">Privateer</h1>
+            <img src={bannerLogo} alt="Privateer: Letters of Marque" className="h-10 sm:h-12 lg:h-14 object-contain" />
             
             {activeRulesCount > 0 && (
               <div className="flex items-center gap-1">
