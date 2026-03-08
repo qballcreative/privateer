@@ -214,17 +214,10 @@ export const UnloadChest = ({
               )}
               animate={isUnloading ? { rotate: [0, -5, 5, -3, 0] } : {}}
             >
-              {canUnload ? (
-                <Unlock className={cn(
-                  'text-primary',
-                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
-                )} />
-              ) : (
-                <Lock className={cn(
-                  'text-muted-foreground',
-                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
-                )} />
-              )}
+              <img src="/images/supply.png" alt="Sell Cargo" className={cn(
+                'object-contain',
+                isPhone ? 'w-6 h-6' : 'w-7 h-7'
+              )} />
             </motion.div>
             
             <div>
@@ -232,7 +225,7 @@ export const UnloadChest = ({
                 'font-pirate text-primary block',
                 isPhone ? 'text-sm' : 'text-base'
               )}>
-                Sell Chest
+                Sell Cargo
               </span>
               {hasSelection && !allSameType && (
                 <span className="text-[10px] text-destructive">Same type only</span>
@@ -256,7 +249,7 @@ export const UnloadChest = ({
               )}
               size="sm"
             >
-              <Package className={cn(isPhone ? 'w-3.5 h-3.5' : 'w-4 h-4', 'mr-1')} />
+              <img src="/images/supply.png" alt="Unload" className={cn(isPhone ? 'w-4 h-4' : 'w-5 h-5', 'mr-1 object-contain')} />
               Unload{hasSelection ? ` (${selectedCards.length})` : ''}
             </Button>
 
