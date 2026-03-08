@@ -217,19 +217,29 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
         {/* Commandeer Fleet */}
         {ships.length > 0 && isPlayerTurn && phase === 'playing' && mode === 'take' && (
           <motion.div
-            className="mt-3 sm:mt-4 flex justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className="mt-3 sm:mt-4 flex justify-center relative z-20"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            <Button
+            <motion.button
               onClick={handleCommandeerFleet}
-              variant="outline"
-              size="sm"
-              className="border-accent text-accent hover:bg-accent/10 text-xs sm:text-sm"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative group flex flex-col items-center cursor-pointer focus:outline-none"
             >
-              <Anchor className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-              Commandeer Fleet ({ships.length})
-            </Button>
+              {/* Fleet image — overflows above the pill */}
+              <motion.img
+                src="/images/fleet.png"
+                alt="Fleet"
+                className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_4px_12px_hsl(var(--accent)/0.5)] group-hover:drop-shadow-[0_6px_20px_hsl(var(--accent)/0.7)] transition-all duration-300 -mb-3"
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              {/* Text pill */}
+              <span className="px-4 py-1.5 rounded-full bg-accent/20 border border-accent/40 text-accent font-pirate text-xs sm:text-sm backdrop-blur-sm group-hover:bg-accent/30 group-hover:border-accent/60 transition-all duration-300 shadow-[0_0_15px_hsl(var(--accent)/0.2)] group-hover:shadow-[0_0_25px_hsl(var(--accent)/0.4)]">
+                Commandeer Fleet ({ships.length})
+              </span>
+            </motion.button>
           </motion.div>
         )}
       </div>
