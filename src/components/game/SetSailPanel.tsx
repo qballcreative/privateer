@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
-import { Swords, Users, Anchor, Crown, Shield } from 'lucide-react';
+import { Swords, Users, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
+import deckhandImg from '@/assets/difficulty/deckhand.png';
+import bosunImg from '@/assets/difficulty/bosun.png';
+import privateerImg from '@/assets/difficulty/privateer.png';
+import admiralImg from '@/assets/difficulty/admiral.png';
 
 interface SetSailPanelProps {
   mode: 'aai' | 'multiplayer';
@@ -18,11 +22,11 @@ interface SetSailPanelProps {
   restrictedMode: boolean;
 }
 
-const difficultyLevels: { key: Difficulty; label: string; icon: typeof Shield }[] = [
-  { key: 'easy', label: 'Deckhand', icon: Shield },
-  { key: 'medium', label: 'Bosun', icon: Anchor },
-  { key: 'hard', label: 'Privateer', icon: Swords },
-  { key: 'expert', label: 'Admiral', icon: Crown },
+const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
+  { key: 'easy', label: 'Deckhand', img: deckhandImg },
+  { key: 'medium', label: 'Bosun', img: bosunImg },
+  { key: 'hard', label: 'Privateer', img: privateerImg },
+  { key: 'expert', label: 'Admiral', img: admiralImg },
 ];
 
 export const SetSailPanel = ({
@@ -111,7 +115,7 @@ export const SetSailPanel = ({
             <div>
               <p className="text-sm text-muted-foreground mb-2 font-semibold">Difficulty</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {difficultyLevels.map(({ key, label, icon: Icon }) => {
+                {difficultyLevels.map(({ key, label, img }) => {
                   const locked = restrictedMode && key !== 'easy';
                   return (
                     <button
@@ -119,14 +123,14 @@ export const SetSailPanel = ({
                       onClick={() => onDifficultyChange(key)}
                       disabled={locked}
                       className={cn(
-                        'min-h-[44px] rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border',
+                        'min-h-[72px] rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border',
                         locked && 'opacity-40 cursor-not-allowed',
                         difficulty === key
                           ? 'bg-primary/10 border-primary text-primary'
                           : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
                       )}
                     >
-                      <Icon className="w-4 h-4" />
+                      <img src={img} alt={label} className="w-10 h-10 object-contain" />
                       <span className="text-xs font-bold">{label}</span>
                     </button>
                   );
