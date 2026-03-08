@@ -127,11 +127,11 @@ export const ShipsHold = ({
       )}>
         <div className={cn(
           isPhone
-            ? "flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-            : "flex flex-wrap gap-2 items-center justify-center"
+            ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
+            : "flex flex-wrap gap-4 items-end justify-center"
         )}>
           <LayoutGroup id="ships-hold">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence mode="sync">
               {player.hand.map((card, index) => (
                 <motion.div
                   key={card.id}
