@@ -62,12 +62,9 @@ export const LandingPage = () => {
   const handleCreateRoom = () => setShowMultiplayer(true);
   const handleJoinRoom = () => setShowMultiplayer(true);
 
-  if (!hasConsented) {
-    return <AgeConsentModal />;
-  }
-
   return (
     <div className="min-h-screen flex flex-col relative">
+      {!hasConsented && <AgeConsentModal />}
       <InstallPrompt />
 
       {/* Settings — top right */}
