@@ -317,73 +317,88 @@ export const GameBoard = () => {
   const activeRulesCount = Object.values(optionalRules).filter(Boolean).length;
 
   // ─── Treasure Supply Panel (reusable across layouts) ───
-  const TreasureSupplyPanel = ({ compact = false }: { compact?: boolean }) => (
-    <div className="space-y-4">
-      <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
-        <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
-        <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
-          {GOODS_ORDER.map((type) => (
-            <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-          ))}
+  const TreasureSupplyPanel = ({ compact = false, framed = false }: { compact?: boolean; framed?: boolean }) => {
+    const content = (
+      <div className="space-y-4">
+        <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
+          <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
+          <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
+            {GOODS_ORDER.map((type) => (
+              <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
+            ))}
+          </div>
+        </div>
+
+        <BonusTokens
+          threeCards={bonusTokens.three}
+          fourCards={bonusTokens.four}
+          fiveCards={bonusTokens.five}
+        />
+
+        {/* Pirate Raid Button */}
+        {optionalRules.pirateRaid && currentPlayerIndex === localPlayerIndex && phase === 'playing' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="p-4 rounded-xl bg-card border border-red-500/20"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Crosshair className="w-5 h-5 text-red-400" />
+              <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
+            </div>
+            
+            {humanPlayer.hasUsedPirateRaid ? (
+              <p className="text-xs text-muted-foreground">Already used this game</p>
+            ) : canUsePirateRaid() && !currentPlayer.isAI ? (
+              <>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Steal one card from your opponent!
+                </p>
+                <Button
+                  size="sm"
+                  variant={isRaidMode ? 'destructive' : 'outline'}
+                  className={cn(
+                    'w-full',
+                    !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+                  )}
+                  onClick={() => setIsRaidMode(!isRaidMode)}
+                >
+                  {isRaidMode ? (
+                    <>
+                      <X className="w-4 h-4 mr-1" />
+                      Cancel Raid
+                    </>
+                  ) : (
+                    <>
+                      <Crosshair className="w-4 h-4 mr-1" />
+                      Activate Raid
+                    </>
+                  )}
+                </Button>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
+              </p>
+            )}
+          </motion.div>
+        )}
+      </div>
+    );
+
+    if (!framed) return content;
+
+    return (
+      <div className="rounded-xl border-2 border-[hsl(var(--brass-light)/0.4)] bg-card/60 shadow-[inset_0_2px_8px_hsl(var(--brass)/0.1)] overflow-hidden">
+        <div className="leather-texture px-4 py-2 border-b border-[hsl(var(--brass-light)/0.3)] text-center">
+          <h2 className="font-pirate text-sm text-primary tracking-wide">Treasure Supply</h2>
+        </div>
+        <div className="p-3">
+          {content}
         </div>
       </div>
-
-      <BonusTokens
-        threeCards={bonusTokens.three}
-        fourCards={bonusTokens.four}
-        fiveCards={bonusTokens.five}
-      />
-
-      {/* Pirate Raid Button */}
-      {optionalRules.pirateRaid && currentPlayerIndex === localPlayerIndex && phase === 'playing' && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-card border border-red-500/20"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Crosshair className="w-5 h-5 text-red-400" />
-            <h3 className="font-pirate text-lg text-red-400">Pirate Raid</h3>
-          </div>
-          
-          {humanPlayer.hasUsedPirateRaid ? (
-            <p className="text-xs text-muted-foreground">Already used this game</p>
-          ) : canUsePirateRaid() && !currentPlayer.isAI ? (
-            <>
-              <p className="text-xs text-muted-foreground mb-2">
-                Steal one card from your opponent!
-              </p>
-              <Button
-                size="sm"
-                variant={isRaidMode ? 'destructive' : 'outline'}
-                className={cn(
-                  'w-full',
-                  !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-                )}
-                onClick={() => setIsRaidMode(!isRaidMode)}
-              >
-                {isRaidMode ? (
-                  <>
-                    <X className="w-4 h-4 mr-1" />
-                    Cancel Raid
-                  </>
-                ) : (
-                  <>
-                    <Crosshair className="w-4 h-4 mr-1" />
-                    Activate Raid
-                  </>
-                )}
-              </Button>
-            </>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {currentPlayer.isAI ? 'Wait for your turn' : 'Cannot raid (hand full or no targets)'}
-            </p>
-          )}
-        </motion.div>
-      )}
-    </div>
-  );
+    );
+  };
 
   // ─── Opponent Panel (reusable) ───
   const OpponentPanel = () => (
@@ -437,7 +452,6 @@ export const GameBoard = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-2 sm:gap-3">
-            <img src={privateerLogo} alt="Privateer" className="h-10 sm:h-12 lg:h-14 object-contain drop-shadow-[0_0_10px_hsl(var(--brass)/0.4)]" />
             
             {activeRulesCount > 0 && (
               <div className="flex items-center gap-1">
@@ -497,6 +511,23 @@ export const GameBoard = () => {
             </Button>
           </div>
         </motion.header>
+
+        {/* ── Centered Logo + Treasure Supply (tablet/desktop) ── */}
+        <div className="hidden md:block mb-4 lg:mb-6">
+          {/* Prominent Logo */}
+          <div className="flex justify-center mb-4">
+            <motion.img
+              src={privateerLogo}
+              alt="Privateer: Letters of Marque"
+              className="h-16 sm:h-20 lg:h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--brass)/0.5)]"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          {/* Framed Treasure Supply */}
+          <TreasureSupplyPanel framed />
+        </div>
 
         {/* ════════════════════════════════════════════════════════════════
             PHONE LAYOUT — stacked, drawers for treasure/opponent
@@ -590,7 +621,7 @@ export const GameBoard = () => {
             TABLET LAYOUT — board composition, all panels docked
             ════════════════════════════════════════════════════════════════ */}
         <div className="hidden md:block lg:hidden">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Left column: Opponent + ScoreBoard */}
             <motion.aside
               className="col-span-1 space-y-4"
@@ -611,7 +642,7 @@ export const GameBoard = () => {
               <ScoreBoard />
             </motion.aside>
 
-            {/* Center column: Trading Post + Player Hold */}
+            {/* Right column: Trading Post + Player Hold */}
             <motion.main
               className={cn(
                 "col-span-1 space-y-4",
@@ -630,16 +661,6 @@ export const GameBoard = () => {
                 />
               )}
             </motion.main>
-
-            {/* Right column: Treasure Supply + Bonuses */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <TreasureSupplyPanel />
-            </motion.aside>
           </div>
         </div>
 
@@ -647,17 +668,7 @@ export const GameBoard = () => {
             DESKTOP LAYOUT — Trading Post top, Hold bottom, sidebars
             ════════════════════════════════════════════════════════════════ */}
         <div className="hidden lg:block">
-          <div className="grid grid-cols-4 gap-6">
-            {/* Left sidebar - Treasure & Bonuses (fixed) */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <TreasureSupplyPanel />
-            </motion.aside>
-
+          <div className="grid grid-cols-3 gap-6">
             {/* Main game area — Trading Post top, Hold bottom */}
             <motion.main
               className={cn(
@@ -681,7 +692,7 @@ export const GameBoard = () => {
               )}
             </motion.main>
 
-            {/* Right sidebar — Opponent & Scoreboard (fixed) */}
+            {/* Right sidebar — Opponent & Scoreboard */}
             <motion.aside
               className="col-span-1 space-y-4"
               initial={{ opacity: 0, x: 20 }}
