@@ -97,7 +97,6 @@ export const RoundEndModal = ({
                 </motion.div>
               )}
 
-              {/* Score breakdown per player */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {players.map((player) => {
                   const breakdown = getScoreBreakdown(player, players);
