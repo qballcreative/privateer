@@ -298,7 +298,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 80 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        className={cn(isPhone && "flex-shrink-0")}
+                        className=""
                       >
                         <CargoObject
                           card={card}
