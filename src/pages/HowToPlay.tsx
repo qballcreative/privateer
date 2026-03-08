@@ -316,7 +316,7 @@ const TutorialMockBoard = () => {
       <div data-tutorial-id="tutorial-market-prices" className="game-box-card p-4">
         <h3 className="font-serif text-lg font-bold text-primary mb-3">Market Prices</h3>
         <div className="flex gap-4 flex-wrap">
-          {['rum', 'cannonballs', 'silks', 'silver', 'gold', 'gemstones'].map((type) => (
+          {['rum', 'iron', 'silk', 'silver', 'gold', 'gems'].map((type) => (
             <div key={type} className="text-center">
               <img src={goodsIcons[type]} alt={type} className="w-8 h-8 object-contain mx-auto mb-1" />
               <div className="text-xs text-muted-foreground capitalize">{type}</div>
