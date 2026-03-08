@@ -117,13 +117,15 @@ export const UnloadChest = ({
   const [earnedTokens, setEarnedTokens] = useState<{ value: number; type: 'doubloon' | 'bonus' }[]>([]);
   const { lastAction } = useGameStore();
   const [announcement, setAnnouncement] = useState('');
+  const processedAction = useRef<typeof lastAction>(null);
 
   const isPhone = layout === 'phone';
   const hasSelection = selectedCards.length > 0;
 
   // Track the sell action to trigger animations
   useEffect(() => {
-    if (lastAction?.type === 'sell' && lastAction.cardsInvolved) {
+    if (lastAction?.type === 'sell' && lastAction.cardsInvolved && lastAction !== processedAction.current) {
+      processedAction.current = lastAction;
       setIsUnloading(true);
       setShowSparkles(true);
 
