@@ -120,8 +120,8 @@ const HowToPlay = () => {
 
         {/* Hand Limit */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Package className="w-5 h-5" /> Hand Limit
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Hand Limit
           </h2>
           <p className="text-foreground/80">
             Your Ship's Hold can carry at most <strong className="text-primary">7 goods</strong>.
