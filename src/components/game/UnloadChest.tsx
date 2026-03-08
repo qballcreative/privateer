@@ -160,8 +160,6 @@ export const UnloadChest = ({
     ? player.hand.find((c) => selectedCards.includes(c.id))?.type
     : null;
 
-  const doubloonTotal = player.tokens.reduce((sum, t) => sum + t.value, 0);
-  const bonusTotal = player.bonusTokens.reduce((sum, t) => sum + t.value, 0);
 
   return (
     <div className={cn(
