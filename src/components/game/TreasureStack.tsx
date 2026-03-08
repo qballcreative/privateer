@@ -56,7 +56,7 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
                 <img 
                   src={config.image} 
                   alt={config.label} 
-                  className="absolute w-11 h-11 -top-2 -right-3 object-contain drop-shadow-md"
+                  className="absolute w-11 h-11 -top-2 -right-5 object-contain drop-shadow-md"
                 />
               </>
             )}
