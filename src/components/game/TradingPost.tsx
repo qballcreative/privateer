@@ -127,7 +127,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Icons/Trade.png" alt="Trade" className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 object-contain" />
+            <img src="/Icons/Trade.png" alt="Trade" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Trade Goods
           </Button>
         </div>
