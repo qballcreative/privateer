@@ -24,6 +24,7 @@ import {
   MIN_SELL_EXPENSIVE,
 } from '@/types/game';
 import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
+import { validateGameState } from '@/lib/validateGameState';
 import {
   RulesEngine,
   RuleContext,
