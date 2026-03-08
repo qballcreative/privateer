@@ -542,6 +542,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (totalFromHand !== marketCards.length) return;
     if (totalFromHand < 2) return;
 
+    // Reject same-type swaps: cannot trade away a goods type you are also taking
+    const handTypes = new Set([...handCards, ...handShips].map(c => c.type));
+    const marketTypes = new Set(marketCards.map(c => c.type));
+    for (const t of handTypes) {
+      if (marketTypes.has(t)) return;
+    }
+
     // Calculate resulting hand size (ships don't count toward hand limit)
     const nonShipMarketCards = marketCards.filter((c) => c.type !== 'ships').length;
     const newHandSize = player.hand.length - handCards.length + nonShipMarketCards;
