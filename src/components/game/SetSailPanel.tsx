@@ -171,15 +171,15 @@ const OptionGroup = ({ label, children }: { label: string; children: React.React
 );
 
 const ModeButton = ({
-  active, onClick, icon, label, variant,
+  active, onClick, label, variant,
 }: {
-  active: boolean; onClick: () => void; icon: React.ReactNode; label: string;
+  active: boolean; onClick: () => void; label: string;
   variant: 'gold' | 'ocean';
 }) => (
   <button
     onClick={onClick}
     className={cn(
-      'min-h-[56px] rounded-lg p-4 flex items-center justify-center gap-3 font-bold text-base transition-all border',
+      'min-h-[56px] rounded-lg p-4 flex items-center justify-center font-bold text-base transition-all border',
       active
         ? variant === 'gold'
           ? 'bg-primary/10 border-primary text-primary shadow-[0_0_12px_hsl(var(--gold)/0.15)]'
@@ -187,7 +187,6 @@ const ModeButton = ({
         : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
     )}
   >
-    {icon}
     {label}
   </button>
 );
