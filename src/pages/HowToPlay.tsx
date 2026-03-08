@@ -8,6 +8,15 @@ import {
   Award, Package, CloudLightning, Skull, Gem
 } from 'lucide-react';
 
+// Token images
+import rumTokens from '@/assets/tokens/rum.png';
+import ironTokens from '@/assets/tokens/iron.png';
+import silverTokens from '@/assets/tokens/silver.png';
+import silkTokens from '@/assets/tokens/silk.png';
+import goldTokens from '@/assets/tokens/gold.png';
+import gemTokens from '@/assets/tokens/gems.png';
+import shipTokens from '@/assets/tokens/ship.png';
+
 const sectionAnim = {
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
