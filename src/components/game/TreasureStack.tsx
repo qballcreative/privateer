@@ -19,7 +19,7 @@ const treasureConfig: Record<GoodsType, {
   gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
 };
 
-export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
+export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
   const config = treasureConfig[type];
   const topToken = tokens[0];
   const isEmpty = tokens.length === 0;
