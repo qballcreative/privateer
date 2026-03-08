@@ -84,7 +84,7 @@ export const ActionNotification = ({ action, show }: ActionNotificationProps) =>
                 transition={{ type: 'spring', stiffness: 400, delay: 0.1 }}
                 className={cn('p-2 rounded-lg bg-background/50', iconColor)}
               >
-                <Icon className="w-5 h-5" />
+                <img src={iconSrc} alt={action.type} className="w-5 h-5 object-contain" />
               </motion.div>
               <div>
                 <motion.p
