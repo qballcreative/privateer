@@ -124,9 +124,10 @@ const HowToPlay = () => {
             Hand Limit
           </h2>
           <p className="text-foreground/80">
-            Your Ship's Hold can carry at most <strong className="text-primary">7 goods</strong>.
-            Ships are stored separately and don't count. If your Hold is full, you'll need to sell
-            or trade before claiming more cargo.
+            You are limited to a maximum of <strong className="text-primary">7 cargo</strong> in your Ship's Hold at the end of your turn, excluding ships in your fleet.
+            While you can have more than 7 goods momentarily during your actions (such as taking multiple goods),
+            you must reduce your hold to 7 or fewer cards before your turn ends.
+            If your Hold is full, you'll need to sell or trade before claiming more cargo.
           </p>
         </motion.section>
 
