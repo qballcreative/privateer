@@ -159,10 +159,10 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
           "min-h-[80px] sm:min-h-[140px]",
           isPhone 
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
-            : "flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-4"
+            : "flex flex-wrap items-end justify-center gap-4 sm:gap-6 pt-4"
         )}>
           <LayoutGroup id="trading-post">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence mode="sync">
               {market.map((card, index) => (
                 <motion.div
                   key={card.id}
