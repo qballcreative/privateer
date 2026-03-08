@@ -89,8 +89,8 @@ const HowToPlay = () => {
 
         {/* Actions */}
         <motion.section {...sectionAnim}>
-          <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-            <Swords className="w-6 h-6" /> Your Turn — Actions Available
+          <h2 className="font-serif text-2xl font-bold text-primary mb-4">
+            Your Turn — Actions Available
           </h2>
           <p className="text-foreground/70 mb-4">On your turn, choose one of these actions:</p>
 
