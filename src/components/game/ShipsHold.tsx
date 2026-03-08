@@ -115,7 +115,7 @@ export const ShipsHold = ({
         
         {/* Fleet count */}
         <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-accent/10 border border-accent/20">
-          <img src="/images/fleet.png" alt="Fleet" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+          <img src="/images/fleet.png" alt="Fleet" className="w-7 h-7 sm:w-8 sm:h-8 object-contain -ml-1 -my-2" />
           <span className="text-xs sm:text-sm font-bold text-accent">{player.ships.length}</span>
         </div>
       </div>
