@@ -142,11 +142,7 @@ export const Market = () => {
                 transition={{ 
                   delay: index * 0.1,
                   duration: 0.45,
-                  ease: [0.2, 0.8, 0.2, 1],
-                  exit: {
-                    duration: 0.5,
-                    ease: [0.2, 0.8, 0.2, 1],
-                  },
+                  ease: [0.2, 0.8, 0.2, 1] as any,
                 }}
               >
                 {/* Dust puff effect on enter */}
