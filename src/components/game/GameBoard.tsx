@@ -163,6 +163,7 @@ export const GameBoard = () => {
     lastAction,
     nextRound,
     resetGame,
+    restartGame,
     getRoundWinner,
     getWinner,
     round,
