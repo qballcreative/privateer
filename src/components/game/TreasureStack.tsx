@@ -53,9 +53,11 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
                 <span className="absolute inset-0 flex items-center justify-center text-foreground font-bold text-sm drop-shadow-md">
                   {topToken.value}
                 </span>
-                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
-                  {config.icon}
-                </div>
+                <img 
+                  src={config.image} 
+                  alt={config.label} 
+                  className="absolute w-11 h-11 -top-2 -right-3 object-contain drop-shadow-md"
+                />
               </>
             )}
           </motion.div>
