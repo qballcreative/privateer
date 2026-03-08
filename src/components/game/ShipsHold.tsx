@@ -113,13 +113,11 @@ export const ShipsHold = ({
           )}
         </div>
         
-        {/* Fleet count - opponent only (player sees ships inline) */}
-        {isOpponent && (
-          <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-accent/10 border border-accent/20">
-            <img src="/images/fleet.png" alt="Fleet" className="w-7 h-7 sm:w-8 sm:h-8 object-contain -ml-1 -my-2" />
-            <span className="text-xs sm:text-sm font-bold text-accent">{player.ships.length}</span>
-          </div>
-        )}
+        {/* Fleet count - always shown */}
+        <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-accent/10 border border-accent/20">
+          <img src="/images/fleet.png" alt="Fleet" className="w-7 h-7 sm:w-8 sm:h-8 object-contain -ml-1 -my-2" />
+          <span className="text-xs sm:text-sm font-bold text-accent">{player.ships.length}</span>
+        </div>
       </div>
 
       {/* Cargo Hold */}
@@ -224,54 +222,6 @@ export const ShipsHold = ({
         />
       )}
 
-      {/* Ships display */}
-      {!isOpponent && player.ships.length > 0 && (
-        <div className={cn(
-          "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border",
-          isPhone
-            ? "flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-            : "flex flex-wrap gap-3 items-center justify-center"
-        )}>
-          <LayoutGroup id="ships-display">
-            <AnimatePresence mode="sync">
-              {player.ships.map((card, index) => (
-                <motion.div
-                  key={card.id}
-                  layout
-                  initial={shipFanIn(index)}
-                  animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.6 }}
-                  transition={{
-                    delay: index * 0.05,
-                    type: 'spring',
-                    stiffness: 280,
-                    damping: 22,
-                  }}
-                  className={cn(isPhone && "flex-shrink-0")}
-                >
-                  <CargoObject
-                    card={card}
-                    disabled
-                    size={isPhone ? 'sm' : 'sm'}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </LayoutGroup>
-        </div>
-      )}
-
-      {(!isCurrentPlayer || isOpponent || phase !== 'playing') && (
-        <div className={cn(
-          "mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between",
-          isPhone ? "text-xs" : "text-sm"
-        )}>
-          <span className="text-muted-foreground flex items-center gap-1">
-            <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
-            <span className="font-bold text-accent">{player.ships.length}</span>
-          </span>
-        </div>
-      )}
     </div>
   );
 };
