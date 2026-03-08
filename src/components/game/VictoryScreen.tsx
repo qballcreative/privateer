@@ -2,7 +2,8 @@ import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Home, RotateCcw, Anchor, Crown, Ship, Coins } from 'lucide-react';
 import { Player } from '@/types/game';
-import { calculateScore } from '@/store/gameStore';
+import { calculateScore, useGameStore } from '@/store/gameStore';
+import { getScoreBreakdown } from '@/lib/scoring';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -15,22 +16,6 @@ interface VictoryScreenProps {
   onReturnHome: () => void;
 }
 
-/** Break down a player's score into components */
-const getScoreBreakdown = (player: Player, allPlayers: Player[]) => {
-  const tokenScore = player.tokens.reduce((sum, t) => sum + t.value, 0);
-  const bonusScore = player.bonusTokens.reduce((sum, t) => sum + t.value, 0);
-
-  let shipBonus = 0;
-  if (allPlayers.length > 1) {
-    const maxShips = Math.max(...allPlayers.map((p) => p.ships.length));
-    if (player.ships.length > 0 && player.ships.length === maxShips) {
-      const playersWithMax = allPlayers.filter((p) => p.ships.length === maxShips).length;
-      if (playersWithMax === 1) shipBonus = 5;
-    }
-  }
-
-  return { tokenScore, bonusScore, shipBonus, total: tokenScore + bonusScore + shipBonus };
-};
 
 /** Gold particle for confetti effect */
 const GoldParticle = ({ index, total }: { index: number; total: number }) => {
@@ -100,12 +85,7 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
   const isPlayerVictory = winner && !winner.isAI;
   const particles = useMemo(() => Array.from({ length: 25 }, (_, i) => i), []);
 
-  // Determine round winners from roundWins array
-  const voyageWinners = useMemo(() => {
-    // roundWins is [player0Wins, player1Wins] — we need per-round data
-    // Since we don't have per-round history, show the total wins summary
-    return roundWins;
-  }, [roundWins]);
+  const roundWinners = useGameStore.getState().roundWinners || [];
 
   return (
     <AnimatePresence>
@@ -171,6 +151,15 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
             className="relative z-10 mb-5"
           >
             <h3 className="font-pirate text-sm text-muted-foreground mb-2 uppercase tracking-wider">Voyage Results</h3>
+            {/* Per-round voyage indicators */}
+            {roundWinners.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                {roundWinners.map((winnerId, idx) => {
+                  const winnerIdx = winnerId ? players.findIndex(p => p.id === winnerId) : -1;
+                  return <VoyageIndicator key={idx} roundIndex={idx} winnerIndex={winnerIdx} players={players} />;
+                })}
+              </div>
+            )}
             <div className="flex items-center justify-center gap-3 mb-3">
               {players.map((player, i) => (
                 <div key={player.id} className="flex items-center gap-2">

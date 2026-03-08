@@ -1,13 +1,23 @@
 import { motion } from 'framer-motion';
-import { Users, Anchor } from 'lucide-react';
+import { Users, Anchor, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
+import { Input } from '@/components/ui/input';
 import deckhandImg from '@/assets/difficulty/deckhand.png';
 import bosunImg from '@/assets/difficulty/bosun.png';
 import privateerImg from '@/assets/difficulty/privateer.png';
 import admiralImg from '@/assets/difficulty/admiral.png';
 
+interface PlayerStats {
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+}
+
 interface SetSailPanelProps {
+  playerName: string;
+  onNameChange: (name: string) => void;
+  stats: PlayerStats;
   mode: 'aai' | 'multiplayer';
   setMode: (m: 'aai' | 'multiplayer') => void;
   difficulty: Difficulty;
@@ -30,10 +40,13 @@ const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
 ];
 
 export const SetSailPanel = ({
+  playerName, onNameChange, stats,
   mode, setMode, difficulty, onDifficultyChange,
   bestOf, setBestOf, firstPlayer, setFirstPlayer,
   onStartAAI, onCreateRoom, onJoinRoom, restrictedMode,
 }: SetSailPanelProps) => {
+  const winRate = stats.gamesPlayed > 0 ? Math.round((stats.wins / stats.gamesPlayed) * 100) : 0;
+
   return (
     <motion.div
       className="relative max-w-lg mx-auto z-10 px-4"
@@ -46,6 +59,28 @@ export const SetSailPanel = ({
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-center mb-6">
           Set Sail
         </h2>
+
+        {/* Player Name */}
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground mb-2 font-semibold">Captain's Name</p>
+          <Input
+            value={playerName}
+            onChange={(e) => onNameChange(e.target.value)}
+            placeholder="Enter your name, Captain…"
+            maxLength={20}
+            className="bg-muted/30 border-border text-foreground"
+          />
+        </div>
+
+        {/* Player Stats */}
+        {stats.gamesPlayed > 0 && (
+          <div className="flex items-center gap-3 mb-4 px-3 py-2 rounded-lg bg-muted/20 border border-border text-xs text-muted-foreground">
+            <Trophy className="w-4 h-4 text-primary shrink-0" />
+            <span>{stats.wins}W – {stats.losses}L</span>
+            <span className="text-primary font-bold">{winRate}%</span>
+            <span className="ml-auto">{stats.gamesPlayed} games</span>
+          </div>
+        )}
 
         {/* Mode Select */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-0">

@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Gift, RotateCcw } from 'lucide-react';
 import { Player, HiddenTreasure } from '@/types/game';
-import { calculateScore } from '@/store/gameStore';
+import { calculateScore, useGameStore } from '@/store/gameStore';
+import { getScoreBreakdown } from '@/lib/scoring';
 import { Button } from '@/components/ui/button';
 
 interface RoundEndModalProps {
@@ -16,22 +17,6 @@ interface RoundEndModalProps {
   onNextRound: () => void;
 }
 
-/** Break down a player's score into components */
-const getScoreBreakdown = (player: Player, allPlayers: Player[]) => {
-  const tokenScore = player.tokens.reduce((sum, t) => sum + t.value, 0);
-  const bonusScore = player.bonusTokens.reduce((sum, t) => sum + t.value, 0);
-
-  let shipBonus = 0;
-  if (allPlayers.length > 1) {
-    const maxShips = Math.max(...allPlayers.map((p) => p.ships.length));
-    if (player.ships.length > 0 && player.ships.length === maxShips) {
-      const playersWithMax = allPlayers.filter((p) => p.ships.length === maxShips).length;
-      if (playersWithMax === 1) shipBonus = 5;
-    }
-  }
-
-  return { tokenScore, bonusScore, shipBonus, total: tokenScore + bonusScore + shipBonus };
-};
 
 export const RoundEndModal = ({
   phase,
@@ -112,7 +97,6 @@ export const RoundEndModal = ({
                 </motion.div>
               )}
 
-              {/* Score breakdown per player */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {players.map((player) => {
                   const breakdown = getScoreBreakdown(player, players);
@@ -152,6 +136,7 @@ export const RoundEndModal = ({
                   : round >= 3
                     ? 'See Final Results'
                     : `Begin Voyage ${round + 1}`}
+
               </Button>
             </div>
           </motion.div>

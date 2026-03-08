@@ -754,7 +754,7 @@ export const GameBoard = () => {
                   <span className="font-pirate text-lg sm:text-xl text-primary">
                     {isMultiplayer 
                       ? `Waiting for ${opponentName || 'opponent'}...` 
-                      : 'Pirate AI is thinking...'}
+                      : `${opponentPlayer?.name || 'The Captain'} is pondering their next move…`}
                   </span>
                 </div>
               </div>
@@ -812,7 +812,7 @@ export const GameBoard = () => {
             players={players}
             roundWins={useGameStore.getState().roundWins}
             winner={getWinner()}
-            maxRounds={3}
+            maxRounds={useGameStore.getState().maxRounds}
             onPlayAgain={restartGame}
             onReturnHome={resetGame}
           />

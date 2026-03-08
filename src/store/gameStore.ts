@@ -216,7 +216,7 @@ const getOpponentIndex = (current: number, total: number): number =>
 
 interface GameStore extends GameState {
   // Actions
-  startGame: (playerName: string, difficulty: Difficulty, optionalRules?: OptionalRules) => void;
+  startGame: (playerName: string, difficulty: Difficulty, optionalRules?: OptionalRules, maxRounds?: number, firstPlayer?: 'host' | 'random') => void;
   startMultiplayerGame: (playerName: string, opponentName: string, optionalRules: OptionalRules, isHost: boolean) => void;
   applyGameState: (state: Partial<GameState>, swapPlayers?: boolean) => void;
   getSerializableState: () => Partial<GameState>;
@@ -272,8 +272,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   turnCount: 0,
   hiddenTreasures: [],
   isMultiplayer: false,
+  roundWinners: [],
 
-  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules) => {
+  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = 'host') => {
     const deck = createDeck();
     const market: Card[] = [];
     const players: Player[] = [
@@ -321,9 +322,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       players,
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      currentPlayerIndex: 0,
+      currentPlayerIndex: firstPlayer === 'random' ? secureRandomInt(2) : 0,
       round: 1,
-      maxRounds: 3,
+      maxRounds,
       roundWins: players.map(() => 0),
       lastAction: null,
       difficulty,
@@ -331,6 +332,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: false,
+      roundWinners: [],
     };
 
     // Fire engine hooks
@@ -400,6 +402,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: true,
+      roundWinners: [],
     };
 
     const ctx = buildCtx(initialState);
@@ -717,9 +720,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       const winner = get().getRoundWinner();
       const roundWins = [...fullState.roundWins];
+      const roundWinners = [...(fullState.roundWinners || [])];
       if (winner) {
         const winnerIndex = fullState.players.findIndex((p) => p.id === winner.id);
         if (winnerIndex !== -1) roundWins[winnerIndex]++;
+        roundWinners.push(winner.id);
+      } else {
+        roundWinners.push(null);
       }
       // In best-of-1, skip the round-end modal and go straight to game end
       const skipRoundEnd = fullState.maxRounds <= 1;
@@ -728,6 +735,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         hiddenTreasures: fullState.hiddenTreasures,
         phase: skipRoundEnd ? 'gameEnd' : 'roundEnd',
         roundWins,
+        roundWinners,
         turnCount: newTurnCount,
       });
       return;
@@ -840,6 +848,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       round: 1,
       roundWins: [0, 0],
+      roundWinners: [],
       lastAction: null,
       optionalRules: defaultOptionalRules,
       turnCount: 0,

@@ -42,7 +42,7 @@ export const LandingPage = () => {
   const { hasConsented, restrictedMode } = useConsentStore();
   const { config: remoteConfig } = useRemoteConfigStore();
 
-  const [playerName] = useState(savedPlayerName || 'Captain');
+  const [playerName, setPlayerName] = useState(savedPlayerName || 'Captain');
   const [difficulty, setDifficulty] = useState<Difficulty>(
     restrictedMode ? 'easy' : (lastDifficulty || remoteConfig.defaultAIDifficulty)
   );
@@ -70,7 +70,7 @@ export const LandingPage = () => {
     const rules = restrictedMode
       ? { stormRule: false, pirateRaid: false, treasureChest: false }
       : optionalRules;
-    startGame(name, restrictedMode ? 'easy' : difficulty, rules);
+    startGame(name, restrictedMode ? 'easy' : difficulty, rules, bestOf === 1 ? 1 : 3, firstPlayer);
   };
 
   const handleCreateRoom = () => setShowMultiplayer(true);
@@ -103,6 +103,9 @@ export const LandingPage = () => {
         ) : (
           <SetSailPanel
             key="setup"
+            playerName={playerName}
+            onNameChange={(name) => { setPlayerName(name); savePlayerName(name); }}
+            stats={usePlayerStore.getState().stats}
             mode={mode}
             setMode={setMode}
             difficulty={difficulty}
