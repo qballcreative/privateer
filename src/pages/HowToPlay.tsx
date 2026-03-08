@@ -161,8 +161,8 @@ const HowToPlay = () => {
 
         {/* Commission Seals */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Award className="w-5 h-5" /> Commission Seals
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Commission Seals
           </h2>
           <p className="text-foreground/80 mb-3">
             Sell 3 or more matching goods at once to earn a bonus Commission Seal:
