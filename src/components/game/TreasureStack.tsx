@@ -1,42 +1,21 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
 
-import { Wine, CircleDot, Shirt, Coins, Gem } from 'lucide-react';
-
 interface TreasureStackProps {
   type: GoodsType;
   tokens: Token[];
 }
 
-// Token configuration with cargo-themed colors
 const treasureConfig: Record<GoodsType, { 
-  icon: React.ReactNode; 
+  image: string; 
   label: string;
 }> = {
-  rum: {
-    icon: <Wine className="w-3.5 h-3.5" />,
-    label: 'Rum',
-  },
-  cannonballs: {
-    icon: <CircleDot className="w-3.5 h-3.5" />,
-    label: 'Iron',
-  },
-  silks: {
-    icon: <Shirt className="w-3.5 h-3.5" />,
-    label: 'Silk',
-  },
-  silver: {
-    icon: <Coins className="w-3.5 h-3.5" />,
-    label: 'Silver',
-  },
-  gold: {
-    icon: <Coins className="w-3.5 h-3.5" />,
-    label: 'Gold',
-  },
-  gemstones: {
-    icon: <Gem className="w-3.5 h-3.5" />,
-    label: 'Gems',
-  },
+  rum: { image: '/Icons/rum.png', label: 'Rum' },
+  cannonballs: { image: '/Icons/cannonballs.png', label: 'Iron' },
+  silks: { image: '/Icons/silks.png', label: 'Silk' },
+  silver: { image: '/Icons/silver.png', label: 'Silver' },
+  gold: { image: '/Icons/gold.png', label: 'Gold' },
+  gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
 };
 
 export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
@@ -74,9 +53,11 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
                 <span className="absolute inset-0 flex items-center justify-center text-foreground font-bold text-sm drop-shadow-md">
                   {topToken.value}
                 </span>
-                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
-                  {config.icon}
-                </div>
+                <img 
+                  src={config.image} 
+                  alt={config.label} 
+                  className="absolute w-11 h-11 -top-2 -right-3 object-contain drop-shadow-md"
+                />
               </>
             )}
           </motion.div>
