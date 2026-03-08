@@ -5,7 +5,7 @@ import CargoObject from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
-import { Anchor, ArrowLeftRight, Hand, AlertTriangle, Ship } from 'lucide-react';
+import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 
 interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
@@ -118,7 +118,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <Hand className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+            <img src="/Icons/Claim.png" alt="Claim" className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 object-contain" />
             Claim Cargo
           </Button>
           <Button
@@ -127,7 +127,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
             onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+            <img src="/Icons/Trade.png" alt="Trade" className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 object-contain" />
             Trade Goods
           </Button>
         </div>

@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActionDisplay, Card } from '@/types/game';
 import CargoObject from './CargoObject';
-import { ArrowRight, ArrowDown, Coins, Star, CloudLightning, Crosshair, Ship, Package } from 'lucide-react';
+import { ArrowRight, ArrowDown, Coins, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ActionNotificationProps {
@@ -9,13 +9,13 @@ interface ActionNotificationProps {
   show: boolean;
 }
 
-const actionIcons = {
-  'take': Package,
-  'take-ships': Ship,
-  'exchange': ArrowRight,
-  'sell': Coins,
-  'raid': Crosshair,
-  'storm': CloudLightning,
+const actionIcons: Record<string, string> = {
+  'take': '/Icons/Claim.png',
+  'take-ships': '/images/fleet.png',
+  'exchange': '/Icons/Trade.png',
+  'sell': '/Icons/Sell.png',
+  'raid': '/Icons/Raid.png',
+  'storm': '/Icons/Storm.png',
 };
 
 const actionColors = {
@@ -57,7 +57,7 @@ const CardRow = ({ cards, label }: { cards: Card[]; label?: string }) => (
 export const ActionNotification = ({ action, show }: ActionNotificationProps) => {
   if (!action) return null;
 
-  const Icon = actionIcons[action.type];
+  const iconSrc = actionIcons[action.type];
   const colorClass = actionColors[action.type];
   const iconColor = actionIconColors[action.type];
 
@@ -84,7 +84,7 @@ export const ActionNotification = ({ action, show }: ActionNotificationProps) =>
                 transition={{ type: 'spring', stiffness: 400, delay: 0.1 }}
                 className={cn('p-2 rounded-lg bg-background/50', iconColor)}
               >
-                <Icon className="w-5 h-5" />
+                <img src={iconSrc} alt={action.type} className="w-5 h-5 object-contain" />
               </motion.div>
               <div>
                 <motion.p
