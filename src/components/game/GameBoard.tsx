@@ -754,7 +754,7 @@ export const GameBoard = () => {
                   <span className="font-pirate text-lg sm:text-xl text-primary">
                     {isMultiplayer 
                       ? `Waiting for ${opponentName || 'opponent'}...` 
-                      : 'Pirate AI is thinking...'}
+                      : `${opponentPlayer?.name || 'The Captain'} is pondering their next move…`}
                   </span>
                 </div>
               </div>
