@@ -11,45 +11,31 @@ interface TreasureStackProps {
 // Token configuration with cargo-themed colors
 const treasureConfig: Record<GoodsType, { 
   icon: React.ReactNode; 
-  gradientClass: string; 
   label: string;
-  coinColor: string;
 }> = {
   rum: {
     icon: <Wine className="w-3.5 h-3.5" />,
-    gradientClass: 'from-amber-600 to-amber-800',
     label: 'Rum',
-    coinColor: 'border-amber-400',
   },
   cannonballs: {
     icon: <CircleDot className="w-3.5 h-3.5" />,
-    gradientClass: 'from-slate-400 to-slate-600',
     label: 'Iron',
-    coinColor: 'border-slate-300',
   },
   silks: {
     icon: <Shirt className="w-3.5 h-3.5" />,
-    gradientClass: 'from-purple-500 to-purple-700',
     label: 'Silk',
-    coinColor: 'border-purple-400',
   },
   silver: {
     icon: <Coins className="w-3.5 h-3.5" />,
-    gradientClass: 'from-gray-300 to-gray-500',
     label: 'Silver',
-    coinColor: 'border-gray-200',
   },
   gold: {
     icon: <Coins className="w-3.5 h-3.5" />,
-    gradientClass: 'from-yellow-400 to-yellow-600',
     label: 'Gold',
-    coinColor: 'border-yellow-300',
   },
   gemstones: {
     icon: <Gem className="w-3.5 h-3.5" />,
-    gradientClass: 'from-emerald-400 to-emerald-600',
     label: 'Gems',
-    coinColor: 'border-emerald-300',
   },
 };
 
