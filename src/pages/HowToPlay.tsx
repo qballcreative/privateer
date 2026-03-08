@@ -217,7 +217,7 @@ const HowToPlay = () => {
             />
             <ActionCard
               icon={<img src="/Icons/Raid.png" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
-              title="Pirate Raid 🏴‍☠️"
+              title="Pirate Raid"
               desc="Once per game, you can launch a Pirate Raid on your opponent! Steal 1 random cargo from their Hold. Use it strategically — you only get one raid per game."
             />
             <ActionCard
