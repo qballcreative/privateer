@@ -113,6 +113,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               setMode('take');
               setSelectedMarketCards([]);
               setSelectedHandCards([]);
+              onModeChange?.(false);
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
