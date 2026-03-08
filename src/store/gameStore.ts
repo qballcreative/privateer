@@ -25,6 +25,7 @@ import {
 } from '@/types/game';
 import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
 import { validateGameState } from '@/lib/validateGameState';
+import { debugLog } from '@/lib/debugLog';
 import {
   RulesEngine,
   RuleContext,
@@ -412,7 +413,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Validate incoming state before applying
     const validated = validateGameState(state);
     if (!validated) {
-      console.warn('Rejected invalid game state from peer');
+      debugLog('engine', 'P2P Validation', 'Rejected invalid game state from peer');
       return;
     }
 
