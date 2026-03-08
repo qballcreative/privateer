@@ -575,19 +575,29 @@ export const GameBoard = () => {
             </AnimatePresence>
           </div>
 
-          {/* Ship's Hold — primary zone, thumb-reachable */}
-          <div className={cn(
-            'transition-all duration-400',
-            phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
-          )}>
-            {humanPlayer && (
-              <ShipsHold
-                player={humanPlayer}
-                isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                layout="phone"
-              />
+          {/* Ship's Hold — hidden during exchange mode */}
+          <AnimatePresence>
+            {!isExchangeMode && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                  'overflow-hidden transition-all duration-400',
+                  phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
+                )}
+              >
+                {humanPlayer && (
+                  <ShipsHold
+                    player={humanPlayer}
+                    isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                    layout="phone"
+                  />
+                )}
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
 
         {/* ════════════════════════════════════════════════════════════════
