@@ -11,101 +11,116 @@ interface CargoObjectProps {
   hidden?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  /** Enable shared layout animation across components */
   enableLayoutId?: boolean;
 }
 
-// Cargo configuration - each type has distinct visual identity
+// Each cargo type as a distinct physical token
 const cargoConfig: Record<CardType, {
   icon: React.ElementType;
   label: string;
   labelShort: string;
-  containerClass: string;
-  iconClass: string;
-  accentClass: string;
+  bgFrom: string;
+  bgTo: string;
+  borderColor: string;
+  iconColor: string;
+  ringGlow: string;
 }> = {
   rum: {
     icon: Wine,
     label: 'Rum Barrel',
-    labelShort: 'Rum',
-    containerClass: 'from-amber-800 to-amber-950 border-amber-700',
-    iconClass: 'text-amber-300',
-    accentClass: 'bg-amber-600/30',
+    labelShort: 'RUM',
+    bgFrom: 'hsl(25, 70%, 28%)',
+    bgTo: 'hsl(25, 60%, 18%)',
+    borderColor: 'hsl(25, 50%, 40%)',
+    iconColor: 'hsl(40, 90%, 65%)',
+    ringGlow: 'hsla(25, 80%, 50%, 0.4)',
   },
   cannonballs: {
     icon: CircleDot,
     label: 'Cannonballs',
-    labelShort: 'Iron',
-    containerClass: 'from-slate-600 to-slate-800 border-slate-500',
-    iconClass: 'text-slate-300',
-    accentClass: 'bg-slate-500/30',
+    labelShort: 'IRON',
+    bgFrom: 'hsl(210, 10%, 35%)',
+    bgTo: 'hsl(210, 12%, 22%)',
+    borderColor: 'hsl(210, 8%, 50%)',
+    iconColor: 'hsl(210, 15%, 75%)',
+    ringGlow: 'hsla(210, 15%, 50%, 0.4)',
   },
   silks: {
     icon: Shirt,
     label: 'Silk Bales',
-    labelShort: 'Silk',
-    containerClass: 'from-purple-700 to-purple-900 border-purple-500',
-    iconClass: 'text-purple-300',
-    accentClass: 'bg-purple-500/30',
+    labelShort: 'SILK',
+    bgFrom: 'hsl(280, 50%, 35%)',
+    bgTo: 'hsl(280, 45%, 22%)',
+    borderColor: 'hsl(280, 40%, 50%)',
+    iconColor: 'hsl(280, 60%, 75%)',
+    ringGlow: 'hsla(280, 50%, 50%, 0.4)',
   },
   silver: {
     icon: Coins,
     label: 'Silver Strongbox',
-    labelShort: 'Silver',
-    containerClass: 'from-gray-400 to-gray-600 border-gray-300',
-    iconClass: 'text-gray-100',
-    accentClass: 'bg-gray-300/30',
+    labelShort: 'SILVER',
+    bgFrom: 'hsl(210, 8%, 55%)',
+    bgTo: 'hsl(210, 10%, 38%)',
+    borderColor: 'hsl(210, 10%, 65%)',
+    iconColor: 'hsl(210, 15%, 88%)',
+    ringGlow: 'hsla(210, 15%, 65%, 0.4)',
   },
   gold: {
     icon: Coins,
     label: 'Gold Chest',
-    labelShort: 'Gold',
-    containerClass: 'from-yellow-500 to-yellow-700 border-yellow-400',
-    iconClass: 'text-yellow-200',
-    accentClass: 'bg-yellow-400/30',
+    labelShort: 'GOLD',
+    bgFrom: 'hsl(43, 80%, 45%)',
+    bgTo: 'hsl(43, 70%, 30%)',
+    borderColor: 'hsl(43, 70%, 55%)',
+    iconColor: 'hsl(43, 90%, 80%)',
+    ringGlow: 'hsla(43, 80%, 50%, 0.5)',
   },
   gemstones: {
     icon: Gem,
     label: 'Jewel Case',
-    labelShort: 'Gems',
-    containerClass: 'from-emerald-600 to-emerald-800 border-emerald-400',
-    iconClass: 'text-emerald-300',
-    accentClass: 'bg-emerald-400/30',
+    labelShort: 'GEMS',
+    bgFrom: 'hsl(155, 50%, 32%)',
+    bgTo: 'hsl(155, 45%, 20%)',
+    borderColor: 'hsl(155, 40%, 48%)',
+    iconColor: 'hsl(155, 60%, 70%)',
+    ringGlow: 'hsla(155, 50%, 45%, 0.4)',
   },
   ships: {
     icon: Anchor,
     label: 'Ship Model',
-    labelShort: 'Ship',
-    containerClass: 'from-cyan-700 to-cyan-900 border-cyan-500',
-    iconClass: 'text-cyan-300',
-    accentClass: 'bg-cyan-500/30',
+    labelShort: 'SHIP',
+    bgFrom: 'hsl(195, 60%, 32%)',
+    bgTo: 'hsl(195, 55%, 20%)',
+    borderColor: 'hsl(195, 50%, 48%)',
+    iconColor: 'hsl(195, 70%, 70%)',
+    ringGlow: 'hsla(195, 60%, 45%, 0.4)',
   },
 };
 
 const sizeConfig = {
   sm: {
-    container: 'w-14 h-16',
+    outer: 'w-12 h-12',
     icon: 'w-5 h-5',
-    label: 'text-[8px]',
-    plate: 'px-1 py-0.5',
-    shadow: '0 4px 8px -2px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3)',
-    liftShadow: '0 8px 16px -4px rgba(0,0,0,0.5), 0 4px 8px -2px rgba(0,0,0,0.35)',
+    label: 'text-[7px]',
+    borderW: '2px',
+    shadow: '0 3px 6px -1px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3)',
+    liftShadow: '0 6px 14px -2px rgba(0,0,0,0.6), 0 3px 6px rgba(0,0,0,0.35)',
   },
   md: {
-    container: 'w-20 h-24',
+    outer: 'w-16 h-16',
     icon: 'w-7 h-7',
-    label: 'text-[10px]',
-    plate: 'px-1.5 py-0.5',
-    shadow: '0 6px 12px -3px rgba(0,0,0,0.45), 0 3px 6px -2px rgba(0,0,0,0.3)',
-    liftShadow: '0 12px 24px -6px rgba(0,0,0,0.55), 0 6px 12px -3px rgba(0,0,0,0.35)',
+    label: 'text-[8px]',
+    borderW: '3px',
+    shadow: '0 4px 10px -2px rgba(0,0,0,0.55), 0 2px 5px rgba(0,0,0,0.3)',
+    liftShadow: '0 10px 22px -4px rgba(0,0,0,0.65), 0 5px 10px rgba(0,0,0,0.35)',
   },
   lg: {
-    container: 'w-24 h-28',
+    outer: 'w-20 h-20',
     icon: 'w-9 h-9',
-    label: 'text-xs',
-    plate: 'px-2 py-1',
-    shadow: '0 8px 16px -4px rgba(0,0,0,0.5), 0 4px 8px -2px rgba(0,0,0,0.3)',
-    liftShadow: '0 16px 32px -8px rgba(0,0,0,0.6), 0 8px 16px -4px rgba(0,0,0,0.35)',
+    label: 'text-[9px]',
+    borderW: '3px',
+    shadow: '0 5px 14px -3px rgba(0,0,0,0.55), 0 3px 7px rgba(0,0,0,0.3)',
+    liftShadow: '0 14px 30px -6px rgba(0,0,0,0.65), 0 7px 14px rgba(0,0,0,0.35)',
   },
 };
 
@@ -124,34 +139,43 @@ export const CargoObject = ({
   const IconComponent = config.icon;
   const layoutProps = enableLayoutId ? { layoutId: `cargo-${card.id}` } : {};
 
-  // Hidden cargo (opponent's cargo) shows as covered crate
+  // Hidden cargo (opponent's hold) — sealed barrel token
   if (hidden) {
     return (
       <motion.div
         {...layoutProps}
         className={cn(
-          sizes.container,
-          'relative cursor-pointer select-none',
-          'rounded-lg cargo-crate',
+          sizes.outer,
+          'relative cursor-default select-none rounded-full',
           disabled && 'opacity-50 cursor-not-allowed',
           className
         )}
-        style={{ boxShadow: sizes.shadow }}
+        style={{
+          background: 'linear-gradient(180deg, hsl(25, 30%, 28%) 0%, hsl(25, 35%, 18%) 100%)',
+          border: `${sizes.borderW} solid hsl(25, 25%, 38%)`,
+          boxShadow: `${sizes.shadow}, inset 0 1px 0 hsla(25, 30%, 45%, 0.3), inset 0 -2px 4px rgba(0,0,0,0.3)`,
+        }}
         onClick={disabled ? undefined : onClick}
-        whileHover={disabled ? {} : { scale: 1.02, y: -3, boxShadow: sizes.liftShadow }}
-        whileTap={disabled ? {} : { scale: 0.98 }}
+        whileHover={disabled ? {} : { scale: 1.05, boxShadow: sizes.liftShadow }}
+        whileTap={disabled ? {} : { scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
-        {/* Tarp cover effect */}
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-secondary to-secondary/80 border-2 border-border">
-          <div className="absolute inset-x-2 top-1/3 h-0.5 bg-muted-foreground/40" />
-          <div className="absolute inset-x-2 bottom-1/3 h-0.5 bg-muted-foreground/40" />
-          <div className="absolute inset-y-2 left-1/3 w-0.5 bg-muted-foreground/40" />
-          <div className="absolute inset-y-2 right-1/3 w-0.5 bg-muted-foreground/40" />
+        {/* Cross-rope pattern */}
+        <div className="absolute inset-0 rounded-full overflow-hidden opacity-30">
+          <div className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 bg-[hsl(var(--rope))]" />
+          <div className="absolute inset-y-0 left-1/2 w-[2px] -translate-x-1/2 bg-[hsl(var(--rope))]" />
         </div>
+        {/* Center icon */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <Package className={cn(sizes.icon, 'text-muted-foreground/50')} />
+          <Package className={cn(sizes.icon, 'text-[hsl(var(--rope))] opacity-50')} />
         </div>
+        {/* Rim highlight */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, hsla(0,0%,100%,0.08) 0%, transparent 40%, hsla(0,0%,0%,0.15) 100%)',
+          }}
+        />
       </motion.div>
     );
   }
@@ -160,77 +184,84 @@ export const CargoObject = ({
     <motion.div
       {...layoutProps}
       className={cn(
-        sizes.container,
-        'relative cursor-pointer select-none cargo-object-tile',
+        sizes.outer,
+        'relative cursor-pointer select-none rounded-full',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
       onClick={disabled ? undefined : onClick}
       whileHover={disabled ? {} : {
-        scale: 1.02,
-        y: -3,
-        boxShadow: `${sizes.liftShadow}, 0 0 12px 2px hsla(43, 80%, 60%, 0.35)`,
+        scale: 1.08,
+        y: -4,
+        boxShadow: `${sizes.liftShadow}, 0 0 16px 3px ${config.ringGlow}`,
       }}
-      whileTap={disabled ? {} : { scale: 0.98 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
       animate={{
         y: selected ? -8 : 0,
         boxShadow: selected
-          ? `${sizes.liftShadow}, 0 0 18px 4px hsla(43, 80%, 60%, 0.5)`
+          ? `${sizes.liftShadow}, 0 0 20px 5px hsla(43, 80%, 60%, 0.6)`
           : sizes.shadow,
       }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      style={{
+        background: `linear-gradient(180deg, ${config.bgFrom} 0%, ${config.bgTo} 100%)`,
+        border: `${sizes.borderW} solid ${config.borderColor}`,
+        boxShadow: sizes.shadow,
+      }}
     >
-      {/* Cargo container (crate/barrel/chest base) */}
+      {/* Inner rim — 3D depth ring */}
       <div
-        className={cn(
-          'absolute inset-0 rounded-lg border-2 overflow-hidden',
-          'bg-gradient-to-b',
-          config.containerClass,
-          selected && 'ring-2 ring-primary'
-        )}
-      >
-        {/* Wood grain/texture overlay */}
-        <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
-        
-        {/* Metal corner fittings */}
-        <div className="absolute top-0.5 left-0.5 w-2 h-2 border-t-2 border-l-2 border-primary/40 rounded-tl" />
-        <div className="absolute top-0.5 right-0.5 w-2 h-2 border-t-2 border-r-2 border-primary/40 rounded-tr" />
-        <div className="absolute bottom-0.5 left-0.5 w-2 h-2 border-b-2 border-l-2 border-primary/40 rounded-bl" />
-        <div className="absolute bottom-0.5 right-0.5 w-2 h-2 border-b-2 border-r-2 border-primary/40 rounded-br" />
+        className="absolute inset-[3px] rounded-full pointer-events-none"
+        style={{
+          boxShadow: `inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -1px 2px rgba(255,255,255,0.08)`,
+        }}
+      />
 
-        {/* Icon container */}
-        <div className={cn(
-          'absolute top-1/4 inset-x-2 h-1/2 rounded flex items-center justify-center',
-          config.accentClass
-        )}>
-          <IconComponent className={cn(sizes.icon, config.iconClass, 'drop-shadow-md')} />
-        </div>
+      {/* Specular highlight — top arc */}
+      <div
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'linear-gradient(180deg, hsla(0,0%,100%,0.15) 0%, transparent 35%, hsla(0,0%,0%,0.2) 100%)',
+        }}
+      />
 
-        {/* Brass label plate at bottom */}
-        <div className={cn(
-          'absolute bottom-1 inset-x-1 brass-plate rounded-sm flex items-center justify-center',
-          sizes.plate
-        )}>
-          <span className={cn(
-            'font-bold text-amber-950 uppercase tracking-wide',
-            sizes.label
-          )}>
-            {config.labelShort}
-          </span>
-        </div>
-
-        {/* Selection glow effect */}
-        {selected && (
-          <motion.div
-            className="absolute inset-0 bg-primary/10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.1, 0.2, 0.1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-        )}
-
-        {/* Gold rim highlight on hover — handled via boxShadow in whileHover */}
+      {/* Icon */}
+      <div className="absolute inset-0 flex items-center justify-center pb-2">
+        <IconComponent
+          className={cn(sizes.icon, 'drop-shadow-md')}
+          style={{ color: config.iconColor }}
+        />
       </div>
+
+      {/* Label — engraved at bottom */}
+      <div className="absolute bottom-[3px] inset-x-0 flex justify-center pointer-events-none">
+        <span
+          className={cn(
+            sizes.label,
+            'font-bold tracking-wider uppercase'
+          )}
+          style={{
+            color: config.iconColor,
+            textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+          }}
+        >
+          {config.labelShort}
+        </span>
+      </div>
+
+      {/* Selection ring */}
+      {selected && (
+        <motion.div
+          className="absolute -inset-[3px] rounded-full pointer-events-none"
+          style={{
+            border: '2px solid hsl(var(--gold))',
+            boxShadow: '0 0 12px 3px hsla(43, 80%, 60%, 0.5)',
+          }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: [0.7, 1, 0.7], scale: 1 }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      )}
     </motion.div>
   );
 };
