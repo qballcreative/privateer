@@ -205,7 +205,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/Storm.png" alt="Storm" className="w-8 h-8 object-contain" />}
               title="Storm Rule ⛈️"
-              desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Supply Ship. Keep your strategy flexible — the market can shift without warning."
+              desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Trading Post supply. Keep your strategy flexible — the market can shift without warning."
             />
             <ActionCard
               icon={<img src="/Icons/Raid.png" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
