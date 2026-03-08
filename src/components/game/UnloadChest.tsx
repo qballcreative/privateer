@@ -160,8 +160,6 @@ export const UnloadChest = ({
     ? player.hand.find((c) => selectedCards.includes(c.id))?.type
     : null;
 
-  const doubloonTotal = player.tokens.reduce((sum, t) => sum + t.value, 0);
-  const bonusTotal = player.bonusTokens.reduce((sum, t) => sum + t.value, 0);
 
   return (
     <div className={cn(
@@ -294,14 +292,6 @@ export const UnloadChest = ({
         </AnimatePresence>
       </motion.div>
 
-      {/* Score summary with ticking animation */}
-      <div className={cn(
-        'mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border flex items-center justify-between',
-        isPhone ? 'text-xs' : 'text-sm'
-      )}>
-        <TickingScore value={doubloonTotal} label="Doubloons" />
-        <TickingScore value={bonusTotal} label="Comm" />
-      </div>
     </div>
   );
 };
