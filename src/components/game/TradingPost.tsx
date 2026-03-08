@@ -5,7 +5,7 @@ import CargoObject from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
-import { Anchor, ArrowLeftRight, Hand, AlertTriangle, Ship } from 'lucide-react';
+import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 
 interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
