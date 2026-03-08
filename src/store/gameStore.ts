@@ -410,7 +410,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Apply game state received from network (for multiplayer sync)
   applyGameState: (state, swapPlayers = false) => {
     // Validate incoming state before applying
-    const { validateGameState } = await_validateGameState();
     const validated = validateGameState(state);
     if (!validated) {
       console.warn('Rejected invalid game state from peer');
