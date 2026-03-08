@@ -11,7 +11,7 @@ interface MultiplayerChatProps {
   phase: string;
   localPlayerName: string;
   sendMessage: (msg: any) => void;
-  registerMessageHandler: (handler: (msg: any) => (() => void)) => (() => void);
+  registerMessageHandler: (handler: (msg: any) => void) => (() => void);
   playSound: (sound: string) => void;
 }
 
