@@ -319,7 +319,10 @@ export const GameBoard = () => {
   const TreasureSupplyPanel = ({ compact = false }: { compact?: boolean }) => (
     <div className="space-y-4">
       <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
-        <h3 className="font-pirate text-lg text-primary mb-4 text-center">Doubloons</h3>
+        <h3 className="font-pirate text-lg text-primary mb-4 text-center flex items-center justify-center gap-2">
+          <img src="/images/doubloons.png" alt="Doubloons" className="w-7 h-7 object-contain" />
+          Doubloons
+        </h3>
         <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
           {GOODS_ORDER.map((type) => (
             <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />

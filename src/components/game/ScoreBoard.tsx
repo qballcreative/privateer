@@ -84,7 +84,7 @@ export const ScoreBoard = () => {
               {/* Score breakdown */}
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="flex items-center gap-1 text-muted-foreground" title="Doubloons">
-                  <Coins className="w-3 h-3" />
+                  <img src="/images/doubloons.png" alt="Doubloons" className="w-4 h-4 object-contain" />
                   <span>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground" title="Commissions">
@@ -100,7 +100,10 @@ export const ScoreBoard = () => {
               {/* Total score */}
               <div className="mt-2 pt-2 border-t border-border">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total Doubloons</span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <img src="/images/doubloons.png" alt="Doubloons" className="w-4 h-4 object-contain" />
+                    Total
+                  </span>
                   <span className={cn(
                     'font-bold text-lg font-pirate',
                     player.isAI ? 'text-foreground' : 'text-primary'
