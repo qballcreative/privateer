@@ -529,6 +529,7 @@ export const GameBoard = () => {
           <TreasureSupplyPanel framed />
         </div>
 
+        {/* ════════════════════════════════════════════════════════════════
             PHONE LAYOUT — stacked, drawers for treasure/opponent
             ════════════════════════════════════════════════════════════════ */}
         <div className="block md:hidden space-y-3">
