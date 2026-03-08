@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Copy, Check, Users, Loader2, ArrowLeft, Anchor, Wifi, WifiOff } from 'lucide-react';
 import { OptionalRules } from '@/types/game';
+import { debugLog } from '@/lib/debugLog';
 
 interface MultiplayerLobbyProps {
   playerName: string;
@@ -45,17 +46,14 @@ export const MultiplayerLobby = ({ playerName, onBack, onNameChange }: Multiplay
   useEffect(() => {
     if (state === 'connected') {
       const unsubscribe = onMessage((message) => {
-        console.log('Lobby received message:', message.type);
+        debugLog('engine', 'Lobby message', message.type);
         if (message.type === 'start') {
-          const payload = message.payload as { optionalRules: OptionalRules; gameState: any };
-          console.log('Guest received start with game state');
-          // Guest applies the game state from host (with player swap)
+          const payload = message.payload as { optionalRules: OptionalRules; gameState: unknown };
+          debugLog('engine', 'Guest start', 'Received start with game state');
           applyGameState(payload.gameState, true);
         } else if (message.type === 'rejoin-sync') {
-          // Reconnecting player receives current game state from host
-          const payload = message.payload as { gameState: any };
-          console.log('Guest received rejoin-sync with current game state');
-          // Apply game state (with player swap) to resume the game
+          const payload = message.payload as { gameState: unknown };
+          debugLog('engine', 'Guest rejoin', 'Received rejoin-sync with current game state');
           applyGameState(payload.gameState, true);
         }
       });
@@ -66,26 +64,24 @@ export const MultiplayerLobby = ({ playerName, onBack, onNameChange }: Multiplay
   const handleHost = async () => {
     setMode('host');
     const name = playerName.trim() || 'Captain';
-    // Save name for future sessions
     savePlayerName(name);
     onNameChange(name);
     try {
       await hostGame(name);
     } catch (err) {
-      console.error('Failed to host game:', err);
+      debugLog('engine', 'Host error', 'Failed to host game', { error: String(err) });
     }
   };
 
   const handleJoin = async () => {
     if (!joinCode.trim()) return;
     const name = playerName.trim() || 'Captain';
-    // Save name for future sessions
     savePlayerName(name);
     onNameChange(name);
     try {
       await joinGame(joinCode.trim(), name);
     } catch (err) {
-      console.error('Failed to join game:', err);
+      debugLog('engine', 'Join error', 'Failed to join game', { error: String(err) });
     }
   };
 
@@ -103,14 +99,12 @@ export const MultiplayerLobby = ({ playerName, onBack, onNameChange }: Multiplay
   };
 
   const handleStartGame = () => {
-    // Host generates the game state using the stored local player name
     const hostName = localPlayerName || playerName || 'Captain';
     startMultiplayerGame(hostName, opponentName || 'Opponent', optionalRules, true);
     
-    // Small delay to ensure state is set, then send to guest
     setTimeout(() => {
       const gameState = getSerializableState();
-      console.log('Host sending game state to guest');
+      debugLog('engine', 'Host start', 'Sending game state to guest');
       sendMessage({ type: 'start', payload: { optionalRules, gameState } });
     }, 100);
   };
