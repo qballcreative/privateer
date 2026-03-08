@@ -201,7 +201,7 @@ const DebugPanel = () => {
               <div>Current Player: {gameState.players[gameState.currentPlayerIndex]?.name}</div>
               <div>Wins: [{gameState.roundWins.join(', ')}]</div>
               {gameState.players.map((p, i) => (
-                <div key={p.id}>P{i + 1} Hand: {p.hand.length} | Ships: {p.ships.length} | Score: {calculateScore(p)}</div>
+                <div key={p.id}>P{i + 1} Hand: {p.hand.length} | Ships: {p.ships.length} | Score: {calculateScore(p, gameState.players)}</div>
               ))}
               <div className="col-span-2 mt-2 pt-2 border-t border-border">
                 <div>Empty stacks: {Object.values(gameState.tokenStacks).filter((s) => s.length === 0).length}</div>

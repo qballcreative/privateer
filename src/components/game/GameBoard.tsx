@@ -1060,7 +1060,7 @@ export const GameBoard = () => {
                     {players.map((player) => (
                       <div key={player.id} className="p-3 sm:p-4 rounded-lg bg-muted/50 border border-border">
                         <p className="font-bold text-foreground text-sm sm:text-base">{player.name}</p>
-                        <p className="text-2xl sm:text-3xl font-pirate text-primary">{calculateScore(player)}</p>
+                        <p className="text-2xl sm:text-3xl font-pirate text-primary">{calculateScore(player, players)}</p>
                         <p className="text-xs text-muted-foreground">doubloons</p>
                       </div>
                     ))}
