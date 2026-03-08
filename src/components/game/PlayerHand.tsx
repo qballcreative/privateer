@@ -92,7 +92,7 @@ export const PlayerHand = ({
         
         {/* Ships count */}
         <div className="flex items-center gap-1 text-accent">
-          <Anchor className="w-4 h-4" />
+          <img src="/images/fleet.png" alt="Fleet" className="w-5 h-5 object-contain" />
           <span className="text-sm font-bold">{player.ships.length}</span>
         </div>
       </div>
