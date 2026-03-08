@@ -496,7 +496,7 @@ export const GameBoard = () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Continue Playing</AlertDialogCancel>
-                  <AlertDialogAction onClick={resetGame} className="bg-destructive hover:bg-destructive/90">
+                  <AlertDialogAction onClick={() => { if (!isMultiplayer && phase === 'playing') { recordGameResult(false); } resetGame(); }} className="bg-destructive hover:bg-destructive/90">
                     Return to Port
                   </AlertDialogAction>
                 </AlertDialogFooter>
