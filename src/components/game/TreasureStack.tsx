@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
 
@@ -18,7 +19,7 @@ const treasureConfig: Record<GoodsType, {
   gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
 };
 
-export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
+export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
   const config = treasureConfig[type];
   const topToken = tokens[0];
   const isEmpty = tokens.length === 0;
@@ -44,9 +45,9 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
                 transform: 'translateX(-50%)',
                 zIndex: index,
               }}
-              initial={{ scale: 0, y: -20 }}
+              initial={false}
               animate={{ scale: 1, y: 0 }}
-              transition={{ delay: index * 0.1, type: 'spring', stiffness: 300 }}
+              layout
             >
               <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
               {index === tokens.slice(0, 4).length - 1 && topToken && (
@@ -88,4 +89,5 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
       <span className="text-xs text-primary font-bold">{tokens.length} left</span>
     </div>
   );
-};
+});
+TreasureStack.displayName = 'TreasureStack';

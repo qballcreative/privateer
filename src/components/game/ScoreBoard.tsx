@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
 import { Trophy, Anchor, Medal, Coins, Scroll } from 'lucide-react';
 
-export const ScoreBoard = () => {
+export const ScoreBoard = memo(() => {
   const { players, round, maxRounds, roundWins } = useGameStore();
 
   return (
@@ -53,9 +54,8 @@ export const ScoreBoard = () => {
                 'p-3 rounded-lg border overflow-visible',
                 player.isAI ? 'bg-muted/50 border-border' : 'bg-primary/5 border-primary/20'
               )}
-              initial={{ opacity: 0, x: -20 }}
+              initial={false}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -128,4 +128,5 @@ export const ScoreBoard = () => {
       </div>
     </div>
   );
-};
+});
+ScoreBoard.displayName = 'ScoreBoard';

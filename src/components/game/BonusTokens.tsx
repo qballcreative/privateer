@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { BonusToken } from '@/types/game';
 import { cn } from '@/lib/utils';
@@ -46,9 +47,8 @@ const MedallionStack = ({
               transform: 'translateX(-50%)',
               zIndex: index,
             }}
-            initial={{ scale: 0 }}
+            initial={false}
             animate={{ scale: 1 }}
-            transition={{ delay: index * 0.1 }}
           >
             <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain drop-shadow-md" />
           </motion.div>
@@ -67,7 +67,7 @@ const MedallionStack = ({
   );
 };
 
-export const BonusTokens = ({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
+export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
     <div className="flex items-center gap-4 p-3 rounded-lg bg-card/50 border border-border">
       <span className="text-lg font-pirate text-primary">
@@ -78,4 +78,5 @@ export const BonusTokens = ({ threeCards, fourCards, fiveCards }: BonusTokensPro
       <MedallionStack tier="five" tokens={fiveCards} />
     </div>
   );
-};
+});
+BonusTokens.displayName = 'BonusTokens';
