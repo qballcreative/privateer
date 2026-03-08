@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
@@ -13,8 +13,9 @@ import { AdBanner } from './AdBanner';
 import { InstallPrompt } from './InstallPrompt';
 import { HeroSection } from './HeroSection';
 import { SetSailPanel } from './SetSailPanel';
-import { HowToPlunder } from './HowToPlunder';
-import { VictoryConditions } from './VictoryConditions';
+
+const HowToPlunder = lazy(() => import('./HowToPlunder').then(m => ({ default: m.HowToPlunder })));
+const VictoryConditions = lazy(() => import('./VictoryConditions').then(m => ({ default: m.VictoryConditions })));
 
 export const LandingPage = () => {
   const {
