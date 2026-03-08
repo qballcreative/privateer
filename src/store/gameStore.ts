@@ -1248,7 +1248,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   getRoundWinner: () => {
     const { players } = get();
-    const scores = players.map((p) => calculateScore(p));
+    const scores = players.map((p) => calculateScore(p, players));
     
     const maxScore = Math.max(...scores);
     const winners = scores.reduce<number[]>((acc, s, i) => s === maxScore ? [...acc, i] : acc, []);
