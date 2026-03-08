@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActionDisplay, Card } from '@/types/game';
-import { CargoObject } from './CargoObject';
+import CargoObject from './CargoObject';
 import { ArrowRight, ArrowDown, Coins, Star, CloudLightning, Crosshair, Ship, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
