@@ -214,17 +214,10 @@ export const UnloadChest = ({
               )}
               animate={isUnloading ? { rotate: [0, -5, 5, -3, 0] } : {}}
             >
-              {canUnload ? (
-                <Unlock className={cn(
-                  'text-primary',
-                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
-                )} />
-              ) : (
-                <Lock className={cn(
-                  'text-muted-foreground',
-                  isPhone ? 'w-4 h-4' : 'w-5 h-5'
-                )} />
-              )}
+              <img src="/images/supply.png" alt="Sell Cargo" className={cn(
+                'object-contain',
+                isPhone ? 'w-6 h-6' : 'w-7 h-7'
+              )} />
             </motion.div>
             
             <div>
