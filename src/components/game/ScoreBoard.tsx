@@ -91,7 +91,7 @@ export const ScoreBoard = () => {
                   <img src="/images/commissions.png" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary">{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
-                <div className="flex items-center gap-1.5" title="Fleet">
+                <div className="flex items-center gap-1.5 overflow-visible" title="Fleet">
                   <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary">{player.ships.length}</span>
                 </div>
