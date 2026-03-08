@@ -57,13 +57,7 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
         {tokens.slice(0, 4).reverse().map((token, index) => (
           <motion.div
             key={token.id}
-            className={cn(
-              'absolute w-11 h-11 rounded-full border-2',
-              'bg-gradient-to-br flex items-center justify-center',
-              'doubloon',
-              config.gradientClass,
-              config.coinColor
-            )}
+            className="absolute w-11 h-11"
             style={{
               bottom: index * 3,
               left: '50%',
@@ -74,10 +68,10 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
             animate={{ scale: 1, y: 0 }}
             transition={{ delay: index * 0.1, type: 'spring', stiffness: 300 }}
           >
-            {/* Show value and icon only on top coin */}
+            <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
             {index === tokens.slice(0, 4).length - 1 && topToken && (
               <>
-                <span className="text-foreground font-bold text-sm drop-shadow-md">
+                <span className="absolute inset-0 flex items-center justify-center text-foreground font-bold text-sm drop-shadow-md">
                   {topToken.value}
                 </span>
                 <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
