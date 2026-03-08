@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';
 import CargoObject from './CargoObject';
 import { UnloadChest } from './UnloadChest';
