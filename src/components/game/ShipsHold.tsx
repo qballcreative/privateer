@@ -180,16 +180,16 @@ export const ShipsHold = ({
               key={`empty-${index}`}
               layout
               className={cn(
-                "rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
-                isPhone ? "w-14 h-16 flex-shrink-0" : "w-20 h-24"
+                "rounded-full border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
+                isPhone ? "w-12 h-12 flex-shrink-0" : "w-16 h-16"
               )}
               style={{
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.15)',
+                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
               }}
             >
               <Package className={cn(
-                "text-muted-foreground/20",
-                isPhone ? "w-4 h-4" : "w-6 h-6"
+                "text-muted-foreground/15",
+                isPhone ? "w-4 h-4" : "w-5 h-5"
               )} />
             </motion.div>
           ))}
