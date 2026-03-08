@@ -291,6 +291,17 @@ export const SettingsPanel = () => {
                   Change Age & Ad Preferences
                 </Button>
               </div>
+
+              {/* How to Play link */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => navigate('/how-to-play')}
+              >
+                <BookOpen className="w-4 h-4 mr-1" />
+                How to Play
+              </Button>
             </div>
           </div>
         </ScrollArea>

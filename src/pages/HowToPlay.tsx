@@ -337,12 +337,12 @@ const TutorialMockBoard = () => {
 
       {/* Bonus section */}
       <div data-tutorial-id="tutorial-bonus" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Commission Medallions</h3>
+        <h3 className="font-serif text-lg font-bold text-primary mb-3">Commission Seals</h3>
         <div className="flex gap-3">
           {[
-            { label: '3-card', img: '/Icons/bonus3.png' },
-            { label: '4-card', img: '/Icons/bonus4.png' },
-            { label: '5-card', img: '/Icons/bonus5.png' },
+            { label: '3-card', img: '/Icons/RedSeal.png' },
+            { label: '4-card', img: '/Icons/SilverSeal.png' },
+            { label: '5-card', img: '/Icons/GoldSeal.png' },
           ].map((b) => (
             <div key={b.label} className="text-center">
               <img src={b.img} alt={b.label} className="w-10 h-10 object-contain mx-auto" />

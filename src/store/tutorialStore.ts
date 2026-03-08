@@ -105,7 +105,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'winning',
     title: 'Winning the Game',
-    description: 'The round ends when the Supply Ship is empty OR 3 token stacks are depleted. The captain with the most doubloons wins the round. Win the best-of series to earn your Letters of Marque!',
+    description: 'The round ends when the Trading Post supply is empty OR 3 token stacks are depleted. The captain with the most doubloons wins the round. Win the best-of series to earn your Letters of Marque!',
   },
   {
     id: 'ready',
