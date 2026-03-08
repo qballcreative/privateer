@@ -239,7 +239,7 @@ const HowToPlay = () => {
             <p className="text-foreground/70 mb-5 max-w-md mx-auto">
               Start the interactive tutorial to see each action demonstrated on a mock game board.
             </p>
-            <Button size="lg" onClick={startTutorial} className="mr-3">
+            <Button size="lg" onClick={() => navigate('/tutorial')} className="mr-3">
               <Anchor className="w-5 h-5 mr-2" /> Start Tutorial
             </Button>
             <Button variant="outline" size="lg" onClick={() => navigate('/')}>
