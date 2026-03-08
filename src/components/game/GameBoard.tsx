@@ -721,7 +721,7 @@ export const GameBoard = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <TreasureSupplyPanel />
+              <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
             </motion.aside>
 
             {/* Main game area — Trading Post top, Hold bottom */}
