@@ -322,9 +322,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       players,
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      currentPlayerIndex: 0,
+      currentPlayerIndex: firstPlayer === 'random' ? secureRandomInt(2) : 0,
       round: 1,
-      maxRounds: 3,
+      maxRounds,
       roundWins: players.map(() => 0),
       lastAction: null,
       difficulty,
@@ -332,6 +332,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: false,
+      roundWinners: [],
     };
 
     // Fire engine hooks
