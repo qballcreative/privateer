@@ -88,7 +88,7 @@ export const ScoreBoard = () => {
                   <span>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground" title="Commissions">
-                  <Medal className="w-3 h-3" />
+                  <img src="/images/commissions.png" alt="Commissions" className="w-6 h-6 object-contain -my-1" />
                   <span>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground" title="Fleet">
