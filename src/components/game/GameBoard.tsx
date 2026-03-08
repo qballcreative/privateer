@@ -187,17 +187,6 @@ export const GameBoard = () => {
   const [isRaidMode, setIsRaidMode] = useState(false);
   const [showAction, setShowAction] = useState(false);
   const [prevPhase, setPrevPhase] = useState<typeof phase | null>(null);
-  const [chatMessages, setChatMessages] = useState<{ sender: string; text: string }[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [showChat, setShowChat] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
-  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
-  const [isReconnecting, setIsReconnecting] = useState(false);
-  const [disconnectTimer, setDisconnectTimer] = useState<number>(0);
-  const disconnectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const chatScrollRef = useRef<HTMLDivElement>(null);
-  const showChatRef = useRef(showChat);
-
   // Mobile drawer states
   const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
   const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
@@ -217,11 +206,6 @@ export const GameBoard = () => {
 
   // End-of-round flourish
   const [roundFlourish, setRoundFlourish] = useState(false);
-  
-  // Keep ref in sync with state
-  useEffect(() => {
-    showChatRef.current = showChat;
-  }, [showChat]);
 
   const currentPlayer = players[currentPlayerIndex];
   
