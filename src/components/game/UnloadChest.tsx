@@ -249,8 +249,8 @@ export const UnloadChest = ({
               )}
               size="sm"
             >
-              <img src="/images/supply.png" alt="Unload" className={cn(isPhone ? 'w-4 h-4' : 'w-5 h-5', 'mr-1 object-contain')} />
-              Unload{hasSelection ? ` (${selectedCards.length})` : ''}
+              <img src="/images/supply.png" alt="Sell Cargo" className={cn(isPhone ? 'w-4 h-4' : 'w-5 h-5', 'mr-1 object-contain')} />
+              Sell Cargo{hasSelection ? ` (${selectedCards.length})` : ''}
             </Button>
 
             {hasSelection && (
