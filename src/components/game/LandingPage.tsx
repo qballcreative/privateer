@@ -70,7 +70,7 @@ export const LandingPage = () => {
     const rules = restrictedMode
       ? { stormRule: false, pirateRaid: false, treasureChest: false }
       : optionalRules;
-    startGame(name, restrictedMode ? 'easy' : difficulty, rules);
+    startGame(name, restrictedMode ? 'easy' : difficulty, rules, bestOf === 1 ? 1 : 3, firstPlayer);
   };
 
   const handleCreateRoom = () => setShowMultiplayer(true);
