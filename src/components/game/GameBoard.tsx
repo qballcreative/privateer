@@ -320,14 +320,17 @@ export const GameBoard = () => {
   // ─── Treasure Supply Panel (reusable across layouts) ───
   const TreasureSupplyPanel = ({ compact = false }: { compact?: boolean }) => (
     <div className="space-y-4">
-      <div className={cn("p-4 rounded-xl bg-card border border-primary/20", compact && "p-3")}>
-        <h3 className="font-pirate text-lg text-primary mb-4 text-center">
-          Market Prices
-        </h3>
-        <div className={cn("grid gap-4", compact ? "grid-cols-3" : "grid-cols-2")}>
-          {GOODS_ORDER.map((type) => (
-            <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
-          ))}
+      <div className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
+        <div className="absolute inset-0 bg-background/40 pointer-events-none" />
+        <div className="relative z-10">
+          <h3 className="font-pirate text-lg text-primary mb-4 text-center">
+            Market Prices
+          </h3>
+          <div className={cn("grid gap-4 place-items-center", compact ? "grid-cols-3" : "grid-cols-2")}>
+            {GOODS_ORDER.map((type) => (
+              <TreasureStack key={type} type={type} tokens={tokenStacks[type]} />
+            ))}
+          </div>
         </div>
       </div>
 

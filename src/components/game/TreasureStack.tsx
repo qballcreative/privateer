@@ -24,7 +24,7 @@ export const TreasureStack = ({ type, tokens }: TreasureStackProps) => {
   const isEmpty = tokens.length === 0;
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center justify-center gap-1">
       {/* Leather label */}
       <div className="px-2 py-0.5 rounded leather-texture">
         <span className="text-xs text-foreground/90 font-medium">{config.label}</span>
