@@ -549,7 +549,7 @@ export const GameBoard = () => {
               <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
-        </motion.header>
+        </header>
 
         {/* ════════════════════════════════════════════════════════════════
             PHONE LAYOUT — stacked, drawers for treasure/opponent
