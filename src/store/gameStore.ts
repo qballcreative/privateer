@@ -216,7 +216,7 @@ const getOpponentIndex = (current: number, total: number): number =>
 
 interface GameStore extends GameState {
   // Actions
-  startGame: (playerName: string, difficulty: Difficulty, optionalRules?: OptionalRules) => void;
+  startGame: (playerName: string, difficulty: Difficulty, optionalRules?: OptionalRules, maxRounds?: number, firstPlayer?: 'host' | 'random') => void;
   startMultiplayerGame: (playerName: string, opponentName: string, optionalRules: OptionalRules, isHost: boolean) => void;
   applyGameState: (state: Partial<GameState>, swapPlayers?: boolean) => void;
   getSerializableState: () => Partial<GameState>;
