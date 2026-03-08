@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 
 const DebugPanel = lazy(() => import("./pages/DebugPanel"));
 const HowToPlay = lazy(() => import("./pages/HowToPlay"));
+const TutorialPage = lazy(() => import("./pages/TutorialPage"));
 
 const queryClient = new QueryClient();
 
