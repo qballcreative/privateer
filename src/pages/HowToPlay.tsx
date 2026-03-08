@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Anchor } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import bannerLogo from '@/assets/BannerLogo.png';
 
 // Token images

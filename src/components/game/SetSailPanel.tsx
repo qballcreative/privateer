@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Swords, Users, Anchor } from 'lucide-react';
+import { Users, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
 import deckhandImg from '@/assets/difficulty/deckhand.png';

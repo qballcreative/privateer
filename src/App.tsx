@@ -38,14 +38,6 @@ const App = () => {
                 </Suspense>
               }
             />
-            <Route
-              path="/tutorial"
-              element={
-                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading…</div>}>
-                  <TutorialPage />
-                </Suspense>
-              }
-            />
           {import.meta.env.DEV && (
             <Route
               path="/debug"
