@@ -40,10 +40,7 @@ const HowToPlay = () => {
 
         {/* Overview */}
         <motion.section {...sectionAnim} className="game-box-card p-6 md:p-8 text-center">
-          <Anchor className="w-10 h-10 text-primary mx-auto mb-4" />
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary mb-3">
-            Privateer: Letters of Marque
-          </h2>
+          <img src={bannerLogo} alt="Privateer: Letters of Marque" className="h-16 md:h-20 object-contain mx-auto mb-4" />
           <p className="text-foreground/80 max-w-2xl mx-auto leading-relaxed">
             A fast-paced trading duel on the high seas! Buy, sell, and trade cargo to
             earn the most doubloons. Outsmart your opponent to earn your Letters of Marque
