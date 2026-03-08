@@ -146,7 +146,6 @@ export const SetSailPanel = ({
         <div className="space-y-3">
           {mode === 'aai' ? (
             <ActionButton onClick={onStartAAI} variant="gold">
-              <Swords className="w-5 h-5 mr-2" />
               Start Game
             </ActionButton>
           ) : (
