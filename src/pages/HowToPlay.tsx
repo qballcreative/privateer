@@ -156,19 +156,19 @@ const HowToPlay = () => {
           </div>
         </motion.section>
 
-        {/* Bonus Medallions */}
+        {/* Commission Seals */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
           <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Award className="w-5 h-5" /> Commission Medallions
+            <Award className="w-5 h-5" /> Commission Seals
           </h2>
           <p className="text-foreground/80 mb-3">
-            Sell 3 or more matching goods at once to earn a bonus medallion:
+            Sell 3 or more matching goods at once to earn a bonus Commission Seal:
           </p>
           <div className="flex flex-wrap gap-4">
             {[
-              { count: '3 cards', values: '1–3 bonus', img: '/Icons/bonus3.png' },
-              { count: '4 cards', values: '4–6 bonus', img: '/Icons/bonus4.png' },
-              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/bonus5.png' },
+              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.png' },
+              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.png' },
+              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.png' },
             ].map((b) => (
               <div key={b.count} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
                 <img src={b.img} alt={b.count} className="w-8 h-8 object-contain" />
