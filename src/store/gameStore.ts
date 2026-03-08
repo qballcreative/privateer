@@ -720,9 +720,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       const winner = get().getRoundWinner();
       const roundWins = [...fullState.roundWins];
+      const roundWinners = [...(fullState.roundWinners || [])];
       if (winner) {
         const winnerIndex = fullState.players.findIndex((p) => p.id === winner.id);
         if (winnerIndex !== -1) roundWins[winnerIndex]++;
+        roundWinners.push(winner.id);
+      } else {
+        roundWinners.push(null);
       }
       // In best-of-1, skip the round-end modal and go straight to game end
       const skipRoundEnd = fullState.maxRounds <= 1;
