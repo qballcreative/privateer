@@ -10,7 +10,7 @@ import NotFound from "./pages/NotFound";
 
 const DebugPanel = lazy(() => import("./pages/DebugPanel"));
 const HowToPlay = lazy(() => import("./pages/HowToPlay"));
-const TutorialPage = lazy(() => import("./pages/TutorialPage"));
+
 
 const queryClient = new QueryClient();
 
@@ -35,14 +35,6 @@ const App = () => {
               element={
                 <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading…</div>}>
                   <HowToPlay />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/tutorial"
-              element={
-                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading…</div>}>
-                  <TutorialPage />
                 </Suspense>
               }
             />

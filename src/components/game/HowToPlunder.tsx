@@ -29,14 +29,14 @@ export const HowToPlunder = () => {
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-center mb-2">
           How to Play
         </h2>
-        <p className="text-center mb-8">
+        <div className="text-center mb-8">
           <button
             onClick={() => navigate('/how-to-play')}
-            className="text-sm text-accent hover:text-accent/80 underline underline-offset-2 transition-colors"
+            className="inline-flex items-center justify-center min-h-[44px] px-6 rounded-lg font-bold text-base bg-gradient-to-b from-accent to-accent/80 text-accent-foreground shadow-[0_4px_15px_hsl(var(--ocean)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--ocean)/0.5)] transition-all active:scale-95"
           >
-            Full instructions &amp; interactive tutorial →
+            How to Play
           </button>
-        </p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {steps.map((step, i) => (
             <motion.div
