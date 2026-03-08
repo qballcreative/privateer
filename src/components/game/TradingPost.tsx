@@ -183,54 +183,60 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
         </div>
 
         {/* Cargo on the dock */}
-        <div className={cn(
-          "relative z-[1]",
-          "min-h-[80px] sm:min-h-[140px]",
-          isPhone 
-            ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
-            : "flex flex-wrap items-end justify-center gap-4 sm:gap-6 pt-4"
-        )}>
-          <LayoutGroup id="trading-post">
-            <AnimatePresence mode="sync">
-              {market.map((card, index) => (
-                <motion.div
-                  key={card.id}
-                  layout
-                  initial={riseFromDock.initial}
-                  animate={riseFromDock.animate}
-                  exit={
-                    lastAction?.type === 'take-ships' && card.type === 'ships'
-                      ? shipFanExit(index, ships.length)
-                      : lastAction?.type === 'exchange'
-                        ? { opacity: 0, x: 80, scale: 0.8 }
-                        : { opacity: 0, y: 40, scale: 0.85 }
-                  }
-                  transition={{
-                    layout: { type: 'spring', stiffness: 300, damping: 25 },
-                    delay: index * 0.06,
-                    type: 'spring',
-                    stiffness: 250,
-                    damping: 22,
-                  }}
-                  className={cn(isPhone && "flex-shrink-0")}
-                >
-                  <CargoObject
-                    card={card}
-                    selected={selectedMarketCards.includes(card.id)}
-                    onClick={() => handleCardClick(card.id)}
-                    disabled={!isPlayerTurn || phase !== 'playing'}
-                    size={cargoSize}
-                    enableLayoutId
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </LayoutGroup>
-          
-          {market.length === 0 && (
-            <div className="text-muted-foreground text-sm italic">
-              No cargo at the trading post
-            </div>
+        <div className="relative">
+          <div className={cn(
+            "relative z-[1]",
+            "min-h-[80px] sm:min-h-[140px]",
+            isPhone 
+              ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
+              : "flex flex-wrap items-end justify-center gap-4 sm:gap-6 pt-4"
+          )}>
+            <LayoutGroup id="trading-post">
+              <AnimatePresence mode="sync">
+                {market.map((card, index) => (
+                  <motion.div
+                    key={card.id}
+                    layout
+                    initial={riseFromDock.initial}
+                    animate={riseFromDock.animate}
+                    exit={
+                      lastAction?.type === 'take-ships' && card.type === 'ships'
+                        ? shipFanExit(index, ships.length)
+                        : lastAction?.type === 'exchange'
+                          ? { opacity: 0, x: 80, scale: 0.8 }
+                          : { opacity: 0, y: 40, scale: 0.85 }
+                    }
+                    transition={{
+                      layout: { type: 'spring', stiffness: 300, damping: 25 },
+                      delay: index * 0.06,
+                      type: 'spring',
+                      stiffness: 250,
+                      damping: 22,
+                    }}
+                    className={cn(isPhone && "flex-shrink-0")}
+                  >
+                    <CargoObject
+                      card={card}
+                      selected={selectedMarketCards.includes(card.id)}
+                      onClick={() => handleCardClick(card.id)}
+                      disabled={!isPlayerTurn || phase !== 'playing'}
+                      size={cargoSize}
+                      enableLayoutId
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </LayoutGroup>
+            
+            {market.length === 0 && (
+              <div className="text-muted-foreground text-sm italic">
+                No cargo at the trading post
+              </div>
+            )}
+          </div>
+          {/* Scroll fade indicator for mobile */}
+          {isPhone && market.length > 4 && (
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-card/80 to-transparent pointer-events-none z-[2] rounded-r-xl" />
           )}
         </div>
 

@@ -1,87 +1,280 @@
 
 
-## Comprehensive App Review & Improvement Plan
+# Visual Redesign Plan: Privateer: Letters of Marque
 
-### Overall Rating: 8.7/10
-
-The game is well-architected with strong visual design, a sophisticated AI, and polished UX. Here are the areas that can push it further.
-
----
-
-### Strengths (what's working well)
-
-- **Architecture**: Clean separation — RulesEngine plugin system, Zustand stores, memo'd components, cryptographic shuffling
-- **AI**: 4-tier difficulty with weighted scoring across blocking, bonus pursuit, sell timing, and token urgency
-- **Visual design**: Custom cargo tokens, doubloon stacks, wood/leather textures, wax-seal voyage indicators — cohesive tactile aesthetic
-- **Animations**: Spring-based Framer Motion throughout — card rise-from-dock, ship fan-out, sell sparkles, ticking score counters
-- **Multiplayer**: P2P via PeerJS with state validation, reconnection flow, disconnect timer with claim-victory mechanic
-- **Accessibility**: aria-live sell announcements in UnloadChest
+## Vision Summary
+Transform "Plunder" into "Privateer: Letters of Marque" - a premium tactile experience where players handle physical cargo objects on a weathered dock table, rather than abstract cards. Every interaction should feel like physically placing, swapping, or unloading cargo under a Letter of Marque.
 
 ---
 
-### Issues & Improvements Identified
+## Design Philosophy
 
-#### 1. VictoryScreen "Play Again" doesn't start a new game
-Currently both buttons call `resetGame()` which returns to the lobby. The "Play Again" button should auto-start a new game with the same settings (difficulty, optional rules, player name).
+### Core Spatial Metaphors
+| Current Term | New Metaphor | Visual Representation |
+|--------------|--------------|----------------------|
+| Market | **Trading Post** | Weathered dock table with cargo crates |
+| Player Hand | **Ship's Hold** | Cargo bay with physical inventory slots |
+| Cards | **Cargo Objects** | 3D-style physical goods (crates, barrels, chests) |
+| Sell Action | **Unload Cargo** | Goods being offloaded → coins + commission medallions |
+| Token Stacks | **Coin Purses** | Stacked doubloons with leather pouch aesthetic |
+| Deck | **Supply Ship** | Silhouette of arriving cargo ship with count |
 
-#### 2. GameBoard.tsx is 1,147 lines — too large
-The disconnection modal (~150 lines), round-end modal (~100 lines), multiplayer chat (~70 lines), and phone/tablet/desktop layouts are all inline. Extracting these improves maintainability and reduces re-render scope.
-
-#### 3. No confirmation on "Return Home" mid-game
-The Home button in the header calls `resetGame()` with no confirmation dialog. A misclick loses the entire game.
-
-#### 4. Round-end modal doesn't show per-round score breakdown
-The Voyage End modal shows total doubloons per player but not the breakdown (tokens vs commissions vs fleet bonus). The VictoryScreen already has this logic — reuse it.
-
-#### 5. Mobile Trading Post horizontal scroll isn't obvious
-Cards overflow into a horizontal scroll on phone, but there's no visual scroll indicator. Users may not realize they can scroll to see more cards.
-
-#### 6. Sound plays even when soundEnabled is false (edge case)
-The deck-low creak ambience (`sea_sounds.wav`) plays based on `isDeckLow` state but doesn't check `soundEnabled` from the settings store. Same issue with the creak not respecting `soundVolume`.
-
-#### 7. Missing keyboard accessibility
-The Trading Post cards and Ship's Hold cargo objects are `motion.div` with `onClick` but no `role="button"`, `tabIndex`, or keyboard event handlers. Not usable via keyboard alone.
-
-#### 8. "Best of 1" mode skips voyage structure
-When `bestOf` is set to 1, the game still goes through `roundEnd` → `nextRound` flow, showing "Voyage 1 Complete!" then immediately ending. Should skip the round-end modal and go straight to the VictoryScreen.
+### Visual Tone
+- Materials: Wood grain, brass fittings, rope texture, aged leather, parchment
+- Lighting: Warm lantern glow, harbor at dusk ambiance
+- Typography: Maintains `Pirata One` for headers, `Crimson Text` for body
+- No cartoonish elements - grounded, premium tabletop aesthetic
 
 ---
 
-### Improvement Plan
+## Phase 1: Foundation and Core Components
 
-#### Phase A: Quick Fixes (low effort, high impact)
+### 1.1 Rename and Rebrand
+- Update title from "Plunder" to "Privateer: Letters of Marque"
+- Update subtitle to "A Trading Duel"
+- Update footer credits
 
-| # | Fix | File(s) |
-|---|-----|---------|
-| A1 | Wire "Play Again" to auto-start with same settings | `VictoryScreen.tsx`, `GameBoard.tsx`, `gameStore.ts` |
-| A2 | Add confirmation dialog on Home button mid-game | `GameBoard.tsx` |
-| A3 | Fix creak ambience to respect sound settings | `GameBoard.tsx` |
-| A4 | Skip round-end modal in best-of-1 mode | `gameStore.ts` |
+**Files**: `LandingPage.tsx`, `GameBoard.tsx`, `index.html`
 
-#### Phase B: UX Polish
+### 1.2 New Component: CargoObject (replaces GameCard)
+Replace the card metaphor with physical cargo objects:
 
-| # | Improvement | File(s) |
-|---|-------------|---------|
-| B1 | Add scroll fade indicators on mobile Trading Post | `TradingPost.tsx` |
-| B2 | Add keyboard accessibility (`role`, `tabIndex`, `onKeyDown`) to CargoObject | `CargoObject.tsx` |
-| B3 | Add score breakdown to round-end modal (reuse `getScoreBreakdown`) | `GameBoard.tsx` or extract `RoundEndModal.tsx` |
-| B4 | Show per-round winners in VictoryScreen (currently shows totals only because `roundWins` is aggregated — track per-round winner IDs) | `gameStore.ts`, `VictoryScreen.tsx` |
+```text
++------------------+
+|  ┌────────────┐  |  ← Wooden crate texture
+|  │   [ICON]   │  |  ← Cargo icon (barrel, chest, etc.)
+|  │    RUM     │  |  ← Brass label plate
+|  └────────────┘  |
++------------------+
+```
 
-#### Phase C: Code Health
+**Cargo visuals by type**:
+- **Rum**: Wooden barrel + bottle combo (single unit)
+- **Cannonballs**: Iron-bound crate with visible balls
+- **Silks**: Wrapped bale with fabric texture
+- **Silver**: Metal-banded strongbox
+- **Gold**: Ornate chest with gold trim
+- **Gemstones**: Velvet-lined jewelry case
+- **Ships**: Miniature ship model on stand
 
-| # | Refactor | File(s) |
-|---|----------|---------|
-| C1 | Extract `DisconnectModal` component from GameBoard | New `DisconnectModal.tsx` |
-| C2 | Extract `RoundEndModal` component from GameBoard | New `RoundEndModal.tsx` |
-| C3 | Extract `MultiplayerChat` component from GameBoard | New `MultiplayerChat.tsx` |
+**Files**: Create `src/components/game/CargoObject.tsx`
 
-This would reduce `GameBoard.tsx` from ~1,150 lines to ~750 lines.
+### 1.3 Update CSS Variables and Textures
+Add new texture-based styling:
+- Wood plank backgrounds for containers
+- Rope border patterns
+- Brass button/badge styling
+- Parchment overlays for information panels
+
+**Files**: `src/index.css`
 
 ---
 
-### Recommended Priority
+## Phase 2: Trading Post (Market)
 
-**Start with Phase A** (4 quick fixes) — these are bugs/gaps that affect real gameplay. Then **Phase B** for polish. Phase C is optional refactoring that improves developer experience but doesn't change user-facing behavior.
+### 2.1 New Component: TradingPost (replaces Market)
+Transform from card display to dock table surface:
 
-Total estimated effort: ~8-10 implementation messages across all phases.
+```text
+╔══════════════════════════════════════════════════╗
+║              TRADING POST                        ║
+║  ┌──────────────────────────────────────────┐   ║
+║  │   [WOOD PLANKS TEXTURE BACKGROUND]       │   ║
+║  │                                           │   ║
+║  │   🪵  🛢️  📦  💎  ⛵                      │   ║
+║  │  (cargo objects arranged on dock)        │   ║
+║  │                                           │   ║
+║  └──────────────────────────────────────────┘   ║
+║                                                  ║
+║  Supply Ship: ▓▓▓░░ 23 cargo remaining          ║
+╚══════════════════════════════════════════════════╝
+```
+
+- Dock table surface with wood plank texture
+- Cargo objects sit on the table (not floating cards)
+- "Supply Ship" indicator replaces "Deck" count
+- Rope border framing
+
+**Files**: Create `src/components/game/TradingPost.tsx`, update `GameBoard.tsx`
+
+### 2.2 Action Mode Toggles
+Rename and restyle:
+- "Take" → "Claim Cargo" (hand reaching icon)
+- "Exchange" → "Trade Goods" (swap arrows over crates)
+- "Take All Ships" → "Commandeer Fleet" (nautical wheel icon)
+
+---
+
+## Phase 3: Ship's Hold (Player Hand)
+
+### 3.1 New Component: ShipsHold (replaces PlayerHand)
+Transform player hand into cargo bay visualization:
+
+```text
+╔══════════════════════════════════════════════════╗
+║  CAPTAIN'S HOLD                    ⚓ Fleet: 3   ║
+╠══════════════════════════════════════════════════╣
+║  ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐   ║
+║  │ 🛢️  │ 📦  │ 💎  │ 🥇  │     │     │     │   ║  ← 7 cargo slots
+║  │ Rum │Silk │ Gem │Gold │     │     │     │   ║
+║  └─────┴─────┴─────┴─────┴─────┴─────┴─────┘   ║
+║                                                  ║
+║  [UNLOAD CARGO]        Doubloons: 45 | Bonus: 8 ║
+╚══════════════════════════════════════════════════╝
+```
+
+- Visual slot system (7 slots for hand limit)
+- Empty slots show as wooden compartments
+- "Unload Cargo" replaces "Sell"
+- Fleet count shows ship collection
+
+**Files**: Create `src/components/game/ShipsHold.tsx`, update `GameBoard.tsx`
+
+### 3.2 Opponent's Hold
+Show opponent's cargo as obscured/covered crates:
+- Tarp-covered cargo silhouettes
+- Count indicator visible
+- During Pirate Raid: tarps lift to reveal options
+
+---
+
+## Phase 4: Treasure Display
+
+### 4.1 New Component: TreasureChest (replaces TokenStack)
+Replace circular tokens with stacked doubloons:
+
+```text
+    ╭──────────╮
+    │   RUM    │  ← Leather label
+    ├──────────┤
+    │ ⬤ ⬤ ⬤   │  ← Stacked coins
+    │  ⬤ ⬤    │
+    │   ⬤     │
+    │   [4]   │  ← Top coin shows value
+    ╰──────────╯
+       5 left
+```
+
+**Files**: Create `src/components/game/TreasureStack.tsx`
+
+### 4.2 Update BonusTokens Display
+Transform to "Commission Medallions":
+- Bronze/Silver/Gold medallions for 3/4/5 card bonuses
+- Wax seal aesthetic
+
+**Files**: Update `src/components/game/BonusTokens.tsx`
+
+---
+
+## Phase 5: Scoreboard and UI Chrome
+
+### 5.1 Update ScoreBoard
+Rename to "Captain's Ledger":
+- Parchment texture background
+- Quill/ink aesthetic for scores
+- Round indicators become wax seals
+
+### 5.2 Header Updates
+- Game title: "Privateer: Letters of Marque"
+- Optional rules icons get thematic frames (rope circles)
+- Turn indicator: "Your Move, Captain" / "Opponent is trading..."
+
+### 5.3 Action Notification Updates
+Transform to "Harbor Master's Log":
+- Parchment scroll appearance
+- Handwritten-style descriptions
+- Cargo icons instead of card previews
+
+**Files**: Update `ScoreBoard.tsx`, `GameBoard.tsx`, `ActionNotification.tsx`
+
+---
+
+## Phase 6: Landing Page Redesign
+
+### 6.1 Title and Branding
+- Main title: "Privateer" (large, ornate)
+- Subtitle: "Letters of Marque" (smaller, elegant)
+- Tagline: "A Trading Duel" (replaces "A Pirate Trading Card Game")
+
+### 6.2 Goods Showcase
+Replace card icons with cargo object previews:
+- Mini 3D-style cargo representations
+- Tooltip: "Rum Barrels", "Silk Bales", etc.
+
+### 6.3 How to Play Section
+Update terminology:
+- "Take" → "Claim cargo from the Trading Post"
+- "Exchange" → "Trade goods with the harbor"
+- "Sell" → "Unload cargo for doubloons and commission"
+
+**Files**: Update `LandingPage.tsx`
+
+---
+
+## Phase 7: Victory/End Screens
+
+### 7.1 Round End Modal
+- "Voyage Complete" header
+- Score shown as "Treasure Manifest"
+- Ship comparison as fleet silhouettes
+
+### 7.2 Game End Modal
+- "Letters of Marque Awarded" for winner
+- Treasure chest animation opening
+- Final tally on aged parchment
+
+**Files**: Update modals in `GameBoard.tsx`
+
+---
+
+## Asset Requirements
+
+### New Images Needed
+1. Wood plank texture (dock surface)
+2. Cargo crate base texture
+3. Leather/rope border elements
+4. Parchment texture (for modals/scoreboard)
+5. Brass plate texture (for labels)
+
+### Cargo Object Icons (to replace card images)
+- Rum: Barrel + bottle combo
+- Cannonballs: Iron crate with visible balls
+- Silks: Wrapped fabric bale
+- Silver: Metal strongbox
+- Gold: Ornate treasure chest
+- Gemstones: Jewelry case
+- Ships: Miniature model
+
+---
+
+## Implementation Order
+
+1. **Foundation** (Phase 1): Rename, new CSS variables, CargoObject component
+2. **Core Gameplay** (Phase 2-3): TradingPost + ShipsHold
+3. **Scoring** (Phase 4-5): TreasureStack + Ledger updates
+4. **Polish** (Phase 6-7): Landing page + Victory screens
+
+---
+
+## Technical Notes
+
+### Component Mapping
+| Old Component | New Component | Status |
+|---------------|---------------|--------|
+| `GameCard.tsx` | `CargoObject.tsx` | Create new |
+| `Market.tsx` | `TradingPost.tsx` | Create new |
+| `PlayerHand.tsx` | `ShipsHold.tsx` | Create new |
+| `TokenStack.tsx` | `TreasureStack.tsx` | Create new |
+| `BonusTokens.tsx` | Update in place | Modify |
+| `ScoreBoard.tsx` | Update in place | Modify |
+
+### Backward Compatibility
+- Game logic in stores remains unchanged
+- Types remain the same (Card, Token, etc.)
+- Only visual/presentation layer changes
+
+### Animation Updates
+- Card flip → Crate lid opening
+- Card selection → Cargo glow/lift effect
+- Token collection → Coins dropping into purse
 

@@ -17,14 +17,15 @@ import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
 import { VictoryScreen } from './VictoryScreen';
+import { DisconnectModal } from './DisconnectModal';
+import { RoundEndModal } from './RoundEndModal';
+import { MultiplayerChat } from './MultiplayerChat';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
-import { Trophy, RotateCcw, Home, Swords, CloudLightning, Crosshair, Gift, X, MessageCircle, Send, Users, Anchor, WifiOff, Crown, Coins, Medal, ChevronUp, ChevronDown, Eye } from 'lucide-react';
+import { Home, Swords, CloudLightning, Crosshair, Gift, X, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { sanitizeChatMessage, sanitizePlayerName, isValidChatPayload, CHAT_MESSAGE_MAX_LENGTH } from '@/lib/security';
 import bannerLogo from '@/assets/BannerLogo.png';
 
 // ─── Preload static images at module level ───
@@ -162,6 +163,7 @@ export const GameBoard = () => {
     lastAction,
     nextRound,
     resetGame,
+    restartGame,
     getRoundWinner,
     getWinner,
     round,
@@ -185,17 +187,6 @@ export const GameBoard = () => {
   const [isRaidMode, setIsRaidMode] = useState(false);
   const [showAction, setShowAction] = useState(false);
   const [prevPhase, setPrevPhase] = useState<typeof phase | null>(null);
-  const [chatMessages, setChatMessages] = useState<{ sender: string; text: string }[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [showChat, setShowChat] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
-  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
-  const [isReconnecting, setIsReconnecting] = useState(false);
-  const [disconnectTimer, setDisconnectTimer] = useState<number>(0);
-  const disconnectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const chatScrollRef = useRef<HTMLDivElement>(null);
-  const showChatRef = useRef(showChat);
-
   // Mobile drawer states
   const [treasureDrawerOpen, setTreasureDrawerOpen] = useState(false);
   const [opponentDrawerOpen, setOpponentDrawerOpen] = useState(false);
@@ -215,11 +206,6 @@ export const GameBoard = () => {
 
   // End-of-round flourish
   const [roundFlourish, setRoundFlourish] = useState(false);
-  
-  // Keep ref in sync with state
-  useEffect(() => {
-    showChatRef.current = showChat;
-  }, [showChat]);
 
   const currentPlayer = players[currentPlayerIndex];
   
@@ -296,23 +282,31 @@ export const GameBoard = () => {
     prevPlayerIndexRef.current = currentPlayerIndex;
   }, [currentPlayerIndex, phase, localPlayerIndex]);
 
-  // Deck-low creak ambience
+  // Deck-low creak ambience (respects sound settings)
   useEffect(() => {
-    if (isDeckLow) {
-      if (!creakRef.current) {
-        const creak = new Audio('/sounds/sea_sounds.wav');
-        creak.loop = true;
-        creak.volume = 0.15;
-        creakRef.current = creak;
+    const updateCreak = () => {
+      const { soundEnabled, soundVolume } = useSettingsStore.getState();
+      if (isDeckLow && soundEnabled) {
+        if (!creakRef.current) {
+          const creak = new Audio('/sounds/sea_sounds.wav');
+          creak.loop = true;
+          creakRef.current = creak;
+        }
+        creakRef.current.volume = 0.15 * soundVolume;
+        creakRef.current.play().catch(() => {});
+      } else {
+        if (creakRef.current) {
+          creakRef.current.pause();
+          creakRef.current.currentTime = 0;
+        }
       }
-      creakRef.current.play().catch(() => {});
-    } else {
-      if (creakRef.current) {
-        creakRef.current.pause();
-        creakRef.current.currentTime = 0;
-      }
-    }
+    };
+
+    updateCreak();
+    const unsub = useSettingsStore.subscribe(updateCreak);
+
     return () => {
+      unsub();
       if (creakRef.current && !isDeckLow) {
         creakRef.current.pause();
       }
@@ -334,33 +328,8 @@ export const GameBoard = () => {
     playSound('error');
   }, [playSound]);
 
-  // Track previous multiplayer state to detect reconnection
+  // Track previous multiplayer state for reconnection sync
   const prevMultiplayerStateRef = useRef(multiplayerState);
-  
-  // Detect multiplayer disconnect
-  useEffect(() => {
-    if (isMultiplayer && multiplayerState === 'disconnected' && phase === 'playing') {
-      setShowDisconnectModal(true);
-      setDisconnectTimer(0);
-      disconnectTimerRef.current = setInterval(() => {
-        setDisconnectTimer((prev) => prev + 1);
-      }, 1000);
-    } else {
-      if (disconnectTimerRef.current) {
-        clearInterval(disconnectTimerRef.current);
-        disconnectTimerRef.current = null;
-      }
-      if (multiplayerState === 'connected') {
-        setShowDisconnectModal(false);
-        setDisconnectTimer(0);
-      }
-    }
-    return () => {
-      if (disconnectTimerRef.current) {
-        clearInterval(disconnectTimerRef.current);
-      }
-    };
-  }, [isMultiplayer, multiplayerState, phase]);
 
   // Host: Send game state to reconnecting guest
   useEffect(() => {
@@ -374,22 +343,11 @@ export const GameBoard = () => {
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
-  // Listen for multiplayer messages
+  // Listen for multiplayer messages (game state sync only — chat handled by MultiplayerChat)
   useEffect(() => {
     if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
       const unsubscribe = registerMessageHandler((message) => {
-        if (message.type === 'chat' && isValidChatPayload(message.payload)) {
-          const payload = message.payload;
-          const sanitizedText = sanitizeChatMessage(payload.text);
-          const sanitizedSender = sanitizePlayerName(payload.sender);
-          if (sanitizedText) {
-            setChatMessages((prev) => [...prev, { sender: sanitizedSender, text: sanitizedText }]);
-            playSound('message');
-            if (!showChatRef.current) {
-              setUnreadMessages((prev) => prev + 1);
-            }
-          }
-        } else if (message.type === 'game-state') {
+        if (message.type === 'game-state') {
           const payload = message.payload as { gameState: any };
           applyGameState(payload.gameState, true);
         } else if (message.type === 'next-round') {
@@ -398,41 +356,19 @@ export const GameBoard = () => {
       });
       return unsubscribe;
     }
-  }, [isMultiplayer, phase, applyGameState, registerMessageHandler, playSound, nextRound]);
+  }, [isMultiplayer, phase, applyGameState, registerMessageHandler, nextRound]);
 
   // Sync game state after each action in multiplayer
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
     if (isMultiplayer && phase === 'playing' && lastAction && lastAction !== prevLastActionRef.current) {
       if (currentPlayerIndex !== localPlayerIndex) {
-        // Current player just changed away from local → send state
         const gs = getSerializableState();
         sendMessage({ type: 'game-state', payload: { gameState: gs } });
       }
       prevLastActionRef.current = lastAction;
     }
   }, [isMultiplayer, phase, lastAction, currentPlayerIndex, sendMessage, getSerializableState]);
-
-  // Auto-scroll chat
-  useEffect(() => {
-    if (chatScrollRef.current) {
-      setTimeout(() => {
-        if (chatScrollRef.current) {
-          chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-        }
-      }, 50);
-    }
-  }, [chatMessages]);
-
-  const sendChatMessage = () => {
-    if (!chatInput.trim()) return;
-    const sanitizedText = sanitizeChatMessage(chatInput);
-    if (!sanitizedText) return;
-    const message = { sender: localPlayer?.name || 'You', text: sanitizedText };
-    setChatMessages((prev) => [...prev, message]);
-    sendMessage({ type: 'chat', payload: message });
-    setChatInput('');
-  };
 
   const handlePirateRaid = (card: Card) => {
     pirateRaid(card.id);
@@ -541,14 +477,31 @@ export const GameBoard = () => {
             
             <SettingsPanel />
             
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={resetGame}
-              className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
-            >
-              <Home className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
+                >
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-pirate text-primary">Abandon Voyage?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Your current game progress will be lost. Are you sure you want to return to port?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Continue Playing</AlertDialogCancel>
+                  <AlertDialogAction onClick={resetGame} className="bg-destructive hover:bg-destructive/90">
+                    Return to Port
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </header>
 
@@ -810,322 +763,48 @@ export const GameBoard = () => {
         </AnimatePresence>
 
         {/* Multiplayer Chat */}
-        {isMultiplayer && (
-          <div className="fixed bottom-4 right-4 z-40">
-            {showChat ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-72 sm:w-80 bg-card border border-primary/30 rounded-xl shadow-xl overflow-hidden"
-              >
-                <div className="flex items-center justify-between p-3 bg-primary/10 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-primary" />
-                    <span className="font-pirate text-primary">Chat</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => setShowChat(false)} className="h-6 w-6">
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="h-48 p-3 overflow-y-auto" ref={chatScrollRef}>
-                  <div className="space-y-2">
-                    {chatMessages.length === 0 && (
-                      <p className="text-xs text-muted-foreground text-center">No messages yet</p>
-                    )}
-                    {chatMessages.map((msg, i) => (
-                      <div key={i} className={cn(
-                        'text-sm p-2 rounded-lg max-w-[85%]',
-                        msg.sender === localPlayer?.name 
-                          ? 'bg-primary/20 ml-auto' 
-                          : 'bg-muted'
-                      )}>
-                        <p className="text-xs font-bold text-primary/80">{msg.sender}</p>
-                        <p className="text-foreground">{msg.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="p-2 border-t border-border flex gap-2">
-                  <Input
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Type a message..."
-                    className="text-sm"
-                    onKeyDown={(e) => e.key === 'Enter' && sendChatMessage()}
-                  />
-                  <Button size="icon" onClick={sendChatMessage} className="shrink-0">
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            ) : (
-              <Button
-                onClick={() => {
-                  setShowChat(true);
-                  setUnreadMessages(0);
-                }}
-                className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-primary hover:bg-primary/90 shadow-lg relative"
-              >
-                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                {unreadMessages > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {unreadMessages > 9 ? '9+' : unreadMessages}
-                  </span>
-                )}
-              </Button>
-            )}
-          </div>
-        )}
+        <MultiplayerChat
+          isMultiplayer={isMultiplayer}
+          phase={phase}
+          localPlayerName={localPlayer?.name || 'Player'}
+          sendMessage={sendMessage}
+          registerMessageHandler={registerMessageHandler}
+          playSound={playSound}
+        />
 
         {/* Disconnect Modal */}
-        <AnimatePresence>
-          {showDisconnectModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className={cn(
-                  "bg-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full text-center",
-                  !isHost ? "border border-primary/30" : "border border-destructive/30"
-                )}
-              >
-                {!isHost ? (
-                  <>
-                    <WifiOff className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
-                    <h2 className="font-pirate text-xl sm:text-2xl text-destructive mb-2">Host Disconnected</h2>
-                    <p className="text-muted-foreground mb-4 text-sm">The host has lost connection.</p>
-                    <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
-                      <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
-                      <p className="font-pirate text-2xl text-foreground">
-                        {Math.floor(disconnectTimer / 60)}:{(disconnectTimer % 60).toString().padStart(2, '0')}
-                      </p>
-                      {disconnectTimer < 30 && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Claim victory in {30 - disconnectTimer}s
-                        </p>
-                      )}
-                    </div>
-                    <div className="space-y-3">
-                      {disconnectTimer >= 30 && (
-                        <Button 
-                          onClick={() => {
-                            playSound('game-win');
-                            recordGameResult(true);
-                            setShowDisconnectModal(false);
-                            resetMultiplayer();
-                            resetGame();
-                          }} 
-                          className="w-full bg-primary hover:bg-primary/90"
-                        >
-                          <Crown className="w-5 h-5 mr-2" />
-                          Claim Victory
-                        </Button>
-                      )}
-                      <Button 
-                        variant={disconnectTimer >= 30 ? "outline" : "default"}
-                        className={cn("w-full", disconnectTimer < 30 && "game-button")}
-                        disabled
-                      >
-                        <WifiOff className="w-5 h-5 mr-2" />
-                        Waiting for Host...
-                      </Button>
-                      <Button 
-                        variant="ghost"
-                        onClick={() => { setShowDisconnectModal(false); setDisconnectTimer(0); resetMultiplayer(); resetGame(); }} 
-                        className="w-full text-muted-foreground"
-                      >
-                        <Home className="w-5 h-5 mr-2" />
-                        Return to Lobby
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
-                    <h2 className="font-pirate text-xl sm:text-2xl text-destructive mb-2">Connection Lost</h2>
-                    <p className="text-muted-foreground mb-4 text-sm">Your opponent has disconnected.</p>
-                    <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
-                      <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
-                      <p className="font-pirate text-2xl text-foreground">
-                        {Math.floor(disconnectTimer / 60)}:{(disconnectTimer % 60).toString().padStart(2, '0')}
-                      </p>
-                      {disconnectTimer < 30 && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Claim victory in {30 - disconnectTimer}s
-                        </p>
-                      )}
-                    </div>
-                    <div className="space-y-3">
-                      {disconnectTimer >= 30 && (
-                        <Button 
-                          onClick={() => {
-                            playSound('game-win');
-                            recordGameResult(true);
-                            setShowDisconnectModal(false);
-                            resetMultiplayer();
-                            resetGame();
-                          }} 
-                          className="w-full bg-primary hover:bg-primary/90"
-                        >
-                          <Crown className="w-5 h-5 mr-2" />
-                          Claim Victory
-                        </Button>
-                      )}
-                      <Button 
-                        onClick={async () => {
-                          const gameCode = isHost ? peerId : hostId;
-                          if (gameCode) {
-                            setIsReconnecting(true);
-                            try {
-                              await reconnect(gameCode, localPlayer?.name || 'Player');
-                              setShowDisconnectModal(false);
-                              setDisconnectTimer(0);
-                            } catch (err) {
-                              if (import.meta.env.DEV) console.error('Reconnect failed:', err);
-                            } finally {
-                              setIsReconnecting(false);
-                            }
-                          }
-                        }}
-                        disabled={isReconnecting}
-                        variant={disconnectTimer >= 30 ? "outline" : "default"}
-                        className={cn("w-full", disconnectTimer < 30 && "game-button")}
-                      >
-                        {isReconnecting ? (
-                          <>
-                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
-                              <RotateCcw className="w-5 h-5 mr-2" />
-                            </motion.div>
-                            Reconnecting...
-                          </>
-                        ) : (
-                          <>
-                            <RotateCcw className="w-5 h-5 mr-2" />
-                            Wait for Reconnect
-                          </>
-                        )}
-                      </Button>
-                      <Button 
-                        variant="ghost"
-                        onClick={() => { setShowDisconnectModal(false); setDisconnectTimer(0); resetMultiplayer(); resetGame(); }} 
-                        className="w-full text-muted-foreground"
-                      >
-                        <Home className="w-5 h-5 mr-2" />
-                        Return to Lobby
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <DisconnectModal
+          isMultiplayer={isMultiplayer}
+          multiplayerState={multiplayerState}
+          phase={phase}
+          isHost={isHost}
+          peerId={peerId}
+          hostId={hostId}
+          localPlayerName={localPlayer?.name || 'Player'}
+          onPlaySound={playSound}
+          onRecordGameResult={recordGameResult}
+          onResetMultiplayer={resetMultiplayer}
+          onResetGame={resetGame}
+          onReconnect={reconnect}
+        />
 
         {/* Voyage End Modal */}
-        <AnimatePresence>
-          {phase === 'roundEnd' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            >
-              {/* Decorative flourish lines */}
-              <motion.div
-                className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-              />
-              <motion.div
-                className="absolute bottom-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}
-              />
-
-              <motion.div
-                initial={{ scale: 0.85, y: 30, rotateX: 5 }}
-                animate={{ scale: 1, y: 0, rotateX: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
-              >
-                <div className="text-center">
-                  <Anchor className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-4" />
-                  <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-2">
-                    Voyage {round} Complete!
-                  </h2>
-                  
-                  {getRoundWinner() && (
-                    <p className="text-lg sm:text-xl mb-4">
-                      <span className="text-primary font-bold">{getRoundWinner()?.name}</span>{' '}
-                      wins this voyage!
-                    </p>
-                  )}
-
-                  {optionalRules.treasureChest && hiddenTreasures.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/20"
-                    >
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <Gift className="w-5 h-5 text-primary" />
-                        <span className="font-pirate text-primary">Hidden Cargo Revealed!</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        {hiddenTreasures.map((treasure) => {
-                          const player = players.find(p => p.id === treasure.playerId);
-                          return (
-                            <div key={treasure.playerId} className="text-muted-foreground">
-                              {player?.name}: +{treasure.tokens.reduce((sum, t) => sum + t.value, 0)} doubloons
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    {players.map((player) => (
-                      <div key={player.id} className="p-3 sm:p-4 rounded-lg bg-muted/50 border border-border">
-                        <p className="font-bold text-foreground text-sm sm:text-base">{player.name}</p>
-                        <p className="text-2xl sm:text-3xl font-pirate text-primary">{calculateScore(player, players)}</p>
-                        <p className="text-xs text-muted-foreground">doubloons</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button 
-                    onClick={() => {
-                      if (isMultiplayer && isHost) {
-                        sendMessage({ type: 'next-round', payload: {} });
-                      }
-                      nextRound();
-                    }} 
-                    className="game-button w-full"
-                    disabled={isMultiplayer && !isHost}
-                  >
-                    <RotateCcw className="w-5 h-5 mr-2" />
-                    {isMultiplayer && !isHost 
-                      ? 'Waiting for host...' 
-                      : round >= 3 ? 'See Final Results' : `Begin Voyage ${round + 1}`}
-                  </Button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <RoundEndModal
+          phase={phase}
+          round={round}
+          players={players}
+          roundWinner={getRoundWinner()}
+          optionalRules={optionalRules}
+          hiddenTreasures={hiddenTreasures}
+          isMultiplayer={isMultiplayer}
+          isHost={isHost}
+          onNextRound={() => {
+            if (isMultiplayer && isHost) {
+              sendMessage({ type: 'next-round', payload: {} });
+            }
+            nextRound();
+          }}
+        />
 
         {/* Game End — Victory Screen */}
         {phase === 'gameEnd' && (
@@ -1134,10 +813,7 @@ export const GameBoard = () => {
             roundWins={useGameStore.getState().roundWins}
             winner={getWinner()}
             maxRounds={3}
-            onPlayAgain={() => {
-              resetGame();
-              // Could auto-start a new game here if desired
-            }}
+            onPlayAgain={restartGame}
             onReturnHome={resetGame}
           />
         )}
