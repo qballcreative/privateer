@@ -50,11 +50,22 @@ const CargoObject = ({
 }: CargoObjectProps) => {
   const imgSrc = hidden ? cargoImg : tokenImages[card.type];
 
+  const isInteractive = onClick && !disabled;
+
   return (
     <motion.div
       {...(enableLayoutId ? { layoutId: `cargo-${card.id}` } : {})}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-label={hidden ? 'Hidden cargo' : card.type}
+      onKeyDown={isInteractive ? (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      } : undefined}
       className={cn(
-        'relative flex items-center justify-center cursor-pointer select-none',
+        'relative flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         sizeClasses[size],
         selected && 'ring-2 ring-amber-400 ring-offset-1 ring-offset-transparent rounded-lg',
         disabled && 'opacity-50 cursor-not-allowed',

@@ -721,10 +721,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const winnerIndex = fullState.players.findIndex((p) => p.id === winner.id);
         if (winnerIndex !== -1) roundWins[winnerIndex]++;
       }
+      // In best-of-1, skip the round-end modal and go straight to game end
+      const skipRoundEnd = fullState.maxRounds <= 1;
       set({
         players: fullState.players,
         hiddenTreasures: fullState.hiddenTreasures,
-        phase: 'roundEnd',
+        phase: skipRoundEnd ? 'gameEnd' : 'roundEnd',
         roundWins,
         turnCount: newTurnCount,
       });
