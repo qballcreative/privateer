@@ -85,12 +85,7 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
   const isPlayerVictory = winner && !winner.isAI;
   const particles = useMemo(() => Array.from({ length: 25 }, (_, i) => i), []);
 
-  // Determine round winners from roundWins array
-  const voyageWinners = useMemo(() => {
-    // roundWins is [player0Wins, player1Wins] — we need per-round data
-    // Since we don't have per-round history, show the total wins summary
-    return roundWins;
-  }, [roundWins]);
+  const roundWinners = useGameStore.getState().roundWinners || [];
 
   return (
     <AnimatePresence>
