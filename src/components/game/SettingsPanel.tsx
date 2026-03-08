@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { Switch } from '@/components/ui/switch';
