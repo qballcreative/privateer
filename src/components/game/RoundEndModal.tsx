@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Gift, RotateCcw } from 'lucide-react';
 import { Player, HiddenTreasure } from '@/types/game';
-import { calculateScore } from '@/store/gameStore';
+import { calculateScore, useGameStore } from '@/store/gameStore';
+import { getScoreBreakdown } from '@/lib/scoring';
 import { Button } from '@/components/ui/button';
 
 interface RoundEndModalProps {
