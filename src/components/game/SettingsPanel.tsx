@@ -78,6 +78,7 @@ export const SettingsPanel = () => {
     resetConsent,
   } = useConsentStore();
 
+  const navigate = useNavigate();
   const [showConsentModal, setShowConsentModal] = useState(false);
 
   return (
