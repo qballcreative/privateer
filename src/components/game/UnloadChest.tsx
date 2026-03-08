@@ -232,7 +232,7 @@ export const UnloadChest = ({
                 'font-pirate text-primary block',
                 isPhone ? 'text-sm' : 'text-base'
               )}>
-                Sell Chest
+                Sell Cargo
               </span>
               {hasSelection && !allSameType && (
                 <span className="text-[10px] text-destructive">Same type only</span>
