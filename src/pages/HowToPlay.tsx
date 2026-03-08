@@ -66,8 +66,8 @@ const HowToPlay = () => {
                 icon: '/Icons/Claim.png',
               },
               {
-                title: 'Supply Ship',
-                desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Supply Ship.',
+                title: 'Trading Post Supply',
+                desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Trading Post supply.',
                 icon: '/images/supply.png',
               },
               {
