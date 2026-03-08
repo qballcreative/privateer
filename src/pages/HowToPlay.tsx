@@ -122,7 +122,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/sell.png" alt="Sell" className="w-8 h-8 object-contain" />}
               title="Sell Cargo"
-              desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gemstones), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Medallions!"
+              desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gems), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Seals!"
             />
           </div>
         </motion.section>
