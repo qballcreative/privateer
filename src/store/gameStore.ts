@@ -272,8 +272,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   turnCount: 0,
   hiddenTreasures: [],
   isMultiplayer: false,
+  roundWinners: [],
 
-  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules) => {
+  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = 'host') => {
     const deck = createDeck();
     const market: Card[] = [];
     const players: Player[] = [
