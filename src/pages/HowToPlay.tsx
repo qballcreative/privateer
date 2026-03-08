@@ -247,9 +247,6 @@ const HowToPlay = () => {
             </Button>
           </div>
         </motion.section>
-
-        {/* Mock game board for tutorial spotlight targets */}
-        <TutorialMockBoard />
       </main>
 
       {/* Footer */}
