@@ -123,7 +123,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
           <Button
             variant={mode === 'exchange' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setMode('exchange')}
+            onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
             <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
