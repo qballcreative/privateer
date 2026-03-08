@@ -561,7 +561,7 @@ export const GameBoard = () => {
               </SheetTrigger>
               <SheetContent side="left" className="w-[85vw] max-w-sm bg-card border-primary/20 p-4 overflow-y-auto">
                 <SheetTitle className="font-pirate text-primary text-lg mb-4">Treasure Supply</SheetTitle>
-                <TreasureSupplyPanel compact />
+                <TreasureSupplyPanel compact {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
               </SheetContent>
             </Sheet>
 
