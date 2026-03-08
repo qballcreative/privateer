@@ -134,6 +134,7 @@ export const ShipsHold = ({
         {/* Subdued overlay */}
         <div className="absolute inset-0 rounded-lg bg-card/80 pointer-events-none" />
         <div className={cn(
+          "relative z-[1]",
           isPhone
             ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
             : "flex flex-wrap gap-4 items-end justify-center"
