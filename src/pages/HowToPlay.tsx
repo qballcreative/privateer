@@ -132,8 +132,8 @@ const HowToPlay = () => {
 
         {/* Scoring */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Coins className="w-5 h-5" /> Scoring
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Scoring
           </h2>
           <p className="text-foreground/80 mb-3">
             When you sell goods, you take tokens from the matching stack. Each stack starts with
