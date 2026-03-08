@@ -187,7 +187,7 @@ const HowToPlay = () => {
             <Anchor className="w-5 h-5" /> End of Round
           </h2>
           <p className="text-foreground/80">
-            The round ends when either: the <strong className="text-primary">Supply Ship is empty</strong> (no cards left to deal),
+            The round ends when either: the <strong className="text-primary">Trading Post supply is empty</strong> (no cards left to deal),
             or <strong className="text-primary">3 token stacks are depleted</strong>. The captain with the most doubloons
             wins the round. Win the best-of series to earn your Letters of Marque!
           </p>
