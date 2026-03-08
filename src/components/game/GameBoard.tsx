@@ -620,7 +620,7 @@ export const GameBoard = () => {
             TABLET LAYOUT — board composition, all panels docked
             ════════════════════════════════════════════════════════════════ */}
         <div className="hidden md:block lg:hidden">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Left column: Opponent + ScoreBoard */}
             <motion.aside
               className="col-span-1 space-y-4"
@@ -641,7 +641,7 @@ export const GameBoard = () => {
               <ScoreBoard />
             </motion.aside>
 
-            {/* Center column: Trading Post + Player Hold */}
+            {/* Right column: Trading Post + Player Hold */}
             <motion.main
               className={cn(
                 "col-span-1 space-y-4",
@@ -660,16 +660,6 @@ export const GameBoard = () => {
                 />
               )}
             </motion.main>
-
-            {/* Right column: Treasure Supply + Bonuses */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <TreasureSupplyPanel />
-            </motion.aside>
           </div>
         </div>
 
