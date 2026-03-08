@@ -38,6 +38,8 @@ const PRELOAD_IMAGES = [
 ];
 PRELOAD_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
 
+const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
+
 // ─── Extracted stable components ───
 
 interface TreasureSupplyPanelProps {
