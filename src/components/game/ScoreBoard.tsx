@@ -4,7 +4,7 @@ import { useGameStore, calculateScore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
 import { Trophy, Anchor, Medal, Coins, Scroll } from 'lucide-react';
 
-export const ScoreBoard = () => {
+export const ScoreBoard = memo(() => {
   const { players, round, maxRounds, roundWins } = useGameStore();
 
   return (
