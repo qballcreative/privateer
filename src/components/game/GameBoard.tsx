@@ -754,7 +754,7 @@ export const GameBoard = () => {
                 />
               )}
               <ScoreBoard />
-            </motion.aside>
+            </aside>
           </div>
         </div>
 
