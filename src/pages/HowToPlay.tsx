@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import {
-  ArrowLeft, Anchor, Ship, Swords, ArrowLeftRight, Coins,
-  Award, Package, CloudLightning, Skull, Gem
-} from 'lucide-react';
+import { ArrowLeft, Anchor } from 'lucide-react';
+import bannerLogo from '@/assets/BannerLogo.png';
 
 // Token images
 import rumTokens from '@/assets/tokens/rum.png';
@@ -42,10 +40,7 @@ const HowToPlay = () => {
 
         {/* Overview */}
         <motion.section {...sectionAnim} className="game-box-card p-6 md:p-8 text-center">
-          <Anchor className="w-10 h-10 text-primary mx-auto mb-4" />
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary mb-3">
-            Privateer: Letters of Marque
-          </h2>
+          <img src={bannerLogo} alt="Privateer: Letters of Marque" className="h-16 md:h-20 object-contain mx-auto mb-4" />
           <p className="text-foreground/80 max-w-2xl mx-auto leading-relaxed">
             A fast-paced trading duel on the high seas! Buy, sell, and trade cargo to
             earn the most doubloons. Outsmart your opponent to earn your Letters of Marque
@@ -55,8 +50,8 @@ const HowToPlay = () => {
 
         {/* Game Setup */}
         <motion.section {...sectionAnim}>
-          <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-            <Ship className="w-6 h-6" /> Game Setup
+          <h2 className="font-serif text-2xl font-bold text-primary mb-4">
+            Game Setup
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
@@ -94,8 +89,8 @@ const HowToPlay = () => {
 
         {/* Actions */}
         <motion.section {...sectionAnim}>
-          <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-            <Swords className="w-6 h-6" /> Your Turn — Actions Available
+          <h2 className="font-serif text-2xl font-bold text-primary mb-4">
+            Your Turn — Actions Available
           </h2>
           <p className="text-foreground/70 mb-4">On your turn, choose one of these actions:</p>
 
@@ -125,8 +120,8 @@ const HowToPlay = () => {
 
         {/* Hand Limit */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Package className="w-5 h-5" /> Hand Limit
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Hand Limit
           </h2>
           <p className="text-foreground/80">
             Your Ship's Hold can carry at most <strong className="text-primary">7 goods</strong>.
@@ -137,8 +132,8 @@ const HowToPlay = () => {
 
         {/* Scoring */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Coins className="w-5 h-5" /> Scoring
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Scoring
           </h2>
           <p className="text-foreground/80 mb-3">
             When you sell goods, you take tokens from the matching stack. Each stack starts with
@@ -166,8 +161,8 @@ const HowToPlay = () => {
 
         {/* Commission Seals */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Award className="w-5 h-5" /> Commission Seals
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            Commission Seals
           </h2>
           <p className="text-foreground/80 mb-3">
             Sell 3 or more matching goods at once to earn a bonus Commission Seal:
@@ -191,8 +186,8 @@ const HowToPlay = () => {
 
         {/* End Conditions */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
-          <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Anchor className="w-5 h-5" /> End of Round
+          <h2 className="font-serif text-xl font-bold text-primary mb-2">
+            End of Round
           </h2>
           <p className="text-foreground/80">
             The round ends when either: the <strong className="text-primary">Trading Post supply is empty</strong> (no cards left to deal),
