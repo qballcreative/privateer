@@ -204,7 +204,7 @@ const HowToPlay = () => {
         {/* Optional Rules */}
         <motion.section {...sectionAnim}>
           <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-            ⚔️ Optional Rules
+            Optional Rules
           </h2>
           <p className="text-foreground/70 mb-4">
             These can be toggled on in game settings for extra challenge and excitement!
