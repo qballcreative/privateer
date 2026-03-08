@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Tutorial } from '@/components/game/Tutorial';
-import { useTutorialStore } from '@/store/tutorialStore';
 import {
   ArrowLeft, Anchor, Ship, Swords, ArrowLeftRight, Coins,
   Award, Package, CloudLightning, Skull, Gem
@@ -26,11 +24,9 @@ const sectionAnim = {
 
 const HowToPlay = () => {
   const navigate = useNavigate();
-  const { start: startTutorial } = useTutorialStore();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Tutorial />
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border">
@@ -239,7 +235,7 @@ const HowToPlay = () => {
             <p className="text-foreground/70 mb-5 max-w-md mx-auto">
               Start the interactive tutorial to see each action demonstrated on a mock game board.
             </p>
-            <Button size="lg" onClick={startTutorial} className="mr-3">
+            <Button size="lg" onClick={() => navigate('/tutorial')} className="mr-3">
               <Anchor className="w-5 h-5 mr-2" /> Start Tutorial
             </Button>
             <Button variant="outline" size="lg" onClick={() => navigate('/')}>
@@ -247,9 +243,6 @@ const HowToPlay = () => {
             </Button>
           </div>
         </motion.section>
-
-        {/* Mock game board for tutorial spotlight targets */}
-        <TutorialMockBoard />
       </main>
 
       {/* Footer */}
@@ -270,117 +263,5 @@ const ActionCard = ({ icon, title, desc }: { icon: React.ReactNode; title: strin
     </div>
   </div>
 );
-
-/* Mock game board rendered at bottom of page — tutorial overlay highlights these elements */
-const TutorialMockBoard = () => {
-  const mockMarket = ['rum', 'gold', 'silk', 'ships', 'iron'];
-  const mockHand = ['silver', 'rum', 'gems', 'gold'];
-
-  const goodsIcons: Record<string, string> = {
-    rum: rumTokens,
-    gold: goldTokens,
-    silver: silverTokens,
-    silk: silkTokens,
-    iron: ironTokens,
-    gems: gemTokens,
-    ships: shipTokens,
-  };
-
-  return (
-    <div className="space-y-6 pb-8">
-      <h2 className="font-serif text-2xl font-bold text-primary text-center">Tutorial Board</h2>
-      <p className="text-center text-muted-foreground text-sm">
-        Start the tutorial above — these areas will be highlighted step by step.
-      </p>
-
-      {/* Trading Post */}
-      <div data-tutorial-id="tutorial-trading-post" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Trading Post</h3>
-        <div className="flex gap-3 flex-wrap" data-tutorial-id="tutorial-claim">
-          {mockMarket.map((type, i) => (
-            <div key={i} className="bg-muted rounded-lg p-3 text-center w-16">
-              <img src={goodsIcons[type]} alt={type} className="w-10 h-10 object-contain mx-auto mb-1" />
-              <span className="text-xs text-foreground/70 capitalize">{type}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-3" data-tutorial-id="tutorial-commandeer">
-          <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded">Commandeer Fleet: Take all ships</span>
-        </div>
-        <div className="flex gap-2 mt-2" data-tutorial-id="tutorial-trade">
-          <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded">Trade: Exchange 2+ goods</span>
-        </div>
-      </div>
-
-      {/* Market Prices */}
-      <div data-tutorial-id="tutorial-market-prices" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Market Prices</h3>
-        <div className="flex gap-4 flex-wrap">
-          {['rum', 'iron', 'silk', 'silver', 'gold', 'gems'].map((type) => (
-            <div key={type} className="text-center">
-              <img src={goodsIcons[type]} alt={type} className="w-8 h-8 object-contain mx-auto mb-1" />
-              <div className="text-xs text-muted-foreground capitalize">{type}</div>
-              <div className="text-sm font-bold text-primary">●●●</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Ship's Hold */}
-      <div data-tutorial-id="tutorial-ships-hold" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Your Ship's Hold</h3>
-        <div className="flex gap-3 flex-wrap">
-          {mockHand.map((type, i) => (
-            <div key={i} className="bg-muted rounded-lg p-3 text-center w-16">
-              <img src={goodsIcons[type]} alt={type} className="w-10 h-10 object-contain mx-auto mb-1" />
-              <span className="text-xs text-foreground/70 capitalize">{type}</span>
-            </div>
-          ))}
-          {[...Array(3)].map((_, i) => (
-            <div key={`empty-${i}`} className="bg-muted/30 border border-dashed border-border rounded-lg p-3 w-16 flex items-center justify-center">
-              <span className="text-xs text-muted-foreground">Empty</span>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3" data-tutorial-id="tutorial-sell">
-          <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Sell: 2+ matching goods for doubloons</span>
-        </div>
-      </div>
-
-      {/* Bonus section */}
-      <div data-tutorial-id="tutorial-bonus" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Commission Seals</h3>
-        <div className="flex gap-3">
-          {[
-            { label: '3-card', img: '/Icons/RedSeal.png' },
-            { label: '4-card', img: '/Icons/SilverSeal.png' },
-            { label: '5-card', img: '/Icons/GoldSeal.png' },
-          ].map((b) => (
-            <div key={b.label} className="text-center">
-              <img src={b.img} alt={b.label} className="w-10 h-10 object-contain mx-auto" />
-              <span className="text-xs text-muted-foreground">{b.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Optional rules targets */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div data-tutorial-id="tutorial-storm" className="game-box-card p-4 text-center">
-          <img src="/Icons/Storm.png" alt="Storm" className="w-10 h-10 object-contain mx-auto mb-2" />
-          <span className="text-sm font-bold text-primary">Storm Rule</span>
-        </div>
-        <div data-tutorial-id="tutorial-raid" className="game-box-card p-4 text-center">
-          <img src="/Icons/Raid.png" alt="Raid" className="w-10 h-10 object-contain mx-auto mb-2" />
-          <span className="text-sm font-bold text-primary">Pirate Raid</span>
-        </div>
-        <div data-tutorial-id="tutorial-treasure" className="game-box-card p-4 text-center">
-          <img src="/Icons/bonus.png" alt="Treasure" className="w-10 h-10 object-contain mx-auto mb-2" />
-          <span className="text-sm font-bold text-primary">Treasure Chest</span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default HowToPlay;
