@@ -155,7 +155,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
           </div>
         )}
 
-        {/* Supply Ship indicator */}
+        {/* Trading Post Supply indicator */}
         <div className={cn(
           "flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1 bg-card rounded-full border border-border shadow-md z-10",
           isPhone ? "mb-2 w-fit mx-auto" : "absolute -top-3 right-4"

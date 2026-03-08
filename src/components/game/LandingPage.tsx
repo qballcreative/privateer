@@ -69,14 +69,8 @@ export const LandingPage = () => {
       {!hasConsented && <AgeConsentModal />}
       <InstallPrompt />
 
-      {/* Settings & How to Play — top right */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <button
-          onClick={() => navigate('/how-to-play')}
-          className="text-xs font-serif text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
-        >
-          How to Play
-        </button>
+      {/* Settings — top right */}
+      <div className="absolute top-4 right-4 z-20">
         <SettingsPanel />
       </div>
 

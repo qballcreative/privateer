@@ -66,8 +66,8 @@ const HowToPlay = () => {
                 icon: '/Icons/Claim.png',
               },
               {
-                title: 'Supply Ship',
-                desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Supply Ship.',
+                title: 'Trading Post Supply',
+                desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Trading Post supply.',
                 icon: '/images/supply.png',
               },
               {
@@ -98,7 +98,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/Claim.png" alt="Claim" className="w-8 h-8 object-contain" />}
               title="Claim Cargo"
-              desc="Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Supply Ship."
+              desc="Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Trading Post supply."
             />
             <ActionCard
               icon={<img src="/Icons/take.png" alt="Commandeer" className="w-8 h-8 object-contain" />}
@@ -156,19 +156,19 @@ const HowToPlay = () => {
           </div>
         </motion.section>
 
-        {/* Bonus Medallions */}
+        {/* Commission Seals */}
         <motion.section {...sectionAnim} className="game-box-card p-6">
           <h2 className="font-serif text-xl font-bold text-primary mb-2 flex items-center gap-2">
-            <Award className="w-5 h-5" /> Commission Medallions
+            <Award className="w-5 h-5" /> Commission Seals
           </h2>
           <p className="text-foreground/80 mb-3">
-            Sell 3 or more matching goods at once to earn a bonus medallion:
+            Sell 3 or more matching goods at once to earn a bonus Commission Seal:
           </p>
           <div className="flex flex-wrap gap-4">
             {[
-              { count: '3 cards', values: '1–3 bonus', img: '/Icons/bonus3.png' },
-              { count: '4 cards', values: '4–6 bonus', img: '/Icons/bonus4.png' },
-              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/bonus5.png' },
+              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.png' },
+              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.png' },
+              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.png' },
             ].map((b) => (
               <div key={b.count} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
                 <img src={b.img} alt={b.count} className="w-8 h-8 object-contain" />
@@ -187,7 +187,7 @@ const HowToPlay = () => {
             <Anchor className="w-5 h-5" /> End of Round
           </h2>
           <p className="text-foreground/80">
-            The round ends when either: the <strong className="text-primary">Supply Ship is empty</strong> (no cards left to deal),
+            The round ends when either: the <strong className="text-primary">Trading Post supply is empty</strong> (no cards left to deal),
             or <strong className="text-primary">3 token stacks are depleted</strong>. The captain with the most doubloons
             wins the round. Win the best-of series to earn your Letters of Marque!
           </p>
@@ -205,7 +205,7 @@ const HowToPlay = () => {
             <ActionCard
               icon={<img src="/Icons/Storm.png" alt="Storm" className="w-8 h-8 object-contain" />}
               title="Storm Rule ⛈️"
-              desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Supply Ship. Keep your strategy flexible — the market can shift without warning."
+              desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Trading Post supply. Keep your strategy flexible — the market can shift without warning."
             />
             <ActionCard
               icon={<img src="/Icons/Raid.png" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
@@ -337,12 +337,12 @@ const TutorialMockBoard = () => {
 
       {/* Bonus section */}
       <div data-tutorial-id="tutorial-bonus" className="game-box-card p-4">
-        <h3 className="font-serif text-lg font-bold text-primary mb-3">Commission Medallions</h3>
+        <h3 className="font-serif text-lg font-bold text-primary mb-3">Commission Seals</h3>
         <div className="flex gap-3">
           {[
-            { label: '3-card', img: '/Icons/bonus3.png' },
-            { label: '4-card', img: '/Icons/bonus4.png' },
-            { label: '5-card', img: '/Icons/bonus5.png' },
+            { label: '3-card', img: '/Icons/RedSeal.png' },
+            { label: '4-card', img: '/Icons/SilverSeal.png' },
+            { label: '5-card', img: '/Icons/GoldSeal.png' },
           ].map((b) => (
             <div key={b.label} className="text-center">
               <img src={b.img} alt={b.label} className="w-10 h-10 object-contain mx-auto" />

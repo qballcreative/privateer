@@ -39,7 +39,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'claim-cargo',
     title: 'Action: Claim Cargo',
-    description: 'Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Supply Ship. Simple and effective!',
+    description: 'Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Trading Post supply. Simple and effective!',
     highlightId: 'tutorial-claim',
     position: 'bottom',
   },
@@ -66,8 +66,8 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'bonus-medallions',
-    title: 'Commission Medallions',
-    description: 'Sell 3, 4, or 5+ goods at once to earn a bonus Commission Medallion! These are worth extra doubloons — the more you sell at once, the bigger the bonus.',
+    title: 'Commission Seals',
+    description: 'Sell 3, 4, or 5+ goods at once to earn a bonus Commission Seal! These are worth extra doubloons — the more you sell at once, the bigger the bonus.',
     highlightId: 'tutorial-bonus',
     position: 'top',
   },
@@ -81,7 +81,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'storm-rule',
     title: 'Optional: Storm Rule ⛈️',
-    description: 'When enabled, every 3rd turn a storm hits! 2 random goods are swept from the Trading Post and replaced from the Supply Ship. Keep your plans flexible!',
+    description: 'When enabled, every 3rd turn a storm hits! 2 random goods are swept from the Trading Post and replaced from the Trading Post supply. Keep your plans flexible!',
     highlightId: 'tutorial-storm',
     position: 'bottom',
     optional: true,
@@ -105,7 +105,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'winning',
     title: 'Winning the Game',
-    description: 'The round ends when the Supply Ship is empty OR 3 token stacks are depleted. The captain with the most doubloons wins the round. Win the best-of series to earn your Letters of Marque!',
+    description: 'The round ends when the Trading Post supply is empty OR 3 token stacks are depleted. The captain with the most doubloons wins the round. Win the best-of series to earn your Letters of Marque!',
   },
   {
     id: 'ready',

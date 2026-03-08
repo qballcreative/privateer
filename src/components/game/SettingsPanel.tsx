@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { Switch } from '@/components/ui/switch';
@@ -77,6 +78,7 @@ export const SettingsPanel = () => {
     resetConsent,
   } = useConsentStore();
 
+  const navigate = useNavigate();
   const [showConsentModal, setShowConsentModal] = useState(false);
 
   return (
@@ -289,6 +291,17 @@ export const SettingsPanel = () => {
                   Change Age & Ad Preferences
                 </Button>
               </div>
+
+              {/* How to Play link */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => navigate('/how-to-play')}
+              >
+                <BookOpen className="w-4 h-4 mr-1" />
+                How to Play
+              </Button>
             </div>
           </div>
         </ScrollArea>
