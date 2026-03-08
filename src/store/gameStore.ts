@@ -402,6 +402,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: true,
+      roundWinners: [],
     };
 
     const ctx = buildCtx(initialState);
