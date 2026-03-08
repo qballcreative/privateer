@@ -655,12 +655,7 @@ export const GameBoard = () => {
         <div className="hidden md:block lg:hidden">
           <div className="grid grid-cols-3 gap-4">
             {/* Left column: Opponent + ScoreBoard */}
-            <motion.aside
-              className="col-span-1 space-y-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <aside className="col-span-1 space-y-4">
               {opponentPlayer && (
                 <ShipsHold
                   player={opponentPlayer}
