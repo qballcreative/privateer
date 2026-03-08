@@ -692,16 +692,25 @@ export const GameBoard = () => {
               transition={{ delay: 0.3 }}
             >
               {/* Trading Post — top center */}
-              <TradingPost layout="desktop" />
+              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
 
-              {/* Player's Hold — bottom center */}
-              {humanPlayer && (
-                <ShipsHold
-                  player={humanPlayer}
-                  isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
-                  layout="desktop"
-                />
-              )}
+              {/* Player's Hold — hidden during exchange */}
+              <AnimatePresence>
+                {!isExchangeMode && humanPlayer && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ShipsHold
+                      player={humanPlayer}
+                      isCurrentPlayer={currentPlayerIndex === localPlayerIndex}
+                      layout="desktop"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.main>
 
             {/* Right sidebar — Opponent & Scoreboard (fixed) */}
