@@ -139,49 +139,37 @@ export const ShipsHold = ({
             ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
             : "flex flex-wrap gap-4 items-end justify-center"
         )}>
-          <LayoutGroup id="ships-hold">
-            <AnimatePresence mode="sync">
-              {player.hand.map((card, index) => (
-                <motion.div
-                  key={card.id}
-                  layout="position"
-                  initial={
-                    wasExchange
-                      ? { opacity: 0, x: -60, scale: 0.8 }
-                      : slideIntoSlot.initial
-                  }
-                  animate={slideIntoSlot.animate}
-                  exit={
-                    wasExchange
-                      ? { opacity: 0, x: 60, scale: 0.8 }
-                      : slideIntoSlot.exit
-                  }
-                  transition={{
-                    layout: { type: 'spring', stiffness: 300, damping: 25 },
-                    delay: index * 0.04,
-                    type: 'spring',
-                    stiffness: 280,
-                    damping: 22,
-                  }}
-                  className={cn(
-                    isRaidMode && isOpponent && 'cursor-crosshair',
-                    isPhone && 'flex-shrink-0'
-                  )}
-                >
-                  <CargoObject
-                    card={card}
-                    selected={selectedCards.includes(card.id)}
-                    onClick={() => handleCardClick(card)}
-                    disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
-                    hidden={isOpponent && !isRaidMode}
-                    size={cargoSize}
-                    enableLayoutId={!isOpponent}
-                    className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-destructive hover:scale-105 transition-all')}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </LayoutGroup>
+          <AnimatePresence mode="sync">
+            {player.hand.map((card, index) => (
+              <motion.div
+                key={card.id}
+                initial={slideIntoSlot.initial}
+                animate={slideIntoSlot.animate}
+                exit={slideIntoSlot.exit}
+                transition={{
+                  delay: index * 0.04,
+                  type: 'spring',
+                  stiffness: 280,
+                  damping: 22,
+                }}
+                className={cn(
+                  isRaidMode && isOpponent && 'cursor-crosshair',
+                  isPhone && 'flex-shrink-0'
+                )}
+              >
+                <CargoObject
+                  card={card}
+                  selected={selectedCards.includes(card.id)}
+                  onClick={() => handleCardClick(card)}
+                  disabled={isRaidMode && isOpponent ? false : (!isCurrentPlayer || isOpponent || phase !== 'playing')}
+                  hidden={isOpponent && !isRaidMode}
+                  size={cargoSize}
+                  enableLayoutId={!isOpponent}
+                  className={cn(isRaidMode && isOpponent && 'hover:ring-2 hover:ring-destructive hover:scale-105 transition-all')}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
           {/* Empty cargo slots */}
           {!isOpponent && Array.from({ length: emptySlots }).map((_, index) => (
