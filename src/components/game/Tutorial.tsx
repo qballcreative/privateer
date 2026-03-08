@@ -25,9 +25,24 @@ export const Tutorial = () => {
 
   useEffect(() => {
     if (!isActive) return;
+
+    // Auto-scroll the highlighted element into view
+    if (step?.highlightId) {
+      const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Wait for scroll to finish before updating highlight
+        setTimeout(updateHighlight, 400);
+      }
+    }
+
     updateHighlight();
     window.addEventListener('resize', updateHighlight);
-    return () => window.removeEventListener('resize', updateHighlight);
+    window.addEventListener('scroll', updateHighlight, true);
+    return () => {
+      window.removeEventListener('resize', updateHighlight);
+      window.removeEventListener('scroll', updateHighlight, true);
+    };
   }, [isActive, currentStep, updateHighlight]);
 
   if (!isActive) return null;
