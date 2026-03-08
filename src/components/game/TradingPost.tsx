@@ -134,7 +134,15 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
       <div className={cn(
         "relative rounded-xl trading-post-surface overflow-visible mt-4",
         isPhone ? "p-3" : "p-6"
-      )}>
+      )}
+        style={{
+          backgroundImage: `url('/images/trading-post-bg.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Subdued overlay to keep cargo readable */}
+        <div className="absolute inset-0 rounded-xl bg-card/80 pointer-events-none" />
         {/* Trading Post Label */}
         {!isPhone && (
           <div className="absolute -top-3 left-4 z-10">
@@ -156,6 +164,7 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
         {/* Cargo on the dock */}
         <div className={cn(
+          "relative z-[1]",
           "min-h-[80px] sm:min-h-[140px]",
           isPhone 
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
