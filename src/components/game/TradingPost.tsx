@@ -378,7 +378,8 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
               onClick={handleExchange}
               disabled={selectedMarketCards.length < 2 || 
                        selectedHandCards.length !== selectedMarketCards.length ||
-                       wouldExceedHandLimit}
+                       wouldExceedHandLimit ||
+                       hasSameTypeSwap}
               className="ocean-button text-xs sm:text-sm"
               size="sm"
             >
