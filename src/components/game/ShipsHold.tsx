@@ -122,9 +122,17 @@ export const ShipsHold = ({
 
       {/* Cargo Hold */}
       <div className={cn(
-        "relative rounded-lg bg-muted/30 border border-border",
+        "relative rounded-lg border border-border overflow-hidden",
         isPhone ? "p-2 min-h-[80px]" : "p-3 min-h-[120px]"
-      )}>
+      )}
+        style={{
+          backgroundImage: `url('/images/cargo-hold-bg.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Subdued overlay */}
+        <div className="absolute inset-0 rounded-lg bg-card/80 pointer-events-none" />
         <div className={cn(
           isPhone
             ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
