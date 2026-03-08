@@ -89,6 +89,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
       setSelectedMarketCards([]);
       setSelectedHandCards([]);
       setMode('take');
+      onModeChange?.(false);
     }
   };
 
