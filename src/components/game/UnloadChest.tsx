@@ -224,7 +224,7 @@ export const UnloadChest = ({
                   'text-foreground font-bold',
                   isPhone ? 'text-xs' : 'text-sm'
                 )}>
-                  {selectedCards.length}× {selectedType}
+                  {selectedCards.length}× {{ cannonballs: 'Iron', rum: 'Rum', silver: 'Silver', silks: 'Silk', gold: 'Gold', gemstones: 'Gems' }[selectedType] || selectedType}
                 </span>
               </div>
             )}
