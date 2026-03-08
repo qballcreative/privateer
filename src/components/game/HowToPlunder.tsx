@@ -1,21 +1,20 @@
 import { motion } from 'framer-motion';
-import { Package, ArrowLeftRight, Coins } from 'lucide-react';
 
 const steps = [
   {
-    icon: Package,
+    img: '/Icons/Claim.png',
     num: 1,
     title: 'Claim Cargo',
     description: 'Take goods from the Trading Post to fill your Ship\'s Hold, or commandeer all ships at once.',
   },
   {
-    icon: ArrowLeftRight,
+    img: '/Icons/Trade.png',
     num: 2,
     title: 'Trade Goods',
     description: 'Exchange 2+ goods between your Hold and the Trading Post. Ships act as wildcards!',
   },
   {
-    icon: Coins,
+    img: '/Icons/Sell.png',
     num: 3,
     title: 'Sell Cargo',
     description: 'Sell matching cargo for doubloons. Larger shipments earn bonus Commission Medallions!',
@@ -46,9 +45,9 @@ export const HowToPlunder = () => {
                 {step.num}
               </div>
 
-              {/* Icon */}
-              <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-primary/10 border border-primary/20">
-                <step.icon className="w-6 h-6 text-primary" />
+              {/* Icon image */}
+              <div className="mx-auto w-16 h-16 flex items-center justify-center mb-3">
+                <img src={step.img} alt={step.title} className="w-14 h-14 object-contain" />
               </div>
 
               <h3 className="font-serif text-xl font-bold text-primary mb-2">{step.title}</h3>

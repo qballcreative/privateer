@@ -32,7 +32,7 @@ export const SetSailPanel = ({
 }: SetSailPanelProps) => {
   return (
     <motion.div
-      className="relative max-w-lg mx-auto -mt-12 z-10 px-4"
+      className="relative max-w-lg mx-auto z-10 px-4"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.5 }}
