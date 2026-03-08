@@ -228,6 +228,7 @@ interface GameStore extends GameState {
   endTurn: () => void;
   nextRound: () => void;
   resetGame: () => void;
+  restartGame: () => void;
   
   // AI
   makeAIMove: () => void;
