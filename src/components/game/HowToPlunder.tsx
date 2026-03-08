@@ -21,8 +21,7 @@ const steps = [
 
 export const HowToPlunder = () => {
   return (
-    <section className="relative py-12 px-4">
-      <hr className="wood-separator mb-10" />
+    <section className="relative py-12 px-4 bg-card/80 backdrop-blur-sm border-t border-border">
       <div className="max-w-4xl mx-auto">
         <h2 className="font-pirate text-3xl md:text-4xl text-primary text-center mb-8">
           How to Plunder
@@ -32,17 +31,16 @@ export const HowToPlunder = () => {
           {steps.map((step, i) => (
             <motion.div
               key={step.title}
-              className="cargo-slot p-6 text-center"
+              className="p-6 rounded-xl border-2 border-[hsl(var(--rope))] bg-card/80 text-center hover:border-primary/40 transition-colors"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ scale: 1.02 }}
             >
-              <div className="mx-auto w-14 h-14 rounded-md flex items-center justify-center mb-3 bg-[hsl(var(--brass)/0.2)] border border-[hsl(var(--brass-light)/0.4)] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]">
+              <div className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-[hsl(var(--brass)/0.15)] border border-[hsl(var(--brass-light)/0.3)]">
                 <step.icon className="w-7 h-7 text-primary" />
               </div>
-              <hr className="wood-separator my-3" />
               <h3 className="font-pirate text-xl text-primary mb-2">{step.title}</h3>
               <p className="text-muted-foreground text-sm">{step.description}</p>
             </motion.div>

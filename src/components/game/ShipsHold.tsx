@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';
-import CargoObject from './CargoObject';
+import { CargoObject } from './CargoObject';
 import { UnloadChest } from './UnloadChest';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
@@ -96,7 +96,7 @@ export const ShipsHold = ({
         <div className="flex items-center gap-1.5 sm:gap-2">
           <h3 className={cn(
             "font-pirate text-primary",
-            isPhone ? "text-sm" : "text-sm"
+            isPhone ? "text-base" : "text-lg"
           )}>
             {isOpponent ? `${player.name}'s Hold` : "Captain's Hold"}
           </h3>
@@ -115,32 +115,23 @@ export const ShipsHold = ({
         
         {/* Fleet count */}
         <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-accent/10 border border-accent/20">
-          <img src="/images/fleet.png" alt="Fleet" className="w-7 h-7 sm:w-8 sm:h-8 object-contain -ml-1 -my-2" />
+          <Anchor className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
           <span className="text-xs sm:text-sm font-bold text-accent">{player.ships.length}</span>
         </div>
       </div>
 
       {/* Cargo Hold */}
       <div className={cn(
-        "relative rounded-lg border border-border overflow-hidden",
+        "relative rounded-lg bg-muted/30 border border-border",
         isPhone ? "p-2 min-h-[80px]" : "p-3 min-h-[120px]"
-      )}
-        style={{
-          backgroundImage: `url('/images/cargo-hold-bg.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Subdued overlay */}
-        <div className="absolute inset-0 rounded-lg bg-card/80 pointer-events-none" />
+      )}>
         <div className={cn(
-          "relative z-[1]",
           isPhone
-            ? "flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-end"
-            : "flex flex-wrap gap-4 items-end justify-center"
+            ? "flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+            : "flex flex-wrap gap-2 items-center justify-center"
         )}>
           <LayoutGroup id="ships-hold">
-            <AnimatePresence mode="sync">
+            <AnimatePresence mode="popLayout">
               {player.hand.map((card, index) => (
                 <motion.div
                   key={card.id}
@@ -190,15 +181,15 @@ export const ShipsHold = ({
               layout
               className={cn(
                 "rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center",
-                isPhone ? "w-12 h-12 flex-shrink-0" : "w-16 h-16"
+                isPhone ? "w-14 h-16 flex-shrink-0" : "w-20 h-24"
               )}
               style={{
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
+                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.15)',
               }}
             >
               <Package className={cn(
-                "text-muted-foreground/15",
-                isPhone ? "w-4 h-4" : "w-5 h-5"
+                "text-muted-foreground/20",
+                isPhone ? "w-4 h-4" : "w-6 h-6"
               )} />
             </motion.div>
           ))}

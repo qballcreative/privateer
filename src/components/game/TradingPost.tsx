@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Card, HAND_LIMIT } from '@/types/game';
-import CargoObject from './CargoObject';
+import { CargoObject } from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
@@ -132,17 +132,9 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
       {/* Trading Post — Dock Table Surface */}
       <div className={cn(
-        "relative rounded-xl trading-post-surface overflow-visible mt-4",
+        "relative rounded-xl wood-plank-texture border-2 border-primary/30 rope-border overflow-hidden",
         isPhone ? "p-3" : "p-6"
-      )}
-        style={{
-          backgroundImage: `url('/images/trading-post-bg.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Subdued overlay to keep cargo readable */}
-        <div className="absolute inset-0 rounded-xl bg-card/80 pointer-events-none" />
+      )}>
         {/* Trading Post Label */}
         {!isPhone && (
           <div className="absolute -top-3 left-4 z-10">
@@ -164,14 +156,13 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
 
         {/* Cargo on the dock */}
         <div className={cn(
-          "relative z-[1]",
           "min-h-[80px] sm:min-h-[140px]",
           isPhone 
             ? "flex gap-2 overflow-x-auto scrollbar-hide pb-2 pt-1" 
-            : "flex flex-wrap items-end justify-center gap-4 sm:gap-6 pt-4"
+            : "flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-4"
         )}>
           <LayoutGroup id="trading-post">
-            <AnimatePresence mode="sync">
+            <AnimatePresence mode="popLayout">
               {market.map((card, index) => (
                 <motion.div
                   key={card.id}
@@ -217,29 +208,19 @@ export const TradingPost = ({ layout = 'desktop' }: TradingPostProps) => {
         {/* Commandeer Fleet */}
         {ships.length > 0 && isPlayerTurn && phase === 'playing' && mode === 'take' && (
           <motion.div
-            className="mt-3 sm:mt-4 flex justify-center relative z-20"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="mt-3 sm:mt-4 flex justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           >
-            <motion.button
+            <Button
               onClick={handleCommandeerFleet}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group flex flex-col items-center cursor-pointer focus:outline-none"
+              variant="outline"
+              size="sm"
+              className="border-accent text-accent hover:bg-accent/10 text-xs sm:text-sm"
             >
-              {/* Fleet image — overflows above the pill */}
-              <motion.img
-                src="/images/fleet.png"
-                alt="Fleet"
-                className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_4px_12px_hsl(var(--accent)/0.5)] group-hover:drop-shadow-[0_6px_20px_hsl(var(--accent)/0.7)] transition-all duration-300 -mb-3"
-                animate={{ y: [0, -4, 0] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              {/* Text pill */}
-              <span className="px-4 py-1.5 rounded-full bg-accent/20 border border-accent/40 text-accent font-pirate text-xs sm:text-sm backdrop-blur-sm group-hover:bg-accent/30 group-hover:border-accent/60 transition-all duration-300 shadow-[0_0_15px_hsl(var(--accent)/0.2)] group-hover:shadow-[0_0_25px_hsl(var(--accent)/0.4)]">
-                Commandeer Fleet ({ships.length})
-              </span>
-            </motion.button>
+              <Anchor className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+              Commandeer Fleet ({ships.length})
+            </Button>
           </motion.div>
         )}
       </div>

@@ -37,14 +37,14 @@ export const SetSailPanel = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.5 }}
     >
-      <div className="rounded-lg rope-border bg-[hsl(var(--wood-plank)/0.85)] backdrop-blur-md p-6 md:p-8 shadow-[var(--shadow-inset),var(--shadow-elevated)]">
+      <div className="rounded-xl border-2 border-[hsl(var(--rope))] bg-card/95 backdrop-blur-md p-6 md:p-8 shadow-[var(--shadow-elevated)]">
         {/* Title */}
         <h2 className="font-pirate text-3xl md:text-4xl text-primary text-center mb-6 drop-shadow-[0_0_10px_hsl(var(--gold)/0.3)]">
           Set Sail
         </h2>
 
         {/* Mode Select */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <ModeButton
             active={mode === 'aai'}
             onClick={() => setMode('aai')}
@@ -63,10 +63,8 @@ export const SetSailPanel = ({
           )}
         </div>
 
-        <hr className="wood-separator my-5" />
-
         {/* Options Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {/* Best Of */}
           <OptionGroup label="Best of">
             <div className="flex gap-2">
@@ -75,10 +73,10 @@ export const SetSailPanel = ({
                   key={v}
                   onClick={() => setBestOf(v)}
                   className={cn(
-                    'flex-1 min-h-[44px] rounded-md font-bold text-sm transition-all',
+                    'flex-1 min-h-[44px] rounded-lg border-2 font-bold text-sm transition-all',
                     bestOf === v
-                      ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                      : 'cargo-slot text-muted-foreground hover:text-primary/70'
+                      ? 'border-[hsl(var(--brass-light))] bg-[hsl(var(--brass)/0.2)] text-primary'
+                      : 'border-border bg-muted/30 text-muted-foreground hover:border-primary/30'
                   )}
                 >
                   {v}
@@ -95,10 +93,10 @@ export const SetSailPanel = ({
                   key={v}
                   onClick={() => setFirstPlayer(v)}
                   className={cn(
-                    'flex-1 min-h-[44px] rounded-md font-bold text-sm transition-all capitalize',
+                    'flex-1 min-h-[44px] rounded-lg border-2 font-bold text-sm transition-all capitalize',
                     firstPlayer === v
-                      ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                      : 'cargo-slot text-muted-foreground hover:text-primary/70'
+                      ? 'border-[hsl(var(--brass-light))] bg-[hsl(var(--brass)/0.2)] text-primary'
+                      : 'border-border bg-muted/30 text-muted-foreground hover:border-primary/30'
                   )}
                 >
                   {v}
@@ -110,37 +108,32 @@ export const SetSailPanel = ({
 
         {/* Pirate Level — AAI only */}
         {mode === 'aai' && (
-          <>
-            <hr className="wood-separator my-5" />
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Pirate Level</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {difficultyLevels.map(({ key, label, icon: Icon }) => {
-                  const locked = restrictedMode && key !== 'easy';
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => onDifficultyChange(key)}
-                      disabled={locked}
-                      className={cn(
-                        'min-h-[44px] rounded-md p-2 transition-all flex flex-col items-center justify-center gap-1',
-                        locked && 'opacity-40 cursor-not-allowed',
-                        difficulty === key
-                          ? 'cargo-slot text-primary shadow-[inset_0_0_8px_hsl(var(--brass)/0.3)]'
-                          : 'cargo-slot text-muted-foreground hover:text-primary/70'
-                      )}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="text-xs font-bold">{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="mb-6">
+            <p className="text-sm text-muted-foreground mb-2">Pirate Level</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {difficultyLevels.map(({ key, label, icon: Icon }) => {
+                const locked = restrictedMode && key !== 'easy';
+                return (
+                  <button
+                    key={key}
+                    onClick={() => onDifficultyChange(key)}
+                    disabled={locked}
+                    className={cn(
+                      'min-h-[44px] rounded-lg border-2 p-2 transition-all flex flex-col items-center justify-center gap-1',
+                      locked && 'opacity-40 cursor-not-allowed',
+                      difficulty === key
+                        ? 'border-primary bg-primary/15 text-primary'
+                        : 'border-border bg-muted/30 text-muted-foreground hover:border-primary/30'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-xs font-bold">{label}</span>
+                  </button>
+                );
+              })}
             </div>
-          </>
+          </div>
         )}
-
-        <hr className="wood-separator my-5" />
 
         {/* Action Buttons */}
         <div className="space-y-3">
@@ -183,12 +176,12 @@ const ModeButton = ({
   <button
     onClick={onClick}
     className={cn(
-      'min-h-[56px] rounded-md p-4 flex items-center justify-center gap-3 font-pirate text-lg transition-all cargo-slot',
+      'min-h-[56px] rounded-lg border-2 p-4 flex items-center justify-center gap-3 font-pirate text-lg transition-all',
       active
         ? variant === 'gold'
-          ? 'text-primary shadow-[inset_0_0_12px_hsl(var(--gold)/0.3),var(--shadow-gold)]'
-          : 'text-accent shadow-[inset_0_0_12px_hsl(var(--ocean)/0.3),0_0_15px_hsl(var(--ocean)/0.3)]'
-        : 'text-muted-foreground hover:text-primary/60'
+          ? 'border-primary bg-primary/15 text-primary shadow-[var(--shadow-gold)]'
+          : 'border-accent bg-accent/15 text-accent shadow-[0_0_15px_hsl(var(--ocean)/0.3)]'
+        : 'border-border bg-muted/30 text-muted-foreground hover:border-primary/20'
     )}
   >
     {icon}
@@ -204,7 +197,7 @@ const ActionButton = ({
   <button
     onClick={onClick}
     className={cn(
-      'w-full min-h-[52px] rounded-md rope-border font-pirate text-lg flex items-center justify-center transition-all active:scale-95',
+      'w-full min-h-[52px] rounded-lg border-2 border-[hsl(var(--rope))] font-pirate text-lg flex items-center justify-center transition-all active:scale-95',
       variant === 'gold'
         ? 'bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[var(--shadow-gold)] hover:shadow-[0_6px_25px_hsl(var(--gold)/0.6)]'
         : 'bg-gradient-to-b from-accent to-accent/80 text-accent-foreground shadow-[0_4px_15px_hsl(var(--ocean)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--ocean)/0.5)]'

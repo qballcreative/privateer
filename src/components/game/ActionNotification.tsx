@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActionDisplay, Card } from '@/types/game';
-import CargoObject from './CargoObject';
+import { GameCard } from './GameCard';
 import { ArrowRight, ArrowDown, Coins, Star, CloudLightning, Crosshair, Ship, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -47,7 +47,7 @@ const CardRow = ({ cards, label }: { cards: Card[]; label?: string }) => (
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: idx * 0.1, type: 'spring', stiffness: 300 }}
         >
-          <CargoObject card={card} size="sm" disabled />
+          <GameCard card={card} size="sm" disabled />
         </motion.div>
       ))}
     </div>
