@@ -89,18 +89,18 @@ export const ScoreBoard = memo(() => {
               {/* Score breakdown */}
               <div className="grid grid-cols-2 gap-2 text-sm overflow-visible">
                 <div className="flex items-center gap-1.5 overflow-visible" title="Doubloons">
-                  <img src="/images/doubloons.webpp" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
+                  <img src="/images/doubloons.webppp" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 overflow-visible" title="Commissions">
-                  <img src="/images/commissionswebpg" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
+                  <img src="/images/commissionwebpbpg" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
               </div>
 
               {/* Fleet bonus row */}
               <div className="flex items-center gap-1.5 mt-1 text-sm overflow-visible" title={`Fleet: ${player.ships.length} ships${hasFleetBonus ? ' — Largest Fleet +5' : ''}`}>
-                <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
+                <img src="/images/fleewebpng" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
                 <span className="text-foreground/80" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.ships.length}</span>
                 {hasFleetBonus && (
                   <span className="text-xs font-bold text-primary ml-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>+5</span>
