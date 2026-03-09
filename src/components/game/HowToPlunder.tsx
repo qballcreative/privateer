@@ -8,7 +8,7 @@ const steps = [
     description: 'Take goods from the Trading Post to fill your Ship\'s Hold, or commandeer all ships at once.',
   },
   {
-    img: '/Icontrade.webpbpg',
+    img: '/Icons/trade.webp',
     num: 2,
     title: 'Trade Goods',
     description: 'Exchange 2+ goods between your Hold and the Trading Post. Ships act as wildcards!',
