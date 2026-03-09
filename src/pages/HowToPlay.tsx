@@ -58,7 +58,7 @@ const HowToPlay = () => {
               {
                 title: 'Trading Post',
                 desc: '5 cargo goods are dealt face-up on the dock. This is where you\'ll claim and trade goods each turn.',
-                icon: '/Icons/Trade.png',
+                icon: '/Icons/Trade.webp',
               },
               {
                 title: "Ship's Hold",
