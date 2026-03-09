@@ -4,6 +4,7 @@ import { Card, HAND_LIMIT } from '@/types/game';
 import CargoObject from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
+import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
 import { cn } from '@/lib/utils';
 import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 
