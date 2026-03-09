@@ -132,7 +132,7 @@ export const ShipsHold = ({
         }}
       >
         {/* Subdued overlay */}
-        <div className="absolute inset-0 rounded-lg bg-card/80 pointer-events-none" />
+        <div className="absolute inset-0 rounded-lg bg-black/50 pointer-events-none" />
         <div className={cn(
           "relative z-[1]",
           isPhone
