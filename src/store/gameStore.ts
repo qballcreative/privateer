@@ -341,6 +341,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     rulesEngine.fireDeal(ctx);
 
     set(initialState);
+
+    // If AI goes first (random first player landed on AI), kick off its move
+    if (initialState.players[initialState.currentPlayerIndex]?.isAI) {
+      const notifDuration = useSettingsStore.getState().actionNotificationDuration;
+      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+    }
   },
 
   startMultiplayerGame: (playerName, opponentName, optionalRules, isHost) => {
