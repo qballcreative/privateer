@@ -52,7 +52,7 @@ export const ScoreBoard = memo(() => {
               key={player.id}
               className={cn(
                 'p-3 rounded-lg border overflow-visible',
-                player.isAI ? 'bg-muted/50 border-border' : 'bg-primary/5 border-primary/20'
+                player.isAI ? 'bg-black/40 border-white/10' : 'bg-black/30 border-primary/30'
               )}
               initial={false}
               animate={{ opacity: 1, x: 0 }}
@@ -60,9 +60,10 @@ export const ScoreBoard = memo(() => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className={cn(
-                    'font-bold',
+                    'font-bold drop-shadow-md',
                     player.isAI ? 'text-foreground' : 'text-primary'
-                  )}>
+                  )}
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
                     {player.name}
                   </span>
                   {player.isAI && (
@@ -89,34 +90,35 @@ export const ScoreBoard = memo(() => {
               <div className="grid grid-cols-2 gap-2 text-sm overflow-visible">
                 <div className="flex items-center gap-1.5 overflow-visible" title="Doubloons">
                   <img src="/images/doubloons.png" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
-                  <span className="font-bold text-primary">{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
+                  <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 overflow-visible" title="Commissions">
                   <img src="/images/commissions.png" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
-                  <span className="font-bold text-primary">{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
+                  <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
               </div>
 
               {/* Fleet bonus row */}
               <div className="flex items-center gap-1.5 mt-1 text-sm overflow-visible" title={`Fleet: ${player.ships.length} ships${hasFleetBonus ? ' — Largest Fleet +5' : ''}`}>
                 <img src="/images/fleet.png" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
-                <span className="text-muted-foreground">{player.ships.length}</span>
+                <span className="text-foreground/80" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.ships.length}</span>
                 {hasFleetBonus && (
-                  <span className="text-xs font-bold text-primary ml-1">+5</span>
+                  <span className="text-xs font-bold text-primary ml-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>+5</span>
                 )}
               </div>
 
               {/* Total score */}
-              <div className="mt-2 pt-2 border-t border-border">
+              <div className="mt-2 pt-2 border-t border-white/20">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span className="text-xs text-foreground/70 flex items-center gap-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
                     <img src="/images/doubloons.png" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
                     Total
                   </span>
                   <span className={cn(
                     'font-bold text-lg font-pirate',
                     player.isAI ? 'text-foreground' : 'text-primary'
-                  )}>
+                  )}
+                  style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
                     {score}
                   </span>
                 </div>
