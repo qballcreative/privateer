@@ -123,7 +123,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
     <div data-tutorial-id="tutorial-trading-post" className="space-y-3 sm:space-y-4">
       {/* Mode Toggle */}
       {isPlayerTurn && phase === 'playing' && (
-        <div className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
+        <div data-tutorial-id="tutorial-actions" className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
           <Button
             variant={mode === 'take' ? 'default' : 'outline'}
             size="sm"
