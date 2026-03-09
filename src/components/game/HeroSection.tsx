@@ -4,10 +4,10 @@ import privateerLogo from '@/assets/Privateer.png';
 import { Users, Clock, Dices } from 'lucide-react';
 
 const infoBadges = [
-  { icon: Users, label: '2 Players' },
-  { icon: Clock, label: '20–30 min' },
-  { icon: Dices, label: 'Ages 10+' },
-];
+{ icon: Users, label: '2 Players' },
+{ icon: Clock, label: '20–30 min' },
+{ icon: Dices, label: 'Ages 10+' }];
+
 
 export const HeroSection = () => {
   return (
@@ -15,8 +15,8 @@ export const HeroSection = () => {
       {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
+        style={{ backgroundImage: `url(${heroBg})` }}>
+        
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
       </div>
 
@@ -29,17 +29,17 @@ export const HeroSection = () => {
           className="w-[50vw] max-w-[20rem] md:w-[35vw] md:max-w-[24rem] lg:w-[28vw] lg:max-w-[28rem] object-contain drop-shadow-[0_0_30px_hsl(var(--brass)/0.5)]"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        />
+          transition={{ duration: 0.5 }} />
+        
 
         {/* Tagline */}
         <motion.p
           className="text-sm md:text-base text-foreground/70 font-semibold tracking-wide uppercase"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-        >
-          A Strategic Trading Card Game
+          transition={{ delay: 0.3, duration: 0.4 }}>
+          
+          A Strategic Trading Game
         </motion.p>
 
         {/* Info badges */}
@@ -47,19 +47,19 @@ export const HeroSection = () => {
           className="flex gap-3"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.4 }}
-        >
-          {infoBadges.map(({ icon: Icon, label }) => (
-            <div
-              key={label}
-              className="game-box-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-            >
+          transition={{ delay: 0.45, duration: 0.4 }}>
+          
+          {infoBadges.map(({ icon: Icon, label }) =>
+          <div
+            key={label}
+            className="game-box-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold">
+            
               <Icon className="w-3.5 h-3.5" />
               {label}
             </div>
-          ))}
+          )}
         </motion.div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
