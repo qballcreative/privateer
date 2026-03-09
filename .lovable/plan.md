@@ -58,10 +58,8 @@
 
 ### 🟢 P3 — Architecture
 
-#### Split GameBoard Layouts
-Extract phone/tablet/desktop layouts into separate components to reduce 880-line file.
-
-**Files:** `src/components/game/layouts/`
+#### ✅ Split GameBoard Layouts
+Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
 
 ---
 
