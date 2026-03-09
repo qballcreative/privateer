@@ -1,12 +1,12 @@
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
-import rumImg from '@/assets/cards/rum.png';
-import cannonballsImg from '@/assets/cards/cannonballs.png';
-import silksImg from '@/assets/cards/silks.png';
-import silverImg from '@/assets/cards/silver.png';
-import goldImg from '@/assets/cards/gold.png';
-import gemstonesImg from '@/assets/cards/gemstones.png';
+import rumImg from '@/assets/tokens/rum.png';
+import ironImg from '@/assets/tokens/iron.png';
+import silkImg from '@/assets/tokens/silk.png';
+import silverImg from '@/assets/tokens/silver.png';
+import goldImg from '@/assets/tokens/gold.png';
+import gemsImg from '@/assets/tokens/gems.png';
 
 interface TreasureStackProps {
   type: GoodsType;
@@ -18,11 +18,11 @@ const treasureConfig: Record<GoodsType, {
   label: string;
 }> = {
   rum: { image: rumImg, label: 'Rum' },
-  cannonballs: { image: cannonballsImg, label: 'Iron' },
-  silks: { image: silksImg, label: 'Silk' },
+  cannonballs: { image: ironImg, label: 'Iron' },
+  silks: { image: silkImg, label: 'Silk' },
   silver: { image: silverImg, label: 'Silver' },
   gold: { image: goldImg, label: 'Gold' },
-  gemstones: { image: gemstonesImg, label: 'Gems' },
+  gemstones: { image: gemsImg, label: 'Gems' },
 };
 
 export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
