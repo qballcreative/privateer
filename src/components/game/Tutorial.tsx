@@ -36,11 +36,17 @@ export const Tutorial = () => {
   // Find target element with retry
   const measureTarget = useCallback((): HighlightRect | null => {
     if (!step?.highlightId) return null;
-    const el = document.querySelector<HTMLElement>(`[data-tutorial-id="${step.highlightId}"]`);
-    console.log('[Tutorial] Looking for:', step.highlightId, 'Found:', !!el, el?.offsetWidth);
-    if (!el || el.offsetWidth === 0) return null;
+    // Find the VISIBLE element — multiple layouts may have the same data-tutorial-id
+    const candidates = document.querySelectorAll<HTMLElement>(`[data-tutorial-id="${step.highlightId}"]`);
+    let el: HTMLElement | null = null;
+    for (const candidate of candidates) {
+      if (candidate.offsetWidth > 0 && candidate.offsetHeight > 0) {
+        el = candidate;
+        break;
+      }
+    }
+    if (!el) return null;
     const r = el.getBoundingClientRect();
-    console.log('[Tutorial] Rect:', r.top, r.left, r.width, r.height);
     return { top: r.top, left: r.left, width: r.width, height: r.height };
   }, [step?.highlightId]);
 
