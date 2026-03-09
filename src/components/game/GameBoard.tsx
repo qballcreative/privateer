@@ -181,7 +181,7 @@ export const GameBoard = () => {
     deck,
   } = useGameStore();
 
-  const { actionNotificationDuration } = useSettingsStore();
+  const { actionNotificationDuration, musicEnabled, hasSeenMusicHint, setHasSeenMusicHint } = useSettingsStore();
   const { recordGameResult } = usePlayerStore();
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
   const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
