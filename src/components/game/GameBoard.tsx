@@ -719,7 +719,7 @@ export const GameBoard = () => {
               )}
             >
               {/* Trading Post — top center */}
-              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
+              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
 
               {/* Player's Hold — hidden during exchange */}
               <AnimatePresence>
