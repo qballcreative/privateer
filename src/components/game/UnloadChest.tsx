@@ -1,10 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Card, GoodsType } from '@/types/game';
+import { Card, GoodsType, INITIAL_TOKEN_VALUES } from '@/types/game';
 import { cn } from '@/lib/utils';
 import { Package, Lock, Unlock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface UnloadChestProps {
   selectedCards: string[];
@@ -115,7 +125,8 @@ export const UnloadChest = ({
   const [isUnloading, setIsUnloading] = useState(false);
   const [showSparkles, setShowSparkles] = useState(false);
   const [earnedTokens, setEarnedTokens] = useState<{ value: number; type: 'doubloon' | 'bonus' }[]>([]);
-  const { lastAction } = useGameStore();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { lastAction, tokenStacks } = useGameStore();
   const [announcement, setAnnouncement] = useState('');
   const processedAction = useRef<typeof lastAction>(null);
 
@@ -154,13 +165,28 @@ export const UnloadChest = ({
     }
   }, [lastAction]);
 
-  const handleUnload = useCallback(() => {
-    onUnload();
-  }, [onUnload]);
-
   const selectedType = hasSelection
     ? player.hand.find((c) => selectedCards.includes(c.id))?.type
     : null;
+
+  const CARGO_LABELS: Record<string, string> = {
+    cannonballs: 'Cannonballs', rum: 'Rum', silver: 'Silver',
+    silks: 'Silk', gold: 'Gold', gemstones: 'Gems',
+  };
+
+  const handleUnload = useCallback(() => {
+    setShowConfirm(false);
+    onUnload();
+  }, [onUnload]);
+
+  // Calculate expected doubloon value for confirmation
+  const getExpectedValue = useCallback(() => {
+    if (!hasSelection || !selectedType) return 0;
+    const type = selectedType as GoodsType;
+    const stack = tokenStacks?.[type];
+    if (!stack) return 0;
+    return stack.slice(0, selectedCards.length).reduce((sum, t) => sum + t.value, 0);
+  }, [selectedCards, selectedType, tokenStacks, hasSelection]);
 
 
   return (
@@ -224,7 +250,7 @@ export const UnloadChest = ({
                   'text-foreground font-bold',
                   isPhone ? 'text-xs' : 'text-sm'
                 )}>
-                  {selectedCards.length}× {{ cannonballs: 'Iron', rum: 'Rum', silver: 'Silver', silks: 'Silk', gold: 'Gold', gemstones: 'Gems' }[selectedType] || selectedType}
+                  {selectedCards.length}× {CARGO_LABELS[selectedType] || selectedType}
                 </span>
               </div>
             )}
@@ -233,7 +259,7 @@ export const UnloadChest = ({
           {/* Action buttons */}
           <div className="flex items-center gap-2">
             <Button
-              onClick={handleUnload}
+              onClick={() => setShowConfirm(true)}
               disabled={!canUnload}
               className={cn(
                 'game-button',
@@ -256,6 +282,33 @@ export const UnloadChest = ({
               </Button>
             )}
           </div>
+
+          {/* Sell Confirmation Dialog */}
+          <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+            <AlertDialogContent className="max-w-sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-pirate text-primary flex items-center gap-2">
+                  {selectedType && (
+                    <img src={`/Icons/${selectedType}.png`} alt="" className="w-7 h-7 object-contain" />
+                  )}
+                  Sell Cargo?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-foreground/80">
+                  Sell <strong className="text-primary">{selectedCards.length}× {selectedType ? CARGO_LABELS[selectedType] || selectedType : ''}</strong> for{' '}
+                  <strong className="text-primary">{getExpectedValue()} doubloons</strong>
+                  {selectedCards.length >= 3 && (
+                    <span className="block mt-1 text-accent">+ Commission Seal bonus!</span>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleUnload} className="game-button">
+                  Sell Cargo
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Sparkle particles on unload */}
