@@ -33,7 +33,7 @@ const MedallionStack = ({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] text-muted-foreground">{tierLabels[tier]} cargo</span>
+      <span className="text-[10px] font-semibold text-foreground/80" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tierLabels[tier]} cargo</span>
       
       <div className="relative w-10 h-10">
         {/* Stacked seals */}
