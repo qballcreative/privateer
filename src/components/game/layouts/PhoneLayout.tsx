@@ -62,7 +62,7 @@ export const PhoneLayout = ({
     {/* Mini-info bar */}
     <div className="flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg bg-card/80 border border-border text-[10px]">
       <div className="flex items-center gap-1">
-        <img src="/images/supply.png" alt="Supply" className="w-4 h-4 object-contain" />
+        <img src="/images/supply.webpp" alt="Supply" className="w-4 h-4 object-contain" />
         <span className="text-muted-foreground">{deck.length}</span>
       </div>
       <div className="flex items-center gap-0.5">
@@ -78,7 +78,7 @@ export const PhoneLayout = ({
         })}
       </div>
       <div className="flex items-center gap-1">
-        <img src="/images/fleet.png" alt="Fleet" className="w-4 h-4 object-contain" />
+        <img src="/images/fleetwebpg" alt="Fleet" className="w-4 h-4 object-contain" />
         <span className="text-accent">{opponentPlayer?.ships.length || 0}</span>
       </div>
     </div>

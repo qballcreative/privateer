@@ -2,14 +2,14 @@ import { motion } from 'framer-motion';
 import { Card, CardType } from '@/types/game';
 import { cn } from '@/lib/utils';
 
-import rumImg from '@/assets/tokens/rum.png';
-import ironImg from '@/assets/tokens/iron.png';
-import silverImg from '@/assets/tokens/silver.png';
-import goldImg from '@/assets/tokens/gold.png';
-import gemsImg from '@/assets/tokens/gems.png';
-import silkImg from '@/assets/tokens/silk.png';
-import shipImg from '@/assets/tokens/ship.png';
-import cargoImg from '@/assets/tokens/cargo.png';
+import rumImg from '@/assets/tokens/rum.webp';
+import ironImg from '@/assets/tokens/iron.webp';
+import silverImg from '@/assets/tokens/silver.webp';
+import goldImg from '@/assets/tokens/gold.webp';
+import gemsImg from '@/assets/tokens/gems.webp';
+import silkImg from '@/assets/tokens/silk.webp';
+import shipImg from '@/assets/tokens/ship.webp';
+import cargoImg from '@/assets/tokens/cargo.webp';
 
 interface CargoObjectProps {
   card: Card;

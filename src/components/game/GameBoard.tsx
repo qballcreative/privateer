@@ -23,7 +23,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Card } from '@/types/game';
 import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import bannerLogo from '@/assets/BannerLogo.png';
+import bannerLogo from '@/assets/bannerlogo.webp';
 import { toast } from '@/components/ui/sonner';
 import { PhoneLayout, TabletLayout, DesktopLayout } from './layouts';
 
@@ -256,7 +256,7 @@ export const GameBoard = () => {
     <motion.div
       className="min-h-screen p-2 sm:p-4 lg:p-6 relative"
       style={{
-        backgroundImage: 'url(/images/wood-bg.png)',
+        backgroundImage: 'url(/images/wood-bg.webp)',
         backgroundSize: '100% auto',
         backgroundRepeat: 'repeat-y',
         opacity: ready ? 1 : 0,

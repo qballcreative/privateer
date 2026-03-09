@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 const heroBg = '/images/hero-bg.jpg';
-import privateerLogo from '@/assets/Privateer.png';
+import privateerLogo from '@/assets/privateer.webp';
 import { Users, Clock, Dices } from 'lucide-react';
 
 const infoBadges = [

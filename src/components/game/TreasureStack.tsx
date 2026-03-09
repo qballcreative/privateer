@@ -1,12 +1,12 @@
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';
-import rumImg from '@/assets/tokens/rum.png';
-import ironImg from '@/assets/tokens/iron.png';
-import silkImg from '@/assets/tokens/silk.png';
-import silverImg from '@/assets/tokens/silver.png';
-import goldImg from '@/assets/tokens/gold.png';
-import gemsImg from '@/assets/tokens/gems.png';
+import rumImg from '@/assets/tokens/rum.webp';
+import ironImg from '@/assets/tokens/iron.webp';
+import silkImg from '@/assets/tokens/silk.webp';
+import silverImg from '@/assets/tokens/silver.webp';
+import goldImg from '@/assets/tokens/gold.webp';
+import gemsImg from '@/assets/tokens/gems.webp';
 
 interface TreasureStackProps {
   type: GoodsType;
@@ -55,7 +55,7 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
               animate={{ scale: 1, y: 0 }}
               layout
             >
-              <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
+              <img src="/Icons/doubloon.webp" alt="doubloon" className="w-full h-full" />
               {index === tokens.slice(0, 4).length - 1 && topToken && (
                 <span className="absolute inset-0 flex items-center justify-center font-bold text-sm" style={{ color: '#1a0f00', textShadow: '0 1px 2px rgba(255,220,100,0.6)' }}>
                   {topToken.value}
