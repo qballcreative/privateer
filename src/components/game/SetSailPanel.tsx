@@ -186,7 +186,7 @@ export const SetSailPanel = ({
               Start Game
             </ActionButton>
           ) : (
-            <ActionButton onClick={onCreateRoom} variant="gold" className="w-full">
+            <ActionButton onClick={onCreateRoom} variant="gold">
               <Anchor className="w-5 h-5 mr-2" />
               Issue / Accept a Challenge
             </ActionButton>
