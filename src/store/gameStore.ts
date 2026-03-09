@@ -43,30 +43,12 @@ rulesEngine.register(stormRule);
 rulesEngine.register(pirateRaidRule);
 rulesEngine.register(treasureChestRule);
 
-/** Maps the legacy OptionalRules booleans to engine plugin ids, merging remote enabledRules. */
+/** Maps the legacy OptionalRules booleans to engine plugin ids. */
 const syncEngineRules = (rules: OptionalRules) => {
-  const remoteEnabled = useRemoteConfigStore.getState().config.enabledRules;
-  const ruleMap: Record<string, keyof OptionalRules> = {
-    storm: 'stormRule',
-    pirate_raid: 'pirateRaid',
-    treasure_chest: 'treasureChest',
-  };
-
   const ids: string[] = [];
-  // Local explicit toggles take priority
   if (rules.stormRule) ids.push('storm');
   if (rules.pirateRaid) ids.push('pirate_raid');
   if (rules.treasureChest) ids.push('treasure_chest');
-
-  // Remote can enable rules the user hasn't explicitly toggled on locally
-  for (const ruleId of remoteEnabled) {
-    if (!ids.includes(ruleId) && !(ruleMap[ruleId] && rules[ruleMap[ruleId]] === false)) {
-      // Only add if the local setting isn't explicitly false
-      // Since default is false, we only add remote rules if they aren't in the map
-      // or if user hasn't interacted with them. For simplicity: remote adds, local overrides off.
-    }
-  }
-
   rulesEngine.setEnabled(ids);
 };
 
