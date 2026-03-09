@@ -165,6 +165,15 @@ export const UnloadChest = ({
     }
   }, [lastAction]);
 
+  const selectedType = hasSelection
+    ? player.hand.find((c) => selectedCards.includes(c.id))?.type
+    : null;
+
+  const CARGO_LABELS: Record<string, string> = {
+    cannonballs: 'Cannonballs', rum: 'Rum', silver: 'Silver',
+    silks: 'Silk', gold: 'Gold', gemstones: 'Gems',
+  };
+
   const handleUnload = useCallback(() => {
     setShowConfirm(false);
     onUnload();
@@ -178,15 +187,6 @@ export const UnloadChest = ({
     if (!stack) return 0;
     return stack.slice(0, selectedCards.length).reduce((sum, t) => sum + t.value, 0);
   }, [selectedCards, selectedType, tokenStacks, hasSelection]);
-
-  const CARGO_LABELS: Record<string, string> = {
-    cannonballs: 'Cannonballs', rum: 'Rum', silver: 'Silver',
-    silks: 'Silk', gold: 'Gold', gemstones: 'Gems',
-  };
-
-  const selectedType = hasSelection
-    ? player.hand.find((c) => selectedCards.includes(c.id))?.type
-    : null;
 
 
   return (
