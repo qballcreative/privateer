@@ -20,6 +20,8 @@ import { VictoryScreen } from './VictoryScreen';
 import { DisconnectModal } from './DisconnectModal';
 import { RoundEndModal } from './RoundEndModal';
 import { MultiplayerChat } from './MultiplayerChat';
+import { Tutorial } from './Tutorial';
+import { useTutorialStore } from '@/store/tutorialStore';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
