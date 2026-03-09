@@ -5,13 +5,19 @@ import { ScoreBoard } from '../ScoreBoard';
 import { TreasureSupplyPanel } from './TreasureSupplyPanel';
 import { cn } from '@/lib/utils';
 import { LayoutProps } from './types';
+import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
 
 export const TabletLayout = ({
   treasureSupplyProps, isRaidMode, setIsRaidMode,
   isExchangeMode, setIsExchangeMode, triggerInvalidAction,
   humanPlayer, opponentPlayer, currentPlayerIndex, localPlayerIndex, opponentIndex,
   phase, isOpponentPondering, handlePirateRaid,
-}: LayoutProps) => (
+}: LayoutProps) => {
+  const tutorialActive = useTutorialStore((s) => s.isActive);
+  const tutorialStep = useTutorialStore((s) => s.currentStep);
+  const forceShowHold = tutorialActive && TUTORIAL_STEPS[tutorialStep]?.highlightId === 'tutorial-ships-hold';
+
+  return (
   <div className="hidden md:block lg:hidden">
     <div className="grid grid-cols-3 gap-4">
       <aside className="col-span-1 space-y-4">
