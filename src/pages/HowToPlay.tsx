@@ -96,7 +96,7 @@ const HowToPlay = () => {
 
           <div className="space-y-4">
             <ActionCard
-              icon={<img src="/Icons/Claim.png" alt="Claim" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Claim.webp" alt="Claim" className="w-8 h-8 object-contain" />}
               title="Claim Cargo"
               desc="Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Trading Post supply."
             />
