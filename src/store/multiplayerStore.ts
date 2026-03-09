@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import Peer, { DataConnection } from 'peerjs';
 import { generateSecureShortCode, sanitizePlayerName } from '@/lib/security';
 import { debugLog } from '@/lib/debugLog';
+import { useRemoteConfigStore } from './remoteConfigStore';
 
 export type MultiplayerState = 'idle' | 'hosting' | 'joining' | 'connected' | 'disconnected' | 'error';
 
