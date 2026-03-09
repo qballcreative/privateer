@@ -71,7 +71,7 @@ export const usePlayerStore = create<PlayerState>()(
       
       resetAll: () => set({
         playerName: '',
-        lastDifficulty: 'medium',
+        lastDifficulty: 'easy',
         stats: defaultStats,
         recentVoyages: [],
       }),
