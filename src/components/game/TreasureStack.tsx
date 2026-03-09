@@ -51,7 +51,7 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
             >
               <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
               {index === tokens.slice(0, 4).length - 1 && topToken && (
-                <span className="absolute inset-0 flex items-center justify-center text-foreground font-bold text-sm drop-shadow-md">
+                <span className="absolute inset-0 flex items-center justify-center font-bold text-sm" style={{ color: '#1a0f00', textShadow: '0 1px 2px rgba(255,220,100,0.6)' }}>
                   {topToken.value}
                 </span>
               )}
