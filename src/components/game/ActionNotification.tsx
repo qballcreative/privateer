@@ -10,12 +10,12 @@ interface ActionNotificationProps {
 }
 
 const actionIcons: Record<string, string> = {
-  'take': '/Icons/Claim.png',
-  'take-ships': '/images/fleet.png',
-  'exchange': '/Icons/Trade.png',
-  'sell': '/Icons/Sell.png',
-  'raid': '/Icons/Raid.png',
-  'storm': '/Icons/Storm.png',
+  'take': '/Icons/Claim.webp',
+  'take-ships': '/images/fleet.webp',
+  'exchange': '/Icons/Trade.webp',
+  'sell': '/Icons/Sell.webp',
+  'raid': '/Icons/Raid.webp',
+  'storm': '/Icons/Storm.webp',
 };
 
 const actionColors = {

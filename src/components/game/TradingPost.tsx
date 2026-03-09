@@ -269,7 +269,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             >
               {/* Fleet image — overflows above the pill */}
               <motion.img
-                src="/images/fleet.png"
+                src="/images/fleet.webp"
                 alt="Fleet"
                 className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_4px_12px_hsl(var(--accent)/0.5)] group-hover:drop-shadow-[0_6px_20px_hsl(var(--accent)/0.7)] transition-all duration-300 -mb-3"
                 animate={{ y: [0, -4, 0] }}
