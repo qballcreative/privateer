@@ -73,7 +73,7 @@ const HowToPlay = () => {
               {
                 title: 'Market Prices',
                 desc: 'Stacked doubloon tokens for each goods type. The top token is the most valuable — prices drop as goods are sold.',
-                icon: '/Icons/Doubloon.png',
+                icon: '/Icons/Doubloon.webp',
               },
             ].map((item) => (
               <div key={item.title} className="game-box-card p-4 flex items-start gap-4">
