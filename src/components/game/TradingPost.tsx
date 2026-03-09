@@ -29,7 +29,7 @@ const shipFanExit = (index: number, total: number) => ({
   rotate: (index - (total - 1) / 2) * 8,
 });
 
-export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostProps) => {
+export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction }: TradingPostProps) => {
   const { 
     market, 
     takeCard, 
