@@ -4,16 +4,16 @@
 
 ---
 
-## Fresh Site Assessment (v2) — Overall: **8.0 / 10** ⬆️
+## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
 
 | Category | Score | Status |
 |----------|-------|--------|
 | Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
 | Game Mechanics | 8.0 | ✅ Sell confirmation added |
-| AI Opponent | 8.0 | ✅ Extracted to module |
+| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
 | UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
 | Mobile | 7.5 | ✅ Mini-info bar shows key stats |
-| Multiplayer | 5.0 | TURN server needed |
+| Multiplayer | 6.0 | ✅ TURN server config ready |
 | Onboarding | 7.5 | ✅ Naming fixed |
 | Performance | 8.0 | ✅ Preload extracted |
 | Code Quality | 8.0 | ✅ AI extracted, immutable state |
@@ -39,33 +39,27 @@
 - ✅ Reduced in-game logo size ~30%
 - ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
 
+### P2 Multiplayer
+- ✅ ICE servers now loaded from remote config (supports TURN when added)
+- ✅ Heartbeat/ping-pong already implemented
+- ✅ DisconnectModal with countdown already exists
+
 ### P3 Architecture
 - ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
 - ✅ Fixed syncEngineRules no-op
 - ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
 
+### Visual Polish
+- ✅ AI "thinking" overlay (already implemented in ShipsHold)
+
 ---
 
 ## Remaining Roadmap
 
-### 🟡 P2 — Multiplayer Robustness
-
-#### TURN Server Fallback
-Add `iceServers` config with TURN credentials for NAT traversal.
-
-**Files:** `src/store/multiplayerStore.ts`, `public/config/remote.json`
-
-#### Reconnection UX Improvements
-30-second window with countdown, heartbeat ping/pong.
-
-**Files:** `src/store/multiplayerStore.ts`, `src/components/game/DisconnectModal.tsx`
-
----
-
 ### 🟢 P3 — Architecture
 
 #### Split GameBoard Layouts
-Extract phone/tablet/desktop layouts into separate components to reduce file size.
+Extract phone/tablet/desktop layouts into separate components to reduce 880-line file.
 
 **Files:** `src/components/game/layouts/`
 
@@ -83,7 +77,6 @@ Replace stubs with Google AdSense or similar.
 ## Visual Polish Backlog
 
 - [ ] Parchment theme CSS variables
-- [ ] AI "thinking" overlay animation on opponent's hold
 - [ ] Victory screen treasure chest opening animation
 - [ ] Round-end "Wax Seal" animation
 - [ ] Custom pirate favicon

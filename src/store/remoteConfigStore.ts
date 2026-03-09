@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { Difficulty } from '@/types/game';
 
+export interface IceServer {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+}
+
 export interface RemoteConfig {
   adsEnabled: boolean;
   interstitialFrequency: string;
@@ -8,7 +14,14 @@ export interface RemoteConfig {
   defaultAIDifficulty: Difficulty;
   enabledRules: string[];
   maxPlayers: number;
+  iceServers: IceServer[];
 }
+
+const DEFAULT_ICE_SERVERS: IceServer[] = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
+];
 
 const DEFAULTS: RemoteConfig = {
   adsEnabled: true,
@@ -17,6 +30,7 @@ const DEFAULTS: RemoteConfig = {
   defaultAIDifficulty: 'easy',
   enabledRules: [],
   maxPlayers: 2,
+  iceServers: DEFAULT_ICE_SERVERS,
 };
 
 const POLL_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
@@ -75,6 +89,7 @@ export const useRemoteConfigStore = create<RemoteConfigState>((set, get) => ({
           : DEFAULTS.defaultAIDifficulty,
         enabledRules: Array.isArray(data.enabledRules) ? data.enabledRules : DEFAULTS.enabledRules,
         maxPlayers: typeof data.maxPlayers === 'number' && data.maxPlayers >= 2 ? data.maxPlayers : DEFAULTS.maxPlayers,
+        iceServers: Array.isArray(data.iceServers) ? data.iceServers : DEFAULTS.iceServers,
       };
 
       set({ config: merged, loaded: true, error: null });

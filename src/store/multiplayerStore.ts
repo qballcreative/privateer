@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import Peer, { DataConnection } from 'peerjs';
 import { generateSecureShortCode, sanitizePlayerName } from '@/lib/security';
 import { debugLog } from '@/lib/debugLog';
+import { useRemoteConfigStore } from './remoteConfigStore';
 
 export type MultiplayerState = 'idle' | 'hosting' | 'joining' | 'connected' | 'disconnected' | 'error';
 
@@ -70,18 +71,11 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
   hostGame: async (playerName: string) => {
     return new Promise((resolve, reject) => {
       const shortCode = generateShortCode();
-      // Configure with public STUN/TURN servers for better NAT traversal
+      // Get ICE servers from remote config (supports TURN when configured)
+      const iceServers = useRemoteConfigStore.getState().config.iceServers;
+      
       const peer = new Peer(shortCode, {
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' },
-          ]
-        },
+        config: { iceServers },
         debug: 1, // Log errors only
       });
       
@@ -171,18 +165,11 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
 
   joinGame: async (hostId: string, playerName: string) => {
     return new Promise((resolve, reject) => {
-      // Configure with public STUN/TURN servers for better NAT traversal
+      // Get ICE servers from remote config (supports TURN when configured)
+      const iceServers = useRemoteConfigStore.getState().config.iceServers;
+      
       const peer = new Peer({
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' },
-          ]
-        },
+        config: { iceServers },
         debug: 1, // Log errors only
       });
       
