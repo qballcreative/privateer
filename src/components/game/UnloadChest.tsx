@@ -259,7 +259,7 @@ export const UnloadChest = ({
           {/* Action buttons */}
           <div className="flex items-center gap-2">
             <Button
-              onClick={handleUnload}
+              onClick={() => setShowConfirm(true)}
               disabled={!canUnload}
               className={cn(
                 'game-button',
@@ -282,6 +282,33 @@ export const UnloadChest = ({
               </Button>
             )}
           </div>
+
+          {/* Sell Confirmation Dialog */}
+          <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+            <AlertDialogContent className="max-w-sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-pirate text-primary flex items-center gap-2">
+                  {selectedType && (
+                    <img src={`/Icons/${selectedType}.png`} alt="" className="w-7 h-7 object-contain" />
+                  )}
+                  Sell Cargo?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-foreground/80">
+                  Sell <strong className="text-primary">{selectedCards.length}× {selectedType ? CARGO_LABELS[selectedType] || selectedType : ''}</strong> for{' '}
+                  <strong className="text-primary">{getExpectedValue()} doubloons</strong>
+                  {selectedCards.length >= 3 && (
+                    <span className="block mt-1 text-accent">+ Commission Seal bonus!</span>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleUnload} className="game-button">
+                  Sell Cargo
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Sparkle particles on unload */}
