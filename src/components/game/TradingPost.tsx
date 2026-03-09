@@ -59,6 +59,9 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
       if (card?.type === 'ships') return;
       if (canTakeCard(cardId)) {
         takeCard(cardId);
+      } else {
+        // Trigger invalid action feedback when take fails (e.g., hold is full)
+        onInvalidAction?.();
       }
     } else {
       setSelectedMarketCards((prev) =>
