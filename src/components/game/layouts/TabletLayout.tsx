@@ -62,7 +62,7 @@ export const TabletLayout = ({
       {/* Mini-info bar */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-card/80 border border-border text-xs">
         <div className="flex items-center gap-1.5">
-          <img src="/images/supply.png" alt="Supply" className="w-5 h-5 object-contain" />
+          <img src="/images/supply.webp" alt="Supply" className="w-5 h-5 object-contain" />
           <span className="text-muted-foreground">{deck.length}</span>
         </div>
         <div className="flex items-center gap-1">
