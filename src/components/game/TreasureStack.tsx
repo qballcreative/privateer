@@ -11,12 +11,12 @@ const treasureConfig: Record<GoodsType, {
   image: string; 
   label: string;
 }> = {
-  rum: { image: '/Icons/rum.png', label: 'Rum' },
-  cannonballs: { image: '/Icons/cannonballs.png', label: 'Iron' },
+  rum: { image: '/Icons/rum.webp', label: 'Rum' },
+  cannonballs: { image: '/Icons/cannonballs.webp', label: 'Iron' },
   silks: { image: '/Icons/silks.png', label: 'Silk' },
   silver: { image: '/Icons/silver.png', label: 'Silver' },
-  gold: { image: '/Icons/gold.png', label: 'Gold' },
-  gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
+  gold: { image: '/Icons/gold.webp', label: 'Gold' },
+  gemstones: { image: '/Icons/gemstones.webp', label: 'Gems' },
 };
 
 export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
