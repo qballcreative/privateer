@@ -17,6 +17,12 @@ export interface RemoteConfig {
   iceServers: IceServer[];
 }
 
+const DEFAULT_ICE_SERVERS: IceServer[] = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
+];
+
 const DEFAULTS: RemoteConfig = {
   adsEnabled: true,
   interstitialFrequency: 'round_end:capped=1;cooldown=120s',
@@ -24,6 +30,7 @@ const DEFAULTS: RemoteConfig = {
   defaultAIDifficulty: 'easy',
   enabledRules: [],
   maxPlayers: 2,
+  iceServers: DEFAULT_ICE_SERVERS,
 };
 
 const POLL_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
