@@ -170,9 +170,9 @@ const HowToPlay = () => {
           </p>
           <div className="flex flex-wrap gap-4">
             {[
-              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.png' },
-              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.png' },
-              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.png' },
+              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.webp' },
+              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.webp' },
+              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.webp' },
             ].map((b) => (
               <div key={b.count} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
                 <img src={b.img} alt={b.count} className="w-8 h-8 object-contain" />
