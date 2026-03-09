@@ -550,6 +550,38 @@ export const GameBoard = () => {
             </div>
           </div>
 
+          {/* Mini-info bar — shows key stats without opening drawers */}
+          <div className="flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg bg-card/80 border border-border text-[10px]">
+            {/* Supply deck count */}
+            <div className="flex items-center gap-1">
+              <img src="/images/supply.png" alt="Supply" className="w-4 h-4 object-contain" />
+              <span className="text-muted-foreground">{deck.length}</span>
+            </div>
+            
+            {/* Depleted token stacks indicator */}
+            <div className="flex items-center gap-0.5">
+              {GOODS_ORDER.map((type) => {
+                const isEmpty = tokenStacks[type].length === 0;
+                return (
+                  <div
+                    key={type}
+                    className={cn(
+                      "w-3 h-3 rounded-sm",
+                      isEmpty ? "bg-destructive/40" : "bg-primary/20"
+                    )}
+                    title={`${type}: ${tokenStacks[type].length} left`}
+                  />
+                );
+              })}
+            </div>
+            
+            {/* Opponent fleet count */}
+            <div className="flex items-center gap-1">
+              <img src="/images/fleet.png" alt="Fleet" className="w-4 h-4 object-contain" />
+              <span className="text-accent">{opponentPlayer?.ships.length || 0}</span>
+            </div>
+          </div
+
           {/* Drawer triggers bar */}
           <div className="flex items-center justify-between gap-2">
             {/* Left: Treasure drawer */}
