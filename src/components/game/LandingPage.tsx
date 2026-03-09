@@ -134,7 +134,7 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
       {!hasConsented && <AgeConsentModal />}
-      <InstallPrompt />
+      {/* <InstallPrompt /> */}
 
       {/* Settings — top right */}
       <div className="absolute top-4 right-4 z-20">
