@@ -461,12 +461,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const card = market[cardIndex];
     const player = players[currentPlayerIndex];
 
-    // Check if it's a ship
+    // Create new arrays immutably
+    let newShips = player.ships;
+    let newHand = player.hand;
+
     if (card.type === 'ships') {
-      player.ships.push(card);
+      newShips = [...player.ships, card];
     } else {
       if (player.hand.length >= HAND_LIMIT) return;
-      player.hand.push(card);
+      newHand = [...player.hand, card];
     }
 
     // Remove from market and refill
@@ -476,7 +479,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player };
+    newPlayers[currentPlayerIndex] = { ...player, hand: newHand, ships: newShips };
 
     set({
       market: newMarket,
@@ -499,7 +502,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (ships.length === 0) return;
 
     const player = players[currentPlayerIndex];
-    player.ships.push(...ships);
+    
+    // Create new ships array immutably
+    const newShips = [...player.ships, ...ships];
 
     // Remove ships and refill market
     let newMarket = market.filter((c) => c.type !== 'ships');
@@ -507,7 +512,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     newMarket = [...newMarket, ...deck.slice(0, cardsNeeded)];
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player };
+    newPlayers[currentPlayerIndex] = { ...player, ships: newShips };
 
     set({
       market: newMarket,
@@ -605,34 +610,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const expensive: GoodsType[] = ['gold', 'silver', 'gemstones'];
     if (expensive.includes(type) && cardsToSell.length < MIN_SELL_EXPENSIVE) return;
 
-    // Take tokens
-    const tokens = tokenStacks[type].splice(0, cardsToSell.length);
-    player.tokens.push(...tokens);
+    // Take tokens immutably
+    const tokensToAward = tokenStacks[type].slice(0, cardsToSell.length);
+    const newTokenStack = tokenStacks[type].slice(cardsToSell.length);
+    const newTokenStacks = { ...tokenStacks, [type]: newTokenStack };
 
-    // Award bonus token
+    // Build new player tokens
+    const newPlayerTokens = [...player.tokens, ...tokensToAward];
+
+    // Award bonus token immutably
     let bonus: BonusToken | undefined;
+    let newBonusTokens = { ...bonusTokens };
+    
     if (cardsToSell.length >= 5 && bonusTokens.five.length > 0) {
-      bonus = bonusTokens.five.shift();
+      bonus = bonusTokens.five[0];
+      newBonusTokens = { ...newBonusTokens, five: bonusTokens.five.slice(1) };
     } else if (cardsToSell.length === 4 && bonusTokens.four.length > 0) {
-      bonus = bonusTokens.four.shift();
+      bonus = bonusTokens.four[0];
+      newBonusTokens = { ...newBonusTokens, four: bonusTokens.four.slice(1) };
     } else if (cardsToSell.length === 3 && bonusTokens.three.length > 0) {
-      bonus = bonusTokens.three.shift();
+      bonus = bonusTokens.three[0];
+      newBonusTokens = { ...newBonusTokens, three: bonusTokens.three.slice(1) };
     }
-    if (bonus) player.bonusTokens.push(bonus);
+    
+    const newPlayerBonusTokens = bonus 
+      ? [...player.bonusTokens, bonus] 
+      : player.bonusTokens;
 
     // Remove cards from hand
     const newHand = player.hand.filter((c) => !cardIds.includes(c.id));
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player, hand: newHand };
+    newPlayers[currentPlayerIndex] = { 
+      ...player, 
+      hand: newHand, 
+      tokens: newPlayerTokens, 
+      bonusTokens: newPlayerBonusTokens,
+    };
 
-    const tokensValue = tokens.reduce((sum, t) => sum + t.value, 0);
+    const tokensValue = tokensToAward.reduce((sum, t) => sum + t.value, 0);
     const bonusValue = bonus?.value || 0;
 
     set({
       players: newPlayers,
-      tokenStacks: { ...tokenStacks },
-      bonusTokens: { ...bonusTokens },
+      tokenStacks: newTokenStacks,
+      bonusTokens: newBonusTokens,
       lastAction: {
         type: 'sell',
         playerName: player.name,
