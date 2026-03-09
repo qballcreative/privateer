@@ -31,6 +31,7 @@ interface MultiplayerStore {
   joinGame: (hostId: string, playerName: string) => Promise<void>;
   reconnect: (gameCode: string, playerName: string) => Promise<void>;
   sendMessage: (message: GameMessage) => void;
+  sendForfeit: () => void;
   sendPing: () => void;
   startHeartbeat: () => void;
   stopHeartbeat: () => void;
@@ -270,6 +271,15 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
     if (connection) {
       connection.send(message);
     }
+  },
+
+  sendForfeit: () => {
+    const { connection } = get();
+    if (connection && connection.open) {
+      connection.send({ type: 'action', payload: { action: 'forfeit' } });
+    }
+    // Small delay to let message send before disconnecting
+    setTimeout(() => get().disconnect(), 100);
   },
 
   sendPing: () => {

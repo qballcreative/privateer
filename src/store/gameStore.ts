@@ -212,6 +212,7 @@ interface GameStore extends GameState {
   nextRound: () => void;
   resetGame: () => void;
   restartGame: () => void;
+  claimVictory: (winnerIndex: number) => void;
   
   // AI
   makeAIMove: () => void;
@@ -888,6 +889,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hiddenTreasures: [],
       isMultiplayer: false,
       firstPlayer: 'host',
+    });
+  },
+
+  claimVictory: (winnerIndex: number) => {
+    const { roundWins, round, players } = get();
+    const newRoundWins = [...roundWins];
+    // Award enough round wins for the winner to clinch the game
+    newRoundWins[winnerIndex] = Math.max(newRoundWins[winnerIndex], 2);
+    const newRoundWinners = [...(get().roundWinners || [])];
+    // Fill remaining rounds as won by the claimer
+    while (newRoundWinners.length < round) {
+      newRoundWinners.push(players[winnerIndex]?.id || null);
+    }
+    set({
+      phase: 'gameEnd',
+      roundWins: newRoundWins,
+      roundWinners: newRoundWinners,
     });
   },
 

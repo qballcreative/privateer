@@ -33,7 +33,7 @@ export const GameBoard = () => {
   const [ready, setReady] = useState(false);
   const { 
     players, currentPlayerIndex, tokenStacks, bonusTokens,
-    phase, lastAction, nextRound, resetGame, restartGame,
+    phase, lastAction, nextRound, resetGame, restartGame, claimVictory,
     getRoundWinner, getWinner, round, optionalRules, turnCount,
     canUsePirateRaid, pirateRaid, hiddenTreasures,
     isMultiplayer, applyGameState, getSerializableState, deck,
@@ -42,7 +42,7 @@ export const GameBoard = () => {
   const { actionNotificationDuration, musicEnabled, hasSeenMusicHint, setHasSeenMusicHint } = useSettingsStore();
   const { recordGameResult } = usePlayerStore();
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
-  const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
+  const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect, sendForfeit } = useMultiplayerStore();
   const isMobile = useIsMobile();
   const { hasSeenTutorial, start: startTutorial, isActive: isTutorialActive } = useTutorialStore();
 
@@ -59,6 +59,7 @@ export const GameBoard = () => {
   const isDeckLow = phase === 'playing' && deck.length <= 10;
   const creakRef = useRef<HTMLAudioElement | null>(null);
   const [roundFlourish, setRoundFlourish] = useState(false);
+  const [opponentForfeited, setOpponentForfeited] = useState(false);
 
   const currentPlayer = players[currentPlayerIndex];
   const localPlayerIndex = isMultiplayer ? 0 : players.findIndex((p) => !p.isAI);
@@ -186,15 +187,29 @@ export const GameBoard = () => {
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
+  // Handle multiplayer messages including forfeit
   useEffect(() => {
     if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
       const unsubscribe = registerMessageHandler((message) => {
         if (message.type === 'game-state') applyGameState((message.payload as any).gameState, true);
         else if (message.type === 'next-round') nextRound();
+        else if (message.type === 'action' && (message.payload as any)?.action === 'forfeit') {
+          setOpponentForfeited(true);
+        }
       });
       return unsubscribe;
     }
   }, [isMultiplayer, phase, applyGameState, registerMessageHandler, nextRound]);
+
+  // Send forfeit on tab close during multiplayer
+  useEffect(() => {
+    if (!isMultiplayer || phase === 'lobby' || phase === 'gameEnd') return;
+    const handleBeforeUnload = () => {
+      sendForfeit();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isMultiplayer, phase, sendForfeit]);
 
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
@@ -315,7 +330,11 @@ export const GameBoard = () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Continue Playing</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => { if (!isMultiplayer && phase === 'playing') recordGameResult(false); resetGame(); }} className="bg-destructive hover:bg-destructive/90">
+                  <AlertDialogAction onClick={() => {
+                    if (isMultiplayer) { sendForfeit(); }
+                    else if (phase === 'playing') { recordGameResult(false); }
+                    resetGame();
+                  }} className="bg-destructive hover:bg-destructive/90">
                     Return to Port
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -357,8 +376,9 @@ export const GameBoard = () => {
 
         <DisconnectModal isMultiplayer={isMultiplayer} multiplayerState={multiplayerState} phase={phase}
           isHost={isHost} peerId={peerId} hostId={hostId} localPlayerName={localPlayer?.name || 'Player'}
+          localPlayerIndex={localPlayerIndex} opponentForfeited={opponentForfeited}
           onPlaySound={playSound} onRecordGameResult={recordGameResult} onResetMultiplayer={resetMultiplayer}
-          onResetGame={resetGame} onReconnect={reconnect} />
+          onResetGame={resetGame} onClaimVictory={claimVictory} onReconnect={reconnect} />
 
         <RoundEndModal phase={phase} round={round} players={players} roundWinner={getRoundWinner()}
           optionalRules={optionalRules} hiddenTreasures={hiddenTreasures} isMultiplayer={isMultiplayer} isHost={isHost}

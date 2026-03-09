@@ -12,10 +12,13 @@ interface DisconnectModalProps {
   peerId: string | null;
   hostId: string | null;
   localPlayerName: string;
+  localPlayerIndex: number;
+  opponentForfeited?: boolean;
   onPlaySound: (sound: string) => void;
   onRecordGameResult: (won: boolean) => void;
   onResetMultiplayer: () => void;
   onResetGame: () => void;
+  onClaimVictory: (winnerIndex: number) => void;
   onReconnect: (code: string, name: string) => Promise<void>;
 }
 
@@ -27,10 +30,13 @@ export const DisconnectModal = ({
   peerId,
   hostId,
   localPlayerName,
+  localPlayerIndex,
+  opponentForfeited = false,
   onPlaySound,
   onRecordGameResult,
   onResetMultiplayer,
   onResetGame,
+  onClaimVictory,
   onReconnect,
 }: DisconnectModalProps) => {
   const [showModal, setShowModal] = useState(false);
@@ -38,8 +44,10 @@ export const DisconnectModal = ({
   const [isReconnecting, setIsReconnecting] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Show modal on disconnect during playing or roundEnd phases
   useEffect(() => {
-    if (isMultiplayer && multiplayerState === 'disconnected' && phase === 'playing') {
+    const activePhase = phase === 'playing' || phase === 'roundEnd';
+    if (isMultiplayer && multiplayerState === 'disconnected' && activePhase) {
       setShowModal(true);
       setDisconnectTimer(0);
       timerRef.current = setInterval(() => {
@@ -60,12 +68,20 @@ export const DisconnectModal = ({
     };
   }, [isMultiplayer, multiplayerState, phase]);
 
+  // Instant victory on opponent forfeit
+  useEffect(() => {
+    if (opponentForfeited) {
+      setShowModal(true);
+      setDisconnectTimer(30); // Skip wait — instant claim available
+    }
+  }, [opponentForfeited]);
+
   const handleClaimVictory = () => {
     onPlaySound('game-win');
     onRecordGameResult(true);
+    onClaimVictory(localPlayerIndex);
     setShowModal(false);
     onResetMultiplayer();
-    onResetGame();
   };
 
   const handleReturnToLobby = () => {
@@ -113,21 +129,25 @@ export const DisconnectModal = ({
           >
             <WifiOff className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
             <h2 className="font-pirate text-xl sm:text-2xl text-destructive mb-2">
-              {!isHost ? 'Host Disconnected' : 'Connection Lost'}
+              {opponentForfeited ? 'Opponent Surrendered!' : !isHost ? 'Host Disconnected' : 'Connection Lost'}
             </h2>
             <p className="text-muted-foreground mb-4 text-sm">
-              {!isHost ? 'The host has lost connection.' : 'Your opponent has disconnected.'}
+              {opponentForfeited
+                ? 'Your opponent has abandoned the voyage.'
+                : !isHost ? 'The host has lost connection.' : 'Your opponent has disconnected.'}
             </p>
 
-            <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
-              <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
-              <p className="font-pirate text-2xl text-foreground">{timerDisplay}</p>
-              {disconnectTimer < 30 && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Claim victory in {30 - disconnectTimer}s
-                </p>
-              )}
-            </div>
+            {!opponentForfeited && (
+              <div className="mb-6 p-3 rounded-lg bg-muted/50 border border-border">
+                <p className="text-sm text-muted-foreground mb-1">Time disconnected</p>
+                <p className="font-pirate text-2xl text-foreground">{timerDisplay}</p>
+                {disconnectTimer < 30 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Claim victory in {30 - disconnectTimer}s
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-3">
               {disconnectTimer >= 30 && (
@@ -137,36 +157,40 @@ export const DisconnectModal = ({
                 </Button>
               )}
 
-              {!isHost ? (
-                <Button
-                  variant={disconnectTimer >= 30 ? 'outline' : 'default'}
-                  className={cn('w-full', disconnectTimer < 30 && 'game-button')}
-                  disabled
-                >
-                  <WifiOff className="w-5 h-5 mr-2" />
-                  Waiting for Host...
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleReconnect}
-                  disabled={isReconnecting}
-                  variant={disconnectTimer >= 30 ? 'outline' : 'default'}
-                  className={cn('w-full', disconnectTimer < 30 && 'game-button')}
-                >
-                  {isReconnecting ? (
-                    <>
-                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
-                        <RotateCcw className="w-5 h-5 mr-2" />
-                      </motion.div>
-                      Reconnecting...
-                    </>
+              {!opponentForfeited && (
+                <>
+                  {!isHost ? (
+                    <Button
+                      variant={disconnectTimer >= 30 ? 'outline' : 'default'}
+                      className={cn('w-full', disconnectTimer < 30 && 'game-button')}
+                      disabled
+                    >
+                      <WifiOff className="w-5 h-5 mr-2" />
+                      Waiting for Host...
+                    </Button>
                   ) : (
-                    <>
-                      <RotateCcw className="w-5 h-5 mr-2" />
-                      Wait for Reconnect
-                    </>
+                    <Button
+                      onClick={handleReconnect}
+                      disabled={isReconnecting}
+                      variant={disconnectTimer >= 30 ? 'outline' : 'default'}
+                      className={cn('w-full', disconnectTimer < 30 && 'game-button')}
+                    >
+                      {isReconnecting ? (
+                        <>
+                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
+                            <RotateCcw className="w-5 h-5 mr-2" />
+                          </motion.div>
+                          Reconnecting...
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="w-5 h-5 mr-2" />
+                          Wait for Reconnect
+                        </>
+                      )}
+                    </Button>
                   )}
-                </Button>
+                </>
               )}
 
               <Button variant="ghost" onClick={handleReturnToLobby} className="w-full text-muted-foreground">
