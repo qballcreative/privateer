@@ -148,7 +148,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Icons/Claim.png" alt="Claim" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
+            <img src="/Icons/Claim.webp" alt="Claim" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Claim Cargo
           </Button>
           <Button
@@ -157,7 +157,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Icons/Trade.png" alt="Trade" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
+            <img src="/Icons/Trade.webp" alt="Trade" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Trade Goods
           </Button>
         </div>
@@ -170,7 +170,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
         isPhone ? "p-3" : "p-6"
       )}
         style={{
-          backgroundImage: `url('/images/trading-post-bg.png')`,
+          backgroundImage: `url('/images/trading-post-bg.webp')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -191,7 +191,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
           "flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1 bg-card rounded-full border border-border shadow-md z-10",
           isPhone ? "mb-2 w-fit mx-auto" : "absolute -top-3 right-4"
         )}>
-          <img src="/images/supply.png" alt="Supply" className="w-5 h-5 sm:w-6 sm:h-6 object-contain -my-1" />
+          <img src="/images/supply.webp" alt="Supply" className="w-5 h-5 sm:w-6 sm:h-6 object-contain -my-1" />
           <span className="text-muted-foreground">Supply:</span>
           <span className="font-bold text-foreground">{deck.length}</span>
         </div>
@@ -269,7 +269,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             >
               {/* Fleet image — overflows above the pill */}
               <motion.img
-                src="/images/fleet.png"
+                src="/images/fleet.webp"
                 alt="Fleet"
                 className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_4px_12px_hsl(var(--accent)/0.5)] group-hover:drop-shadow-[0_6px_20px_hsl(var(--accent)/0.7)] transition-all duration-300 -mb-3"
                 animate={{ y: [0, -4, 0] }}

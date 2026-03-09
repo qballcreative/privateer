@@ -1,12 +1,12 @@
 // Shared preload images used by LandingPage and GameBoard
 export const PRELOAD_IMAGES = [
-  '/images/doubloons.png', '/images/commissions.png', '/images/fleet.png',
-  '/images/supply.png', '/images/ledger-bg.png', '/images/trading-post-bg.png',
-  '/images/cargo-hold-bg.png', '/images/wood-bg.png',
-  '/Icons/Doubloon.png', '/Icons/rum.png', '/Icons/cannonballs.png',
-  '/Icons/silks.png', '/Icons/silver.png', '/Icons/gold.png', '/Icons/gemstones.png',
-  '/Icons/RedSeal.png', '/Icons/SilverSeal.png', '/Icons/GoldSeal.png',
-  '/Icons/Claim.png', '/Icons/Trade.png',
+  '/images/doubloons.webp', '/images/commissions.webp', '/images/fleet.webp',
+  '/images/supply.webp', '/images/ledger-bg.webp', '/images/trading-post-bg.webp',
+  '/images/cargo-hold-bg.webp', '/images/wood-bg.webp',
+  '/Icons/Doubloon.webp', '/Icons/rum.webp', '/Icons/cannonballs.webp',
+  '/Icons/silks.webp', '/Icons/silver.webp', '/Icons/gold.webp', '/Icons/gemstones.webp',
+  '/Icons/RedSeal.webp', '/Icons/SilverSeal.webp', '/Icons/GoldSeal.webp',
+  '/Icons/Claim.webp', '/Icons/Trade.webp',
 ];
 
 // Preload images when this module is imported
