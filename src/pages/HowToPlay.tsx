@@ -207,7 +207,7 @@ const HowToPlay = () => {
           </p>
           <div className="space-y-4">
             <ActionCard
-              icon={<img src="/Icons/Storm.png" alt="Storm" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Storm.webp" alt="Storm" className="w-8 h-8 object-contain" />}
               title="Storm Rule"
               desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Trading Post supply. Keep your strategy flexible — the market can shift without warning."
             />
