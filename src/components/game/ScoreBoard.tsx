@@ -111,7 +111,7 @@ export const ScoreBoard = memo(() => {
               <div className="mt-2 pt-2 border-t border-white/20">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-foreground/70 flex items-center gap-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
-                    <img src="/images/doubloons.png" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
+                    <img src="/images/doubloons.webp" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
                     Total
                   </span>
                   <span className={cn(
