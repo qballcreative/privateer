@@ -756,6 +756,7 @@ export const GameBoard = () => {
                   isCurrentPlayer={currentPlayerIndex === opponentIndex}
                   isOpponent
                   isRaidMode={isRaidMode && currentPlayerIndex === localPlayerIndex}
+                  isPondering={isOpponentPondering}
                   onRaidCard={handlePirateRaid}
                   layout="desktop"
                 />
