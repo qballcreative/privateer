@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { Difficulty } from '@/types/game';
 
+export interface IceServer {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+}
+
 export interface RemoteConfig {
   adsEnabled: boolean;
   interstitialFrequency: string;
@@ -8,6 +14,7 @@ export interface RemoteConfig {
   defaultAIDifficulty: Difficulty;
   enabledRules: string[];
   maxPlayers: number;
+  iceServers: IceServer[];
 }
 
 const DEFAULTS: RemoteConfig = {
