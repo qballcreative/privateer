@@ -146,7 +146,7 @@ const HowToPlay = () => {
               { name: 'Gold', values: '6, 6, 5, 5, 5', color: 'text-yellow-400', img: goldTokens },
               { name: 'Silver', values: '5, 5, 5, 5, 5', color: 'text-gray-300', img: silverTokens },
               { name: 'Silk', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-pink-400', img: silkTokens },
-              { name: 'Iron', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400', img: ironTokens },
+              { name: 'Cannonballs', values: '5, 3, 3, 2, 2, 1, 1', color: 'text-slate-400', img: ironTokens },
               { name: 'Rum', values: '4, 3, 2, 1, 1, 1, 1, 1, 1', color: 'text-amber-500', img: rumTokens },
             ].map((g) => (
               <div key={g.name} className="bg-muted/50 rounded-lg p-2 flex items-center gap-2">
