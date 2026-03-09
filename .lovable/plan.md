@@ -84,17 +84,18 @@ Add `iceServers` config with TURN credentials for NAT traversal.
 
 ### 🟢 P3 — Architecture
 
-#### 9. Extract AI Logic
-Move 450+ lines of AI code from gameStore to dedicated module.
+#### 9. Extract AI Logic ✅ DONE
+Moved ~300 lines of AI code to `src/lib/aiPlayer.ts`. gameStore now calls `computeAIMove()`.
 
-**Files:** New `src/lib/aiPlayer.ts`, `src/store/gameStore.ts`
+#### 10. Fix syncEngineRules No-op ✅ DONE
+Removed the empty for-loop body that did nothing.
 
-#### 10. Split GameBoard Layouts
+#### 11. Split GameBoard Layouts
 Extract phone/tablet/desktop layouts into separate components.
 
 **Files:** `src/components/game/layouts/`
 
-#### 11. Fix Mutable State Patterns
+#### 12. Fix Mutable State Patterns
 `sellCards` and `takeCard` mutate player arrays directly before spreading.
 
 **File:** `src/store/gameStore.ts`
