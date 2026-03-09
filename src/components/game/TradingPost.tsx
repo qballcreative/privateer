@@ -148,7 +148,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             }}
             className={cn(mode === 'take' && 'game-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Icons/claim.webpp" alt="Claim" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
+            <img src="/Icons/claim.webppp" alt="Claim" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Claim Cargo
           </Button>
           <Button
@@ -157,7 +157,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             onClick={() => { setMode('exchange'); onModeChange?.(true); }}
             className={cn(mode === 'exchange' && 'ocean-button', 'text-xs sm:text-sm px-3 sm:px-4')}
           >
-            <img src="/Iconstrade.webpg" alt="Trade" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
+            <img src="/Icontrade.webpbpg" alt="Trade" className="w-5 h-5 sm:w-6 sm:h-6 mr-1 object-contain" />
             Trade Goods
           </Button>
         </div>
@@ -170,7 +170,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
         isPhone ? "p-3" : "p-6"
       )}
         style={{
-          backgroundImage: `url('/images/trading-post-bg.png')`,
+          backgroundImage: `url('/images/trading-post-bwebpng')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
