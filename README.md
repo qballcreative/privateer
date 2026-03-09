@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome Privateer: Letters of Marque
 
 ## Project info
 
