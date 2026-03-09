@@ -372,8 +372,9 @@ export const GameBoard = () => {
 
         <DisconnectModal isMultiplayer={isMultiplayer} multiplayerState={multiplayerState} phase={phase}
           isHost={isHost} peerId={peerId} hostId={hostId} localPlayerName={localPlayer?.name || 'Player'}
+          localPlayerIndex={localPlayerIndex} opponentForfeited={opponentForfeited}
           onPlaySound={playSound} onRecordGameResult={recordGameResult} onResetMultiplayer={resetMultiplayer}
-          onResetGame={resetGame} onReconnect={reconnect} />
+          onResetGame={resetGame} onClaimVictory={claimVictory} onReconnect={reconnect} />
 
         <RoundEndModal phase={phase} round={round} players={players} roundWinner={getRoundWinner()}
           optionalRules={optionalRules} hiddenTreasures={hiddenTreasures} isMultiplayer={isMultiplayer} isHost={isHost}
