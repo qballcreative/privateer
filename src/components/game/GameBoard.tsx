@@ -331,7 +331,17 @@ export const GameBoard = () => {
     playSound('error');
   }, [playSound]);
 
-  // Track previous multiplayer state for reconnection sync
+  // Auto-start tutorial on first game (with a brief delay so the board renders first)
+  const hasStartedTutorialRef = useRef(false);
+  useEffect(() => {
+    if (!hasSeenTutorial && !isTutorialActive && !hasStartedTutorialRef.current && phase === 'playing') {
+      hasStartedTutorialRef.current = true;
+      const timer = setTimeout(() => startTutorial(), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTutorial, isTutorialActive, phase, startTutorial]);
+
+
   const prevMultiplayerStateRef = useRef(multiplayerState);
 
   // Host: Send game state to reconnecting guest
