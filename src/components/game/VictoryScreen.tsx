@@ -112,9 +112,31 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
           )}
 
           {/* Treasure chest animation */}
-          <div className="relative z-10">
-            <TreasureChest isVictory={isPlayerVictory} />
-          </div>
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="relative z-10 mx-auto mb-3"
+          >
+            {isPlayerVictory ? (
+              <video
+                src="/videos/victory.mov"
+                autoPlay
+                muted
+                playsInline
+                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-lg object-cover"
+                onEnded={(e) => {
+                  const v = e.currentTarget;
+                  v.currentTime = Math.max(0, v.duration - 0.01);
+                  v.pause();
+                }}
+              />
+            ) : (
+              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto flex items-center justify-center rounded-lg bg-muted/30">
+                <Anchor className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground" />
+              </div>
+            )}
+          </motion.div>
 
           {/* Title */}
           <motion.div
