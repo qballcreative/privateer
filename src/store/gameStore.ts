@@ -212,6 +212,7 @@ interface GameStore extends GameState {
   nextRound: () => void;
   resetGame: () => void;
   restartGame: () => void;
+  claimVictory: (winnerIndex: number) => void;
   
   // AI
   makeAIMove: () => void;
