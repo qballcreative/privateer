@@ -305,19 +305,8 @@ export const SettingsPanel = () => {
                       </div>
                     </div>
 
-                    {/* Remove Ads toggle (13+ only) */}
-                    {adsEnabled && (
-                      <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                        <div>
-                          <Label className="text-sm font-medium">Remove Ads</Label>
-                          <p className="text-xs text-muted-foreground mt-0.5">Disable all ad surfaces</p>
-                        </div>
-                        <Switch
-                          checked={paidAdFree}
-                          onCheckedChange={setPaidAdFree}
-                        />
-                      </div>
-                    )}
+                    {/* Remove Ads — mobile/tablet IAP */}
+                    <RemoveAdsButton />
                   </div>
                 )}
 

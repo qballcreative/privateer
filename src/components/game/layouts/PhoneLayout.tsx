@@ -165,6 +165,11 @@ export const PhoneLayout = ({
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Fixed bottom ad banner */}
+    <AdBottomBanner />
+    {/* Spacer so content isn't hidden behind the fixed banner */}
+    <div className="h-[50px]" />
   </div>
   );
 };

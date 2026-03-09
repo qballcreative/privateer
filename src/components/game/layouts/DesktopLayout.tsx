@@ -54,6 +54,7 @@ export const DesktopLayout = ({
           />
         )}
         <ScoreBoard />
+        <AdSidebar />
       </aside>
     </div>
   </div>
