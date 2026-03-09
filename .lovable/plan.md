@@ -1,86 +1,79 @@
-# Privateer: Letters of Marque — Implementation Plan
 
-> Last updated: 2026-03-09
 
----
+## Plan: Platform-Aware Ads + Video Interstitial Between Matches
 
-## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
+### Clarification of Requirements
 
-| Category | Score | Status |
-|----------|-------|--------|
-| Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
-| Game Mechanics | 8.0 | ✅ Sell confirmation added |
-| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
-| UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
-| Mobile | 7.5 | ✅ Mini-info bar shows key stats |
-| Multiplayer | 6.0 | ✅ TURN server config ready |
-| Onboarding | 7.5 | ✅ Naming fixed |
-| Performance | 8.0 | ✅ Preload extracted |
-| Code Quality | 8.0 | ✅ AI extracted, immutable state |
-| Monetization | 6.0 | Ad space reserved |
+1. **Website (web browser)**: All ads always shown, no option to remove. Same as current desktop behavior, but extended to all web visitors regardless of screen size.
+2. **Native app (Capacitor)**: Ads shown by default, with IAP to remove. Current mobile behavior is correct for this.
+3. **Video ad between matches**: A new video interstitial that plays between rounds (replaces or supplements the current static interstitial).
 
----
+### Changes
 
-## ✅ Completed
+#### 1. Update platform detection in consent store
 
-### Quick Wins
-- Copyright year → 2026
-- "Iron" → "Cannonballs" in HowToPlay
-- Invalid action feedback wired to TradingPost
-- Preload images extracted to shared module
+**File: `src/store/consentStore.ts`**
 
-### P0 Bugs
-- ✅ AI first-move bug fixed
-- ✅ Next-round first player (already implemented correctly)
-- ✅ Restart preserves firstPlayer (already implemented)
+Current logic uses `window.innerWidth >= 1024` to determine desktop. This needs to change:
+- **`canRemoveAds()`**: Should return `true` only when running inside Capacitor (`platform.isNative`), not based on screen size. Web users of any size cannot remove ads.
+- **`shouldShowAds()`**: On web (`!platform.isNative`), always show ads (no paid removal). On native app, respect `paidAdFree`.
+- **`shouldShowRewarded()`**: Same platform-based logic.
 
-### P1 UX
-- ✅ Sell confirmation dialog with doubloon preview
-- ✅ Reduced in-game logo size ~30%
-- ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
+Import `platform` from `@/lib/platform` and replace all `isDesktop()` checks with `platform.isNative` checks.
 
-### P2 Multiplayer
-- ✅ ICE servers now loaded from remote config (supports TURN when added)
-- ✅ Heartbeat/ping-pong already implemented
-- ✅ DisconnectModal with countdown already exists
+#### 2. Update InterstitialAd to show on all platforms + add video format
 
-### P3 Architecture
-- ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
-- ✅ Fixed syncEngineRules no-op
-- ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
+**File: `src/components/game/InterstitialAd.tsx`**
 
-### Visual Polish
-- ✅ AI "thinking" overlay (already implemented in ShipsHold)
+- Remove the desktop skip (`window.innerWidth >= 1024` check). Interstitials should show on all platforms.
+- On web (non-native), skip the "Remove Ads" nudge since web users can't remove ads.
+- Add a video ad variant: alternate between static and video interstitials, or always show video between rounds.
+- Video placeholder: a `<video>` element with a placeholder source, a countdown timer (e.g., "Skip in 5s"), and a skip button that appears after the countdown.
+- The video ad is more intrusive than the static one, making the IAP more appealing on mobile.
 
----
+#### 3. New VideoInterstitialAd component
 
-## Remaining Roadmap
+**New file: `src/components/game/VideoInterstitialAd.tsx`**
 
-### 🟢 P3 — Architecture
+- Full-screen overlay with a video player placeholder.
+- Shows "Advertisement" label, a countdown timer ("You can skip in Xs"), and a skip button after countdown.
+- On native: shows "Remove Ads" nudge after closing.
+- On web: no remove option, just closes.
+- Triggered at round-end, alternating with or replacing the static interstitial.
 
-#### ✅ Split GameBoard Layouts
-Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
+#### 4. Update GameBoard to use video interstitial
 
----
+**File: `src/components/game/GameBoard.tsx`**
 
-### 🔵 P4 — Monetization
+- Replace or augment the `InterstitialAd` usage to include the video variant.
+- Pass `phase === 'roundEnd'` trigger to the new video component.
 
-#### Real Ad SDK Integration
-Replace stubs with Google AdSense or similar.
+#### 5. Update remote config
 
-**Files:** `src/lib/adProvider.ts`, ad components
+**File: `public/config/remote.json`**
+
+- Add `videoInterstitialEnabled: true` flag for remote control.
+
+#### 6. Update RemoveAdsButton visibility
+
+**File: `src/components/game/RemoveAdsButton.tsx`**
+
+- Already uses `canRemoveAds()` which will now be platform-based. No code changes needed — it will automatically hide on web and show only in the native app.
+
+#### 7. Update AdSidebar / AdBottomBanner
+
+These components already use `shouldShowAds()` which will now always return true on web. The sidebar ad stays on desktop-sized web, bottom banner stays on mobile-sized web. Both are non-removable on web. On native app, they respect `paidAdFree`. No changes needed to these components.
 
 ---
 
-## Visual Polish Backlog
+### Files Summary
 
-- [x] Parchment theme CSS variables (already implemented)
-- [x] Custom pirate favicon (skull & crossbones with coins)
-- [x] Victory screen treasure chest opening animation (already implemented)
-- [x] Round-end "Wax Seal" animation (already implemented)
+| File | Action |
+|------|--------|
+| `src/store/consentStore.ts` | Replace `isDesktop()` with `platform.isNative` checks |
+| `src/components/game/VideoInterstitialAd.tsx` | New — video ad with skip countdown |
+| `src/components/game/InterstitialAd.tsx` | Remove desktop skip, show on all platforms |
+| `src/components/game/GameBoard.tsx` | Add VideoInterstitialAd at round-end |
+| `public/config/remote.json` | Add `videoInterstitialEnabled` flag |
+| `src/store/remoteConfigStore.ts` | Add `videoInterstitialEnabled` to config type |
 
----
-
-## ✅ Plan Complete
-
-All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.
