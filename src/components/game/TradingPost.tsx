@@ -131,8 +131,6 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
     <div data-tutorial-id="tutorial-trading-post" className="space-y-3 sm:space-y-4">
       {/* Mode Toggle — always render during tutorial for highlight, otherwise only when it's the player's turn */}
       {(() => {
-        const tutorialIsActive = useTutorialStore((s) => s.isActive);
-        const tutorialStep = useTutorialStore((s) => s.currentStep);
         const tutorialNeedsActions = tutorialIsActive && TUTORIAL_STEPS[tutorialStep]?.highlightId === 'tutorial-actions';
         const showActions = (isPlayerTurn && phase === 'playing') || tutorialNeedsActions;
         if (!showActions) return null;
