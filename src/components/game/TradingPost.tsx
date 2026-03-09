@@ -43,6 +43,9 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
     lastAction,
   } = useGameStore();
   
+  const tutorialIsActive = useTutorialStore((s) => s.isActive);
+  const tutorialStep = useTutorialStore((s) => s.currentStep);
+  
   const [selectedMarketCards, setSelectedMarketCards] = useState<string[]>([]);
   const [selectedHandCards, setSelectedHandCards] = useState<string[]>([]);
   const [mode, setMode] = useState<'take' | 'exchange'>('take');
@@ -128,8 +131,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
     <div data-tutorial-id="tutorial-trading-post" className="space-y-3 sm:space-y-4">
       {/* Mode Toggle — always render during tutorial for highlight, otherwise only when it's the player's turn */}
       {(() => {
-        const tutorialState = useTutorialStore.getState();
-        const tutorialNeedsActions = tutorialState.isActive && TUTORIAL_STEPS[tutorialState.currentStep]?.highlightId === 'tutorial-actions';
+        const tutorialNeedsActions = tutorialIsActive && TUTORIAL_STEPS[tutorialStep]?.highlightId === 'tutorial-actions';
         const showActions = (isPlayerTurn && phase === 'playing') || tutorialNeedsActions;
         if (!showActions) return null;
         const isDimmed = tutorialNeedsActions && !(isPlayerTurn && phase === 'playing');
