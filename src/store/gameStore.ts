@@ -273,6 +273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hiddenTreasures: [],
   isMultiplayer: false,
   roundWinners: [],
+  firstPlayer: 'host',
 
   startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = 'host') => {
     const deck = createDeck();
