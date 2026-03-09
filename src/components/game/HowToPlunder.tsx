@@ -52,7 +52,7 @@ export const HowToPlunder = () => {
 
               {/* Icon image */}
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-3">
-                <img src={step.img} alt={step.title} className="w-14 h-14 object-contain" />
+                <img src={step.img} alt={step.title} className="w-14 h-14 object-contain" width={56} height={56} loading="lazy" decoding="async" />
               </div>
 
               <h3 className="font-serif text-xl font-bold text-primary mb-2">{step.title}</h3>
