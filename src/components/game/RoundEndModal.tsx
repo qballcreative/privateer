@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Anchor, Gift, RotateCcw } from 'lucide-react';
+import { Gift, RotateCcw } from 'lucide-react';
 import { Player, HiddenTreasure } from '@/types/game';
 import { calculateScore, useGameStore } from '@/store/gameStore';
 import { getScoreBreakdown } from '@/lib/scoring';
@@ -17,6 +17,92 @@ interface RoundEndModalProps {
   onNextRound: () => void;
 }
 
+/** Animated wax seal that stamps onto the modal */
+const WaxSeal = ({ round, isWinner }: { round: number; isWinner: boolean }) => {
+  // Choose seal based on round
+  const sealSrc = round === 3 
+    ? '/Icons/GoldSeal.png' 
+    : round === 2 
+      ? '/Icons/SilverSeal.png' 
+      : '/Icons/RedSeal.png';
+
+  return (
+    <motion.div
+      className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4"
+      initial={{ scale: 3, rotate: -45, opacity: 0, y: -100 }}
+      animate={{ 
+        scale: [3, 0.9, 1.05, 1], 
+        rotate: [-45, 5, -3, 0], 
+        opacity: 1, 
+        y: 0 
+      }}
+      transition={{ 
+        duration: 0.6, 
+        times: [0, 0.6, 0.8, 1],
+        ease: 'easeOut',
+        delay: 0.2
+      }}
+    >
+      {/* Shadow that appears on impact */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, hsl(0, 0%, 0% / 0.3) 0%, transparent 70%)',
+          filter: 'blur(8px)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1.2, opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.2 }}
+      />
+      
+      {/* Main seal image */}
+      <motion.img
+        src={sealSrc}
+        alt="Wax seal"
+        className="w-full h-full object-contain relative z-10 drop-shadow-lg"
+        initial={{ filter: 'brightness(1.5)' }}
+        animate={{ filter: 'brightness(1)' }}
+        transition={{ delay: 0.5, duration: 0.3 }}
+      />
+
+      {/* Impact flash */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: isWinner 
+            ? 'radial-gradient(circle, hsl(var(--primary) / 0.6) 0%, transparent 60%)'
+            : 'radial-gradient(circle, hsl(var(--muted-foreground) / 0.4) 0%, transparent 60%)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: [0, 2, 2.5], opacity: [0, 0.8, 0] }}
+        transition={{ delay: 0.45, duration: 0.5 }}
+      />
+
+      {/* Ribbon beneath seal */}
+      <motion.div
+        className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
+        initial={{ scaleY: 0, opacity: 0 }}
+        animate={{ scaleY: 1, opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.3 }}
+      >
+        <div 
+          className="w-3 h-8 rounded-b-sm origin-top"
+          style={{
+            background: 'linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.7) 100%)',
+            transform: 'rotate(-15deg)',
+          }}
+        />
+        <div 
+          className="w-3 h-8 rounded-b-sm origin-top"
+          style={{
+            background: 'linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.7) 100%)',
+            transform: 'rotate(15deg)',
+          }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+};
 
 export const RoundEndModal = ({
   phase,
@@ -29,6 +115,7 @@ export const RoundEndModal = ({
   isHost,
   onNextRound,
 }: RoundEndModalProps) => {
+  const isPlayerWinner = roundWinner && !roundWinner.isAI;
   return (
     <AnimatePresence>
       {phase === 'roundEnd' && (
@@ -61,7 +148,9 @@ export const RoundEndModal = ({
             className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
           >
             <div className="text-center">
-              <Anchor className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-4" />
+              {/* Animated wax seal stamp */}
+              <WaxSeal round={round} isWinner={!!isPlayerWinner} />
+              
               <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-2">
                 Voyage {round} Complete!
               </h2>

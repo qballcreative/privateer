@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Home, RotateCcw, Anchor, Crown, Ship, Coins } from 'lucide-react';
+import { Home, RotateCcw, Anchor, Crown, Coins } from 'lucide-react';
 import { Player } from '@/types/game';
 import { calculateScore, useGameStore } from '@/store/gameStore';
 import { getScoreBreakdown } from '@/lib/scoring';
@@ -15,7 +15,6 @@ interface VictoryScreenProps {
   onPlayAgain: () => void;
   onReturnHome: () => void;
 }
-
 
 /** Gold particle for confetti effect */
 const GoldParticle = ({ index, total }: { index: number; total: number }) => {
@@ -45,6 +44,108 @@ const GoldParticle = ({ index, total }: { index: number; total: number }) => {
       }}
       transition={{ duration: 2 + Math.random(), delay, ease: 'easeOut' }}
     />
+  );
+};
+
+/** Animated treasure chest with opening lid and spilling coins */
+const TreasureChest = ({ isVictory }: { isVictory: boolean }) => {
+  const coins = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    x: -30 + Math.random() * 60,
+    y: -60 - Math.random() * 40,
+    rotation: Math.random() * 360,
+    delay: 0.6 + Math.random() * 0.3,
+  })), []);
+
+  return (
+    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3">
+      {/* Glow effect behind chest */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: isVictory 
+            ? 'radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, transparent 70%)'
+            : 'radial-gradient(circle, hsl(var(--muted) / 0.3) 0%, transparent 70%)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 2, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      />
+      
+      {/* Chest body */}
+      <motion.div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-10 sm:w-20 sm:h-12 rounded-md"
+        style={{
+          background: 'linear-gradient(180deg, hsl(30, 50%, 35%) 0%, hsl(25, 55%, 25%) 100%)',
+          boxShadow: 'inset 0 -4px 8px hsl(25, 60%, 15%), 0 4px 12px hsl(0, 0%, 0% / 0.4)',
+        }}
+        initial={{ scale: 0, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+      >
+        {/* Lock/clasp */}
+        <motion.div
+          className="absolute top-1 left-1/2 -translate-x-1/2 w-4 h-3 rounded-sm"
+          style={{
+            background: isVictory ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+            boxShadow: '0 1px 2px hsl(0, 0%, 0% / 0.3)',
+          }}
+        />
+        {/* Metal bands */}
+        <div className="absolute top-2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600/50 to-transparent" />
+        <div className="absolute bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600/50 to-transparent" />
+      </motion.div>
+
+      {/* Chest lid */}
+      <motion.div
+        className="absolute bottom-8 sm:bottom-10 left-1/2 w-16 h-8 sm:w-20 sm:h-10 rounded-t-lg origin-bottom"
+        style={{
+          background: 'linear-gradient(180deg, hsl(30, 50%, 40%) 0%, hsl(30, 50%, 35%) 100%)',
+          boxShadow: 'inset 0 4px 8px hsl(30, 60%, 50% / 0.3), 0 -2px 8px hsl(0, 0%, 0% / 0.2)',
+          transformStyle: 'preserve-3d',
+        }}
+        initial={{ x: '-50%', rotateX: 0 }}
+        animate={{ x: '-50%', rotateX: isVictory ? -110 : -30 }}
+        transition={{ type: 'spring', stiffness: 120, damping: 12, delay: 0.4 }}
+      >
+        {/* Lid metal band */}
+        <div className="absolute top-3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600/50 to-transparent" />
+      </motion.div>
+
+      {/* Coins spilling out on victory */}
+      {isVictory && coins.map((coin) => (
+        <motion.div
+          key={coin.id}
+          className="absolute left-1/2 bottom-10 w-3 h-3 sm:w-4 sm:h-4 rounded-full"
+          style={{
+            background: 'linear-gradient(135deg, hsl(45, 90%, 55%) 0%, hsl(38, 85%, 45%) 100%)',
+            boxShadow: '0 2px 4px hsl(0, 0%, 0% / 0.3), inset 0 1px 2px hsl(50, 100%, 70%)',
+          }}
+          initial={{ x: '-50%', y: 0, opacity: 0, scale: 0, rotate: 0 }}
+          animate={{
+            x: coin.x,
+            y: [0, coin.y, coin.y + 80],
+            opacity: [0, 1, 0.8],
+            scale: [0, 1, 0.8],
+            rotate: coin.rotation,
+          }}
+          transition={{ duration: 1.2, delay: coin.delay, ease: 'easeOut' }}
+        />
+      ))}
+
+      {/* Inner gold glow when open */}
+      {isVictory && (
+        <motion.div
+          className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 w-14 h-6 sm:w-16 sm:h-8 rounded-t-lg"
+          style={{
+            background: 'linear-gradient(180deg, hsl(45, 100%, 60% / 0.8) 0%, hsl(38, 90%, 50% / 0.4) 100%)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0.7] }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+        />
+      )}
+    </div>
   );
 };
 
@@ -111,18 +212,10 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
             </div>
           )}
 
-          {/* Trophy animation */}
-          <motion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.15 }}
-            className="relative z-10"
-          >
-            <Trophy className={cn(
-              'w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3',
-              isPlayerVictory ? 'text-primary' : 'text-muted-foreground'
-            )} />
-          </motion.div>
+          {/* Treasure chest animation */}
+          <div className="relative z-10">
+            <TreasureChest isVictory={isPlayerVictory} />
+          </div>
 
           {/* Title */}
           <motion.div
