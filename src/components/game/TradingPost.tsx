@@ -10,6 +10,7 @@ import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
   onModeChange?: (isExchange: boolean) => void;
+  onInvalidAction?: () => void;
 }
 
 // Rise-from-dock animation for new cards arriving from deck
