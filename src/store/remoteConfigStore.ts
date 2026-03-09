@@ -11,6 +11,7 @@ export interface RemoteConfig {
   adsEnabled: boolean;
   interstitialFrequency: string;
   rewardedEnabled: boolean;
+  videoInterstitialEnabled: boolean;
   defaultAIDifficulty: Difficulty;
   enabledRules: string[];
   maxPlayers: number;
@@ -27,6 +28,7 @@ const DEFAULTS: RemoteConfig = {
   adsEnabled: true,
   interstitialFrequency: 'round_end:capped=1;cooldown=120s',
   rewardedEnabled: true,
+  videoInterstitialEnabled: true,
   defaultAIDifficulty: 'easy',
   enabledRules: [],
   maxPlayers: 2,
