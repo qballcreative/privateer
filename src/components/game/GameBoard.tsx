@@ -417,6 +417,9 @@ export const GameBoard = () => {
         )}
       </AnimatePresence>
 
+      {/* In-game Tutorial — auto-starts on first game */}
+      <Tutorial onFirstGame={!hasSeenTutorial} />
+
       {/* Turn Banner */}
       <TurnBanner show={showTurnBanner} />
 
