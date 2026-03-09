@@ -185,6 +185,7 @@ export const GameBoard = () => {
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
   const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
   const isMobile = useIsMobile();
+  const { hasSeenTutorial, start: startTutorial, isActive: isTutorialActive } = useTutorialStore();
 
   const [isRaidMode, setIsRaidMode] = useState(false);
   const [showAction, setShowAction] = useState(false);
