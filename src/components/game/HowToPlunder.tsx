@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 const steps = [
   {
-    img: '/Icons/claim.webppp',
+    img: '/Icons/claim.webp',
     num: 1,
     title: 'Claim Cargo',
     description: 'Take goods from the Trading Post to fill your Ship\'s Hold, or commandeer all ships at once.',
