@@ -63,7 +63,7 @@ const HowToPlay = () => {
               {
                 title: "Ship's Hold",
                 desc: 'Your personal cargo bay. You can hold a maximum of 7 cargo at the end of your turn — ships are stored separately in your fleet and don\'t count toward this limit.',
-                icon: '/Icons/Claim.png',
+                icon: '/Icons/Claim.webp',
               },
               {
                 title: 'Trading Post Supply',
