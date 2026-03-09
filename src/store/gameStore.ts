@@ -334,6 +334,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hiddenTreasures: [],
       isMultiplayer: false,
       roundWinners: [],
+      firstPlayer,
     };
 
     // Fire engine hooks
