@@ -76,5 +76,11 @@ Replace stubs with Google AdSense or similar.
 
 - [x] Parchment theme CSS variables (already implemented)
 - [x] Custom pirate favicon (skull & crossbones with coins)
-- [ ] Victory screen treasure chest opening animation
-- [ ] Round-end "Wax Seal" animation
+- [x] Victory screen treasure chest opening animation (already implemented)
+- [x] Round-end "Wax Seal" animation (already implemented)
+
+---
+
+## ✅ Plan Complete
+
+All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.
