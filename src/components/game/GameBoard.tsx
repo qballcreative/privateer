@@ -675,7 +675,7 @@ export const GameBoard = () => {
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
             >
-              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
+              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
               <AnimatePresence>
                 {!isExchangeMode && humanPlayer && (
                   <motion.div
