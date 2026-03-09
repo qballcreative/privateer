@@ -148,7 +148,9 @@ export const RoundEndModal = ({
             className="bg-card p-6 sm:p-8 rounded-2xl border border-primary/30 shadow-2xl max-w-md w-full"
           >
             <div className="text-center">
-              <Anchor className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-4" />
+              {/* Animated wax seal stamp */}
+              <WaxSeal round={round} isWinner={!!isPlayerWinner} />
+              
               <h2 className="font-pirate text-2xl sm:text-3xl text-primary mb-2">
                 Voyage {round} Complete!
               </h2>

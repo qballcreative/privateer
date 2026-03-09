@@ -212,18 +212,10 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
             </div>
           )}
 
-          {/* Trophy animation */}
-          <motion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.15 }}
-            className="relative z-10"
-          >
-            <Trophy className={cn(
-              'w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3',
-              isPlayerVictory ? 'text-primary' : 'text-muted-foreground'
-            )} />
-          </motion.div>
+          {/* Treasure chest animation */}
+          <div className="relative z-10">
+            <TreasureChest isVictory={isPlayerVictory} />
+          </div>
 
           {/* Title */}
           <motion.div
