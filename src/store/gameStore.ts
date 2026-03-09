@@ -273,6 +273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hiddenTreasures: [],
   isMultiplayer: false,
   roundWinners: [],
+  firstPlayer: 'host',
 
   startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = 'host') => {
     const deck = createDeck();
@@ -333,6 +334,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hiddenTreasures: [],
       isMultiplayer: false,
       roundWinners: [],
+      firstPlayer,
     };
 
     // Fire engine hooks
@@ -409,6 +411,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hiddenTreasures: [],
       isMultiplayer: true,
       roundWinners: [],
+      firstPlayer: 'host',
     };
 
     const ctx = buildCtx(initialState);
@@ -775,7 +778,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   nextRound: () => {
-    const { round, maxRounds, roundWins, optionalRules, players: currentPlayers } = get();
+    const { round, maxRounds, roundWins, roundWinners, optionalRules, players: currentPlayers, isMultiplayer } = get();
     
     // Check if game is over — any player has 2 wins or max rounds reached
     const anyWinner = roundWins.some((w) => w >= 2);
@@ -783,6 +786,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ phase: 'gameEnd' });
       return;
     }
+
+    // Determine who goes first next round: loser of previous round
+    // (the player who did NOT win the last round starts)
+    const lastWinnerId = roundWinners[roundWinners.length - 1];
+    let nextStartIndex = 0;
+    if (lastWinnerId !== null && lastWinnerId !== undefined) {
+      const winnerIndex = currentPlayers.findIndex((p) => p.id === lastWinnerId);
+      if (winnerIndex !== -1) {
+        // Loser goes first (opposite of winner)
+        nextStartIndex = (winnerIndex + 1) % currentPlayers.length;
+      }
+    }
+    // On a tie (null winner), keep the same starting player as this round
 
     // Start new round
     const deck = createDeck();
@@ -810,7 +826,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     market.push(...remainingDeck.splice(0, 2));
 
-    // Deal cards to all players in round-robin
+    // Deal cards to all players in round-robin starting from next start player
     for (let i = 0; i < 5; i++) {
       for (const player of players) {
         const card = remainingDeck.shift();
@@ -829,7 +845,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       players,
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      currentPlayerIndex: 0,
+      currentPlayerIndex: nextStartIndex,
       round: round + 1,
       lastAction: null,
       turnCount: 0,
@@ -841,6 +857,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     rulesEngine.fireDeal(ctx);
 
     set(newState);
+
+    // If AI goes first in the new round, trigger its move
+    if (players[nextStartIndex]?.isAI && !isMultiplayer) {
+      const notifDuration = useSettingsStore.getState().actionNotificationDuration;
+      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+    }
   },
 
   resetGame: () => {
@@ -860,13 +882,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: false,
+      firstPlayer: 'host',
     });
   },
 
   restartGame: () => {
-    const { difficulty, optionalRules, players } = get();
+    const { difficulty, optionalRules, players, firstPlayer } = get();
     const playerName = players.find((p) => !p.isAI && p.isLocal)?.name || 'Player';
-    get().startGame(playerName, difficulty, optionalRules);
+    get().startGame(playerName, difficulty, optionalRules, get().maxRounds, firstPlayer);
   },
 
   makeAIMove: () => {

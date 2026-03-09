@@ -85,6 +85,7 @@ export interface GameState {
   hiddenTreasures: HiddenTreasure[]; // For treasure chest rule
   isMultiplayer: boolean; // For multiplayer mode
   roundWinners: (string | null)[]; // Per-round winner player IDs
+  firstPlayer: 'host' | 'random'; // Preserved preference for rematches
 }
 
 // Token values based on Jaipur rules
