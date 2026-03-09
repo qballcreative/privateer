@@ -120,7 +120,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
   const cargoSize = isPhone ? 'sm' : layout === 'tablet' ? 'md' : 'lg';
 
   return (
-    <div className="space-y-3 sm:space-y-4">
+    <div data-tutorial-id="tutorial-trading-post" className="space-y-3 sm:space-y-4">
       {/* Mode Toggle */}
       {isPlayerTurn && phase === 'playing' && (
         <div className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
