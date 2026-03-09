@@ -69,7 +69,7 @@ const MedallionStack = ({
 
 export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
-    <div className="flex items-center gap-4 p-3 rounded-lg bg-card/50 border border-border">
+    <div data-tutorial-id="tutorial-bonus" className="flex items-center gap-4 p-3 rounded-lg bg-card/50 border border-border">
       <span className="text-lg font-pirate text-primary">
         Commissions
       </span>

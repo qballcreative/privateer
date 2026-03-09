@@ -79,14 +79,16 @@ export const ShipsHold = ({
   const cargoSize = isPhone ? 'sm' : layout === 'tablet' ? 'md' : 'md';
 
   return (
-    <div className={cn(
-      'rounded-xl border-2 transition-all duration-200',
-      isPhone ? 'p-3' : 'p-4',
-      isCurrentPlayer && !isOpponent
-        ? 'bg-card border-primary/40 shadow-lg'
-        : 'bg-card/50 border-border',
-      isRaidMode && isOpponent && 'ring-2 ring-destructive/50 border-destructive/30 bg-destructive/5'
-    )}>
+    <div
+      data-tutorial-id={!isOpponent ? 'tutorial-ships-hold' : undefined}
+      className={cn(
+        'rounded-xl border-2 transition-all duration-200',
+        isPhone ? 'p-3' : 'p-4',
+        isCurrentPlayer && !isOpponent
+          ? 'bg-card border-primary/40 shadow-lg'
+          : 'bg-card/50 border-border',
+        isRaidMode && isOpponent && 'ring-2 ring-destructive/50 border-destructive/30 bg-destructive/5'
+      )}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center gap-1.5 sm:gap-2">

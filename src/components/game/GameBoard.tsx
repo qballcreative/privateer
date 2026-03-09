@@ -20,6 +20,8 @@ import { VictoryScreen } from './VictoryScreen';
 import { DisconnectModal } from './DisconnectModal';
 import { RoundEndModal } from './RoundEndModal';
 import { MultiplayerChat } from './MultiplayerChat';
+import { Tutorial } from './Tutorial';
+import { useTutorialStore } from '@/store/tutorialStore';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -61,7 +63,7 @@ interface TreasureSupplyPanelProps {
 
 const TreasureSupplyPanel = memo(({ compact = false, tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid, isRaidMode, setIsRaidMode }: TreasureSupplyPanelProps) => (
   <div className="space-y-4">
-    <div className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
+    <div data-tutorial-id="tutorial-market-prices" className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%' }}>
       <div className="absolute inset-0 bg-background/40 pointer-events-none" />
       <div className="relative z-10">
         <h3 className="font-pirate text-lg text-primary mb-4 text-center">
@@ -183,6 +185,7 @@ export const GameBoard = () => {
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
   const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
   const isMobile = useIsMobile();
+  const { hasSeenTutorial, start: startTutorial, isActive: isTutorialActive } = useTutorialStore();
 
   const [isRaidMode, setIsRaidMode] = useState(false);
   const [showAction, setShowAction] = useState(false);
@@ -328,7 +331,17 @@ export const GameBoard = () => {
     playSound('error');
   }, [playSound]);
 
-  // Track previous multiplayer state for reconnection sync
+  // Auto-start tutorial on first game (with a brief delay so the board renders first)
+  const hasStartedTutorialRef = useRef(false);
+  useEffect(() => {
+    if (!hasSeenTutorial && !isTutorialActive && !hasStartedTutorialRef.current && phase === 'playing') {
+      hasStartedTutorialRef.current = true;
+      const timer = setTimeout(() => startTutorial(), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTutorial, isTutorialActive, phase, startTutorial]);
+
+
   const prevMultiplayerStateRef = useRef(multiplayerState);
 
   // Host: Send game state to reconnecting guest
@@ -413,6 +426,9 @@ export const GameBoard = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* In-game Tutorial — auto-starts on first game */}
+      <Tutorial />
 
       {/* Turn Banner */}
       <TurnBanner show={showTurnBanner} />
