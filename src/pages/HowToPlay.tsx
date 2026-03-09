@@ -111,7 +111,7 @@ const HowToPlay = () => {
               desc="Exchange 2 or more goods between your Hold and the Trading Post. You cannot trade a goods type for the same type (e.g., trading away rum to take rum). You can use ships from your fleet as part of the trade — great for upgrading cheap goods to expensive ones!"
             />
             <ActionCard
-              icon={<img src="/Icons/sell.png" alt="Sell" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/sell.webp" alt="Sell" className="w-8 h-8 object-contain" />}
               title="Sell Cargo"
               desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gems), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Seals!"
             />
