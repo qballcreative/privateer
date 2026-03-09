@@ -89,15 +89,13 @@ export const SetSailPanel = ({
           <ModeButton
             active={mode === 'aai'}
             onClick={() => setMode('aai')}
-            label="Duel AI"
-            variant="gold"
+            label="Duel            variant="gold"
           />
           {!restrictedMode && (
             <ModeButton
               active={mode === 'multiplayer'}
               onClick={() => setMode('multiplayer')}
-              label="Challenge Player"
-              variant="ocean"
+              label="ChallDuel Captain           variant="ocean"
             />
           )}
         </div>
