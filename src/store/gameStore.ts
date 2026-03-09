@@ -461,12 +461,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const card = market[cardIndex];
     const player = players[currentPlayerIndex];
 
-    // Check if it's a ship
+    // Create new arrays immutably
+    let newShips = player.ships;
+    let newHand = player.hand;
+
     if (card.type === 'ships') {
-      player.ships.push(card);
+      newShips = [...player.ships, card];
     } else {
       if (player.hand.length >= HAND_LIMIT) return;
-      player.hand.push(card);
+      newHand = [...player.hand, card];
     }
 
     // Remove from market and refill
@@ -476,7 +479,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player };
+    newPlayers[currentPlayerIndex] = { ...player, hand: newHand, ships: newShips };
 
     set({
       market: newMarket,
