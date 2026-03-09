@@ -27,7 +27,7 @@ export const DesktopLayout = ({
       <main className={cn("col-span-2 space-y-6", phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed')}>
         <TradingPost layout="desktop" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
         <AnimatePresence>
-          {!isExchangeMode && humanPlayer && (
+          {(!isExchangeMode || forceShowHold) && humanPlayer && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
