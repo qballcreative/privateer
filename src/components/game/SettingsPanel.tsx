@@ -92,7 +92,7 @@ export const SettingsPanel = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Settings">
           <Settings className="w-5 h-5" />
         </Button>
       </SheetTrigger>
