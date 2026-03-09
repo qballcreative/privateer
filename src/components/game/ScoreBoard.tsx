@@ -89,18 +89,18 @@ export const ScoreBoard = memo(() => {
               {/* Score breakdown */}
               <div className="grid grid-cols-2 gap-2 text-sm overflow-visible">
                 <div className="flex items-center gap-1.5 overflow-visible" title="Doubloons">
-                  <img src="/images/doubloons.webpppp" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
+                  <img src="/images/doubloons.webp" alt="Doubloons" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.tokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 overflow-visible" title="Commissions">
-                  <img src="/images/commissiowebpbpbpg" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
+                  <img src="/images/commissions.webp" alt="Commissions" className="w-8 h-8 object-contain -my-2" />
                   <span className="font-bold text-primary" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.bonusTokens.reduce((s, t) => s + t.value, 0)}</span>
                 </div>
               </div>
 
               {/* Fleet bonus row */}
               <div className="flex items-center gap-1.5 mt-1 text-sm overflow-visible" title={`Fleet: ${player.ships.length} ships${hasFleetBonus ? ' — Largest Fleet +5' : ''}`}>
-                <img src="/images/flwebpebpng" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
+                <img src="/images/fleet.webp" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
                 <span className="text-foreground/80" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.ships.length}</span>
                 {hasFleetBonus && (
                   <span className="text-xs font-bold text-primary ml-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>+5</span>
@@ -111,7 +111,7 @@ export const ScoreBoard = memo(() => {
               <div className="mt-2 pt-2 border-t border-white/20">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-foreground/70 flex items-center gap-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
-                    <img src="/images/doubloowebppng" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
+                    <img src="/images/doubloons.webp" alt="Doubloons" className="w-6 h-6 object-contain -my-1" />
                     Total
                   </span>
                   <span className={cn(
