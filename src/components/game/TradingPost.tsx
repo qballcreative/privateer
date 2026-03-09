@@ -159,7 +159,8 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             Trade Goods
           </Button>
         </div>
-      )}
+        );
+      })()}
 
       {/* Trading Post — Dock Table Surface */}
       <div className={cn(

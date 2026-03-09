@@ -1,12 +1,19 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
 import { ChevronLeft, ChevronRight, X, Anchor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Steps that require drawers/sections to be open on phone
+const TREASURE_DRAWER_STEPS = ['tutorial-market-prices', 'tutorial-bonus'];
+const TRADING_POST_STEPS = ['tutorial-trading-post', 'tutorial-actions'];
+const HOLD_STEPS = ['tutorial-ships-hold'];
+
 export const Tutorial = () => {
   const { isActive, currentStep, next, prev, skip } = useTutorialStore();
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
+  const retryRef = useRef<number>(0);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const step = TUTORIAL_STEPS[currentStep];
 
@@ -17,29 +24,54 @@ export const Tutorial = () => {
     }
     const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
     if (el) {
-      setHighlightRect(el.getBoundingClientRect());
-    } else {
-      setHighlightRect(null);
+      const rect = el.getBoundingClientRect();
+      // Only set if element is actually visible (has dimensions)
+      if (rect.width > 0 && rect.height > 0) {
+        setHighlightRect(rect);
+        retryRef.current = 0;
+        return;
+      }
+    }
+    setHighlightRect(null);
+
+    // Retry mechanism: if element not found, retry up to 5 times with increasing delays
+    if (retryRef.current < 5) {
+      retryRef.current++;
+      retryTimerRef.current = setTimeout(updateHighlight, 300);
     }
   }, [step?.highlightId]);
 
+  // Dispatch custom event to tell PhoneLayout which tutorial element we need visible
+  useEffect(() => {
+    if (!isActive || !step?.highlightId) return;
+    window.dispatchEvent(new CustomEvent('tutorial-step', { detail: { highlightId: step.highlightId } }));
+  }, [isActive, step?.highlightId]);
+
   useEffect(() => {
     if (!isActive) return;
+    retryRef.current = 0;
 
-    // Auto-scroll the highlighted element into view
-    if (step?.highlightId) {
-      const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Wait for scroll to finish before updating highlight
-        setTimeout(updateHighlight, 400);
+    // Small delay to allow drawers/sections to open first
+    const initTimer = setTimeout(() => {
+      if (step?.highlightId) {
+        const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
+        if (el) {
+          // Determine if element is near top or bottom of viewport
+          const rect = el.getBoundingClientRect();
+          const vh = window.innerHeight;
+          const scrollBlock = rect.top > vh * 0.6 ? 'start' : 'center';
+          el.scrollIntoView({ behavior: 'smooth', block: scrollBlock as ScrollLogicalPosition });
+          setTimeout(updateHighlight, 400);
+        }
       }
-    }
+      updateHighlight();
+    }, 200);
 
-    updateHighlight();
     window.addEventListener('resize', updateHighlight);
     window.addEventListener('scroll', updateHighlight, true);
     return () => {
+      clearTimeout(initTimer);
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
       window.removeEventListener('resize', updateHighlight);
       window.removeEventListener('scroll', updateHighlight, true);
     };
@@ -50,7 +82,7 @@ export const Tutorial = () => {
   const isFirst = currentStep === 0;
   const isLast = currentStep === TUTORIAL_STEPS.length - 1;
 
-  // Calculate tooltip position
+  // Auto-positioning: below if fits, above otherwise — always horizontally centered
   const getTooltipStyle = (): React.CSSProperties => {
     if (!highlightRect) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
@@ -61,49 +93,28 @@ export const Tutorial = () => {
     const pad = 16;
     const margin = 8;
     const tooltipW = Math.min(320, vw - margin * 2);
-    const tooltipH = 200; // estimated max height
+    const tooltipH = 200;
 
     const clampLeft = (idealLeft: number) =>
       Math.max(margin, Math.min(idealLeft, vw - tooltipW - margin));
 
-    const clampTop = (idealTop: number) =>
-      Math.max(margin, Math.min(idealTop, vh - tooltipH - margin));
-
     const centerX = highlightRect.left + highlightRect.width / 2 - tooltipW / 2;
-    const centerY = highlightRect.top + highlightRect.height / 2 - tooltipH / 2;
 
-    let pos = step.position || 'bottom';
-
-    // Auto-flip vertical if it would overflow
-    if (pos === 'bottom' && highlightRect.bottom + pad + tooltipH > vh - margin) {
-      pos = 'top';
-    } else if (pos === 'top' && highlightRect.top - pad - tooltipH < margin) {
-      pos = 'bottom';
+    // Try below first
+    const belowTop = highlightRect.bottom + pad;
+    if (belowTop + tooltipH < vh - margin) {
+      return {
+        top: `${belowTop}px`,
+        left: `${clampLeft(centerX)}px`,
+      };
     }
 
-    switch (pos) {
-      case 'top':
-        return {
-          top: `${clampTop(highlightRect.top - pad - tooltipH)}px`,
-          left: `${clampLeft(centerX)}px`,
-        };
-      case 'left':
-        return {
-          top: `${clampTop(centerY)}px`,
-          left: `${clampLeft(highlightRect.left - pad - tooltipW)}px`,
-        };
-      case 'right':
-        return {
-          top: `${clampTop(centerY)}px`,
-          left: `${clampLeft(highlightRect.right + pad)}px`,
-        };
-      case 'bottom':
-      default:
-        return {
-          top: `${clampTop(highlightRect.bottom + pad)}px`,
-          left: `${clampLeft(centerX)}px`,
-        };
-    }
+    // Fall back to above
+    const aboveTop = highlightRect.top - pad - tooltipH;
+    return {
+      top: `${Math.max(margin, aboveTop)}px`,
+      left: `${clampLeft(centerX)}px`,
+    };
   };
 
   // Build clip-path to cut out the highlighted region
@@ -204,3 +215,5 @@ export const Tutorial = () => {
     </div>
   );
 };
+
+export { TREASURE_DRAWER_STEPS, TRADING_POST_STEPS, HOLD_STEPS };
