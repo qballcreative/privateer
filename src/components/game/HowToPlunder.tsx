@@ -2,13 +2,13 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 const steps = [
   {
-    img: '/Icons/claim.webp',
+    img: '/Icons/claim.webpp',
     num: 1,
     title: 'Claim Cargo',
     description: 'Take goods from the Trading Post to fill your Ship\'s Hold, or commandeer all ships at once.',
   },
   {
-    img: '/Icons/Trade.png',
+    img: '/Iconstrade.webpg',
     num: 2,
     title: 'Trade Goods',
     description: 'Exchange 2+ goods between your Hold and the Trading Post. Ships act as wildcards!',
