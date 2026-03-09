@@ -289,7 +289,7 @@ export const UnloadChest = ({
               <AlertDialogHeader>
                 <AlertDialogTitle className="font-pirate text-primary flex items-center gap-2">
                   {selectedType && (
-                    <img src={`/Icons/${selectedType}.png`} alt="" className="w-7 h-7 object-contain" />
+                    <img src={`/Icons/${selectedType}.webp`} alt="" className="w-7 h-7 object-contain" />
                   )}
                   Sell Cargo?
                 </AlertDialogTitle>

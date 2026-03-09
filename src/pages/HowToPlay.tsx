@@ -217,7 +217,7 @@ const HowToPlay = () => {
               desc="Once per game, you can launch a Pirate Raid on your opponent! Steal 1 random cargo from their Hold. Use it strategically — you only get one raid per game."
             />
             <ActionCard
-              icon={<img src="/Icons/bonus.png" alt="Treasure Chest" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/bonus.webp" alt="Treasure Chest" className="w-8 h-8 object-contain" />}
               title="Treasure Chest"
               desc="When enabled, each player accumulates hidden treasure tokens throughout the round. These are revealed at the end and added to your doubloon total — an exciting surprise that can swing the outcome!"
             />
