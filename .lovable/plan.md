@@ -1,86 +1,46 @@
-# Privateer: Letters of Marque — Implementation Plan
 
-> Last updated: 2026-03-09
 
----
+## Multiplayer Disconnect Detection — Bug Analysis & Fix Plan
 
-## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
+### Problem
 
-| Category | Score | Status |
-|----------|-------|--------|
-| Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
-| Game Mechanics | 8.0 | ✅ Sell confirmation added |
-| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
-| UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
-| Mobile | 7.5 | ✅ Mini-info bar shows key stats |
-| Multiplayer | 6.0 | ✅ TURN server config ready |
-| Onboarding | 7.5 | ✅ Naming fixed |
-| Performance | 8.0 | ✅ Preload extracted |
-| Code Quality | 8.0 | ✅ AI extracted, immutable state |
-| Monetization | 6.0 | Ad space reserved |
+The DisconnectModal only activates when **all three** conditions are true:
+1. `isMultiplayer === true`
+2. `multiplayerState === 'disconnected'`
+3. `phase === 'playing'`
 
----
+This means if a player leaves during `roundEnd` or `gameEnd` phases, or if the PeerJS signaling server disconnects (which fires `peer.on('disconnected')`) but the data channel stays briefly alive, the remaining player is never notified.
 
-## ✅ Completed
+Additionally, the heartbeat mechanism (3s interval, 3 missed = 9s timeout) correctly detects connection loss, but the modal's phase gate blocks it from surfacing outside of active play.
 
-### Quick Wins
-- Copyright year → 2026
-- "Iron" → "Cannonballs" in HowToPlay
-- Invalid action feedback wired to TradingPost
-- Preload images extracted to shared module
+### Root Causes
 
-### P0 Bugs
-- ✅ AI first-move bug fixed
-- ✅ Next-round first player (already implemented correctly)
-- ✅ Restart preserves firstPlayer (already implemented)
+1. **Phase gate too narrow** — The modal ignores disconnects during `roundEnd` phase, where players are between rounds and the opponent may have quit.
+2. **No "opponent left" message** — When a player deliberately leaves (Return to Port, close tab), no explicit "I'm leaving" message is sent to the opponent. Detection relies entirely on heartbeat timeout (~9 seconds of silence before the modal appears).
+3. **Claim Victory resets to lobby** — `handleClaimVictory` calls `onResetGame()` which goes back to lobby instead of showing the Victory Screen with a proper win recorded.
 
-### P1 UX
-- ✅ Sell confirmation dialog with doubloon preview
-- ✅ Reduced in-game logo size ~30%
-- ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
+### Plan
 
-### P2 Multiplayer
-- ✅ ICE servers now loaded from remote config (supports TURN when added)
-- ✅ Heartbeat/ping-pong already implemented
-- ✅ DisconnectModal with countdown already exists
+#### 1. Send explicit "leave" message on intentional exit
+- In `GameBoard.tsx`, when the player clicks "Return to Port" or navigates away during a multiplayer game, send a `{ type: 'action', payload: { action: 'forfeit' } }` message before disconnecting.
+- Add a `beforeunload` event listener that sends this forfeit message when the tab is closed.
 
-### P3 Architecture
-- ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
-- ✅ Fixed syncEngineRules no-op
-- ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
+#### 2. Handle incoming forfeit message
+- In the GameBoard message handler, listen for the `forfeit` action type.
+- When received, immediately show the DisconnectModal with `disconnectTimer` already at 30 (skip the wait), or directly trigger victory for the remaining player.
 
-### Visual Polish
-- ✅ AI "thinking" overlay (already implemented in ShipsHold)
+#### 3. Expand phase gate in DisconnectModal
+- Change the condition from `phase === 'playing'` to `phase === 'playing' || phase === 'roundEnd'` so disconnects between rounds are also caught.
 
----
+#### 4. Show Victory Screen on Claim Victory
+- Instead of resetting to lobby, route `handleClaimVictory` through the game store to set the game phase to `gameEnd` with the local player as winner, so the standard Victory Screen displays with the win properly recorded.
 
-## Remaining Roadmap
+### Files to modify
 
-### 🟢 P3 — Architecture
+| File | Change |
+|------|--------|
+| `src/components/game/DisconnectModal.tsx` | Expand phase gate; support instant claim on forfeit; route claim to victory screen instead of lobby |
+| `src/components/game/GameBoard.tsx` | Send forfeit message on exit; add `beforeunload` listener; handle incoming forfeit in message handler |
+| `src/store/multiplayerStore.ts` | Add `sendForfeit()` convenience method that sends forfeit then disconnects |
+| `src/store/gameStore.ts` | Add `claimVictory(winnerIndex)` action that sets phase to `gameEnd` with proper round-win recording |
 
-#### ✅ Split GameBoard Layouts
-Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
-
----
-
-### 🔵 P4 — Monetization
-
-#### Real Ad SDK Integration
-Replace stubs with Google AdSense or similar.
-
-**Files:** `src/lib/adProvider.ts`, ad components
-
----
-
-## Visual Polish Backlog
-
-- [x] Parchment theme CSS variables (already implemented)
-- [x] Custom pirate favicon (skull & crossbones with coins)
-- [x] Victory screen treasure chest opening animation (already implemented)
-- [x] Round-end "Wax Seal" animation (already implemented)
-
----
-
-## ✅ Plan Complete
-
-All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.
