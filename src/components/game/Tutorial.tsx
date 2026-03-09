@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
 import { ChevronLeft, ChevronRight, X, Anchor } from 'lucide-react';
@@ -12,77 +12,90 @@ const HOLD_STEPS = ['tutorial-ships-hold'];
 export const Tutorial = () => {
   const { isActive, currentStep, next, prev, skip } = useTutorialStore();
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
-  const retryRef = useRef<number>(0);
-  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+  const lastRectRef = useRef<string>('');
+  const hasScrolledRef = useRef(false);
 
   const step = TUTORIAL_STEPS[currentStep];
 
-  const updateHighlight = useCallback(() => {
-    if (!step?.highlightId) {
+  // Dispatch event to open drawers/sections on phone layout
+  useEffect(() => {
+    if (!isActive || !step?.highlightId) return;
+    window.dispatchEvent(
+      new CustomEvent('tutorial-step', { detail: { highlightId: step.highlightId } })
+    );
+  }, [isActive, step?.highlightId]);
+
+  // RAF-based polling to track the target element position smoothly
+  useEffect(() => {
+    if (!isActive) {
       setHighlightRect(null);
       return;
     }
-    const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
-    if (el) {
-      const rect = el.getBoundingClientRect();
-      // Only set if element is actually visible (has dimensions)
-      if (rect.width > 0 && rect.height > 0) {
-        setHighlightRect(rect);
-        retryRef.current = 0;
+
+    hasScrolledRef.current = false;
+    lastRectRef.current = '';
+
+    const poll = () => {
+      if (!step?.highlightId) {
+        setHighlightRect(null);
+        rafRef.current = requestAnimationFrame(poll);
         return;
       }
-    }
-    setHighlightRect(null);
 
-    // Retry mechanism: if element not found, retry up to 5 times with increasing delays
-    if (retryRef.current < 5) {
-      retryRef.current++;
-      retryTimerRef.current = setTimeout(updateHighlight, 300);
-    }
-  }, [step?.highlightId]);
+      const el = document.querySelector<HTMLElement>(
+        `[data-tutorial-id="${step.highlightId}"]`
+      );
 
-  // Dispatch custom event to tell PhoneLayout which tutorial element we need visible
-  useEffect(() => {
-    if (!isActive || !step?.highlightId) return;
-    window.dispatchEvent(new CustomEvent('tutorial-step', { detail: { highlightId: step.highlightId } }));
-  }, [isActive, step?.highlightId]);
+      if (el && el.offsetWidth > 0 && el.offsetHeight > 0) {
+        const rect = el.getBoundingClientRect();
 
-  useEffect(() => {
-    if (!isActive) return;
-    retryRef.current = 0;
+        // Only scroll once per step, and only if element is not in viewport
+        if (!hasScrolledRef.current) {
+          hasScrolledRef.current = true;
+          const inViewport =
+            rect.top >= 0 &&
+            rect.bottom <= window.innerHeight;
+          if (!inViewport) {
+            // Scroll the element's nearest scrollable parent, not the whole page
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
 
-    // Small delay to allow drawers/sections to open first
-    const initTimer = setTimeout(() => {
-      if (step?.highlightId) {
-        const el = document.querySelector(`[data-tutorial-id="${step.highlightId}"]`);
-        if (el) {
-          // Determine if element is near top or bottom of viewport
-          const rect = el.getBoundingClientRect();
-          const vh = window.innerHeight;
-          const scrollBlock = rect.top > vh * 0.6 ? 'start' : 'center';
-          el.scrollIntoView({ behavior: 'smooth', block: scrollBlock as ScrollLogicalPosition });
-          setTimeout(updateHighlight, 400);
+        // Only update state when rect actually changes (avoids re-render churn)
+        const key = `${rect.top.toFixed(1)},${rect.left.toFixed(1)},${rect.width.toFixed(1)},${rect.height.toFixed(1)}`;
+        if (key !== lastRectRef.current) {
+          lastRectRef.current = key;
+          setHighlightRect(rect);
+        }
+      } else {
+        if (lastRectRef.current !== 'null') {
+          lastRectRef.current = 'null';
+          setHighlightRect(null);
         }
       }
-      updateHighlight();
-    }, 200);
 
-    window.addEventListener('resize', updateHighlight);
-    window.addEventListener('scroll', updateHighlight, true);
-    return () => {
-      clearTimeout(initTimer);
-      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-      window.removeEventListener('resize', updateHighlight);
-      window.removeEventListener('scroll', updateHighlight, true);
+      rafRef.current = requestAnimationFrame(poll);
     };
-  }, [isActive, currentStep, updateHighlight]);
+
+    // Small delay to let drawers/sections open first
+    const timer = setTimeout(() => {
+      rafRef.current = requestAnimationFrame(poll);
+    }, 350);
+
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [isActive, currentStep, step?.highlightId]);
 
   if (!isActive) return null;
 
   const isFirst = currentStep === 0;
   const isLast = currentStep === TUTORIAL_STEPS.length - 1;
 
-  // Auto-positioning: below if fits, above otherwise — always horizontally centered
+  // Position tooltip relative to highlight, measuring actual tooltip height
   const getTooltipStyle = (): React.CSSProperties => {
     if (!highlightRect) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
@@ -90,85 +103,79 @@ export const Tutorial = () => {
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const pad = 16;
+    const gap = 12;
     const margin = 8;
     const tooltipW = Math.min(320, vw - margin * 2);
-    const tooltipH = 200;
+    const tooltipH = tooltipRef.current?.offsetHeight || 180;
 
-    const clampLeft = (idealLeft: number) =>
-      Math.max(margin, Math.min(idealLeft, vw - tooltipW - margin));
-
+    const clampLeft = (x: number) =>
+      Math.max(margin, Math.min(x, vw - tooltipW - margin));
     const centerX = highlightRect.left + highlightRect.width / 2 - tooltipW / 2;
 
-    // Try below first
-    const belowTop = highlightRect.bottom + pad;
-    if (belowTop + tooltipH < vh - margin) {
-      return {
-        top: `${belowTop}px`,
-        left: `${clampLeft(centerX)}px`,
-      };
-    }
+    const spaceBelow = vh - highlightRect.bottom - gap;
+    const spaceAbove = highlightRect.top - gap;
 
-    // Fall back to above
-    const aboveTop = highlightRect.top - pad - tooltipH;
-    return {
-      top: `${Math.max(margin, aboveTop)}px`,
-      left: `${clampLeft(centerX)}px`,
-    };
+    if (spaceBelow >= tooltipH) {
+      return { top: `${highlightRect.bottom + gap}px`, left: `${clampLeft(centerX)}px` };
+    }
+    if (spaceAbove >= tooltipH) {
+      return { top: `${highlightRect.top - gap - tooltipH}px`, left: `${clampLeft(centerX)}px` };
+    }
+    // Fallback: pin to bottom of viewport
+    return { bottom: `${margin}px`, left: `${clampLeft(centerX)}px` };
   };
 
-  // Build clip-path to cut out the highlighted region
-  const getBackdropStyle = (): React.CSSProperties => {
-    if (!highlightRect) {
-      return { background: 'rgba(0,0,0,0.75)' };
-    }
+  // Clip-path cutout for the backdrop
+  const getBackdropClip = (): string | undefined => {
+    if (!highlightRect) return undefined;
     const p = 8;
     const x = highlightRect.left - p;
     const y = highlightRect.top - p;
     const w = highlightRect.width + p * 2;
     const h = highlightRect.height + p * 2;
-    return {
-      clipPath: `polygon(
-        0% 0%, 0% 100%, ${x}px 100%, ${x}px ${y}px,
-        ${x + w}px ${y}px, ${x + w}px ${y + h}px,
-        ${x}px ${y + h}px, ${x}px 100%, 100% 100%, 100% 0%
-      )`,
-      background: 'rgba(0,0,0,0.75)',
-    } as React.CSSProperties;
+    return `polygon(
+      0% 0%, 0% 100%, ${x}px 100%, ${x}px ${y}px,
+      ${x + w}px ${y}px, ${x + w}px ${y + h}px,
+      ${x}px ${y + h}px, ${x}px 100%, 100% 100%, 100% 0%
+    )`;
   };
 
   return (
     <div className="fixed inset-0 z-[100]">
-      {/* Backdrop with cutout */}
-      <div className="absolute inset-0" style={getBackdropStyle()} onClick={skip} />
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/75"
+        style={{ clipPath: getBackdropClip() }}
+        onClick={skip}
+      />
 
-      {/* Highlight border */}
+      {/* Highlight ring */}
       {highlightRect && (
         <div
-          className="absolute border-2 border-primary rounded-lg pointer-events-none z-[101]"
+          className="absolute border-2 border-primary rounded-lg pointer-events-none z-[101] transition-all duration-200"
           style={{
             top: highlightRect.top - 8,
             left: highlightRect.left - 8,
             width: highlightRect.width + 16,
             height: highlightRect.height + 16,
-            boxShadow: 'var(--shadow-gold)',
+            boxShadow: '0 0 0 4px hsl(var(--primary) / 0.25), 0 0 20px hsl(var(--primary) / 0.3)',
           }}
         />
       )}
 
-      {/* Tooltip card */}
+      {/* Tooltip */}
       <AnimatePresence mode="wait">
         <motion.div
           key={step.id}
-          className="absolute z-[102] w-80 max-w-[calc(100vw-2rem)]"
+          ref={tooltipRef}
+          className="absolute z-[102] w-80 max-w-[calc(100vw-1rem)]"
           style={getTooltipStyle()}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.25 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
         >
           <div className="bg-card border border-border rounded-xl p-5 shadow-2xl">
-            {/* Header */}
             <div className="flex items-start justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 {step.optional && (
@@ -185,7 +192,6 @@ export const Tutorial = () => {
 
             <p className="text-sm text-foreground/80 mb-4 leading-relaxed">{step.description}</p>
 
-            {/* Footer */}
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
                 {currentStep + 1} / {TUTORIAL_STEPS.length}
