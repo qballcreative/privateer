@@ -5,7 +5,7 @@ import CargoObject from './CargoObject';
 import { UnloadChest } from './UnloadChest';
 import { useGameStore } from '@/store/gameStore';
 import { cn } from '@/lib/utils';
-import { Anchor, Package, Crosshair } from 'lucide-react';
+import { Anchor, Package, Crosshair, Swords } from 'lucide-react';
 
 interface ShipsHoldProps {
   player: Player;
@@ -14,6 +14,7 @@ interface ShipsHoldProps {
   isRaidMode?: boolean;
   onRaidCard?: (card: Card) => void;
   layout?: 'phone' | 'tablet' | 'desktop';
+  isPondering?: boolean;
 }
 
 // Cargo slides into hold from above (arriving from Trading Post)
@@ -39,6 +40,7 @@ export const ShipsHold = ({
   isRaidMode = false,
   onRaidCard,
   layout = 'desktop',
+  isPondering = false,
 }: ShipsHoldProps) => {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const { sellCards, canSellCards, phase } = useGameStore();
@@ -193,6 +195,34 @@ export const ShipsHold = ({
             <div className="text-muted-foreground text-xs sm:text-sm italic">Hold is empty</div>
           )}
         </div>
+
+        {/* AI Pondering overlay */}
+        <AnimatePresence>
+          {isPondering && (
+            <motion.div
+              key="pondering"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-card/70 backdrop-blur-[2px]"
+            >
+              <motion.div
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/30"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Swords className="w-4 h-4 text-primary" />
+                </motion.div>
+                <span className="font-pirate text-sm text-primary">Pondering…</span>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Unload Chest + Score */}
