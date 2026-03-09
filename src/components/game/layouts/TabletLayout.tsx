@@ -38,7 +38,7 @@ export const TabletLayout = ({
       <main className={cn("col-span-1 space-y-4", phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed')}>
         <TradingPost layout="tablet" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
         <AnimatePresence>
-          {!isExchangeMode && humanPlayer && (
+          {(!isExchangeMode || forceShowHold) && humanPlayer && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
