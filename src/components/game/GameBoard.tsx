@@ -32,16 +32,8 @@ import bannerLogo from '@/assets/BannerLogo.png';
 import { toast } from '@/components/ui/sonner';
 
 // ─── Preload static images at module level ───
-const PRELOAD_IMAGES = [
-  '/images/doubloons.png', '/images/commissions.png', '/images/fleet.png',
-  '/images/supply.png', '/images/ledger-bg.png', '/images/trading-post-bg.png',
-  '/images/cargo-hold-bg.png', '/images/wood-bg.png',
-  '/Icons/Doubloon.png', '/Icons/rum.png', '/Icons/cannonballs.png',
-  '/Icons/silks.png', '/Icons/silver.png', '/Icons/gold.png', '/Icons/gemstones.png',
-  '/Icons/RedSeal.png', '/Icons/SilverSeal.png', '/Icons/GoldSeal.png',
-  '/Icons/Claim.png', '/Icons/Trade.png',
-];
-PRELOAD_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
+import { preloadImages } from '@/lib/preloadImages';
+preloadImages();
 
 const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
 
@@ -624,7 +616,7 @@ export const GameBoard = () => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <TradingPost layout="phone" onModeChange={setIsExchangeMode} />
+                  <TradingPost layout="phone" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -683,7 +675,7 @@ export const GameBoard = () => {
                 phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed'
               )}
             >
-              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} />
+              <TradingPost layout="tablet" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
               <AnimatePresence>
                 {!isExchangeMode && humanPlayer && (
                   <motion.div
@@ -727,7 +719,7 @@ export const GameBoard = () => {
               )}
             >
               {/* Trading Post — top center */}
-              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} />
+              <TradingPost layout="desktop" onModeChange={setIsExchangeMode} onInvalidAction={triggerInvalidAction} />
 
               {/* Player's Hold — hidden during exchange */}
               <AnimatePresence>

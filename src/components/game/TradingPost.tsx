@@ -10,6 +10,7 @@ import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 interface TradingPostProps {
   layout?: 'phone' | 'tablet' | 'desktop';
   onModeChange?: (isExchange: boolean) => void;
+  onInvalidAction?: () => void;
 }
 
 // Rise-from-dock animation for new cards arriving from deck
@@ -28,7 +29,7 @@ const shipFanExit = (index: number, total: number) => ({
   rotate: (index - (total - 1) / 2) * 8,
 });
 
-export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostProps) => {
+export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction }: TradingPostProps) => {
   const { 
     market, 
     takeCard, 
@@ -58,6 +59,9 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
       if (card?.type === 'ships') return;
       if (canTakeCard(cardId)) {
         takeCard(cardId);
+      } else {
+        // Trigger invalid action feedback when take fails (e.g., hold is full)
+        onInvalidAction?.();
       }
     } else {
       setSelectedMarketCards((prev) =>
