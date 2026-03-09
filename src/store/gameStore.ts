@@ -23,9 +23,10 @@ import {
   MARKET_SIZE,
   MIN_SELL_EXPENSIVE,
 } from '@/types/game';
-import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
+import { generateSecureId, secureShuffle } from '@/lib/security';
 import { validateGameState } from '@/lib/validateGameState';
 import { debugLog } from '@/lib/debugLog';
+import { computeAIMove, AIGameView, AIActions } from '@/lib/aiPlayer';
 import {
   RulesEngine,
   RuleContext,
