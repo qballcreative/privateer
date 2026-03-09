@@ -61,7 +61,7 @@ export const AgeConsentModal = ({ onComplete }: AgeConsentModalProps) => {
         transition={{ delay: 0.1 }}
       >
         <div className="flex flex-col items-center mb-6">
-          <img src={privateerLogo} alt="Privateer" className="w-48 mb-4" />
+          <img src={privateerLogo} alt="Privateer" width="192" height="192" className="w-48 mb-4" />
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-primary" />
             <h2 className="font-pirate text-2xl text-primary">Welcome Aboard</h2>
