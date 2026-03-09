@@ -170,7 +170,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
         isPhone ? "p-3" : "p-6"
       )}
         style={{
-          backgroundImage: `url('/images/trading-post-bg.png')`,
+          backgroundImage: `url('/images/trading-post-bg.webp')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
