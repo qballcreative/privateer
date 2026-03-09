@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { OptionalRules } from '@/types/game';
 import { cn } from '@/lib/utils';
 import { AgeConsentModal } from './AgeConsentModal';
+import { RemoveAdsButton } from './RemoveAdsButton';
 import {
   Sheet,
   SheetContent,
