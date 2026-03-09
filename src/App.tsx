@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
 import { useRemoteConfigStore } from "@/store/remoteConfigStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -15,6 +16,12 @@ const HowToPlay = lazy(() => import("./pages/HowToPlay"));
 const queryClient = new QueryClient();
 
 const App = () => {
+  const theme = useSettingsStore((s) => s.theme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
   useEffect(() => {
     const { fetchConfig, startPolling } = useRemoteConfigStore.getState();
     fetchConfig();

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Anchor, Trophy } from 'lucide-react';
+import { Users, Anchor, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ interface SetSailPanelProps {
   onCreateRoom: () => void;
   onJoinRoom: () => void;
   restrictedMode: boolean;
+  loading?: boolean;
 }
 
 const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
@@ -44,6 +45,7 @@ export const SetSailPanel = ({
   mode, setMode, difficulty, onDifficultyChange,
   bestOf, setBestOf, firstPlayer, setFirstPlayer,
   onStartAAI, onCreateRoom, onJoinRoom, restrictedMode,
+  loading = false,
 }: SetSailPanelProps) => {
   const winRate = stats.gamesPlayed > 0 ? Math.round((stats.wins / stats.gamesPlayed) * 100) : 0;
 
@@ -180,7 +182,7 @@ export const SetSailPanel = ({
         {/* Action Buttons */}
         <div className="space-y-3">
           {mode === 'aai' ? (
-            <ActionButton onClick={onStartAAI} variant="gold">
+            <ActionButton onClick={onStartAAI} variant="gold" loading={loading}>
               Start Game
             </ActionButton>
           ) : (
@@ -230,19 +232,25 @@ const ModeButton = ({
 );
 
 const ActionButton = ({
-  onClick, variant, children,
+  onClick, variant, children, loading = false,
 }: {
-  onClick: () => void; variant: 'gold' | 'ocean'; children: React.ReactNode;
+  onClick: () => void; variant: 'gold' | 'ocean'; children: React.ReactNode; loading?: boolean;
 }) => (
   <button
     onClick={onClick}
+    disabled={loading}
     className={cn(
       'w-full min-h-[52px] rounded-lg font-bold text-lg flex items-center justify-center transition-all active:scale-95',
+      loading && 'opacity-80 cursor-not-allowed',
       variant === 'gold'
         ? 'bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[0_4px_15px_hsl(var(--gold)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--gold)/0.5)]'
         : 'bg-gradient-to-b from-accent to-accent/80 text-accent-foreground shadow-[0_4px_15px_hsl(var(--ocean)/0.3)] hover:shadow-[0_6px_25px_hsl(var(--ocean)/0.5)]'
     )}
   >
-    {children}
+    {loading ? (
+      <Loader2 className="w-6 h-6 animate-spin" />
+    ) : (
+      children
+    )}
   </button>
 );

@@ -29,6 +29,7 @@ import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
 import { Home, Swords, CloudLightning, Crosshair, Gift, X, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import bannerLogo from '@/assets/BannerLogo.png';
+import { toast } from '@/components/ui/sonner';
 
 // ─── Preload static images at module level ───
 const PRELOAD_IMAGES = [
@@ -136,9 +137,10 @@ interface OpponentPanelProps {
   currentPlayerIndex: number;
   isRaidMode: boolean;
   onRaidCard: (card: Card) => void;
+  isPondering?: boolean;
 }
 
-const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard }: OpponentPanelProps) => (
+const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard, isPondering }: OpponentPanelProps) => (
   <div className="space-y-4">
     {opponentPlayer && (
       <ShipsHold
@@ -147,6 +149,7 @@ const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, on
         isOpponent
         isRaidMode={isRaidMode && currentPlayerIndex === 0}
         onRaidCard={onRaidCard}
+        isPondering={isPondering}
       />
     )}
     <ScoreBoard />
@@ -180,7 +183,7 @@ export const GameBoard = () => {
     deck,
   } = useGameStore();
 
-  const { actionNotificationDuration } = useSettingsStore();
+  const { actionNotificationDuration, musicEnabled, hasSeenMusicHint, setHasSeenMusicHint } = useSettingsStore();
   const { recordGameResult } = usePlayerStore();
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
   const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
@@ -225,6 +228,11 @@ export const GameBoard = () => {
   useEffect(() => {
     if (phase === 'playing') {
       playMusic();
+      // One-time hint if music is off
+      if (!musicEnabled && !hasSeenMusicHint) {
+        toast('🎵 Background music is available — enable it in Settings.');
+        setHasSeenMusicHint(true);
+      }
     } else if (phase === 'lobby') {
       stopMusic();
     }
@@ -260,7 +268,15 @@ export const GameBoard = () => {
       const winner = getWinner();
       if (winner) {
         const playerWon = !winner.isAI;
-        recordGameResult(playerWon);
+        const pScore = calculateScore(humanPlayer, players);
+        const oScore = calculateScore(opponentPlayer, players);
+        const { lastDifficulty } = usePlayerStore.getState();
+        recordGameResult(playerWon, {
+          date: new Date().toISOString(),
+          difficulty: lastDifficulty,
+          playerScore: pScore,
+          opponentScore: oScore,
+        });
       }
     }
   }, [phase, prevPhase, isMultiplayer, getWinner, recordGameResult]);
@@ -395,9 +411,11 @@ export const GameBoard = () => {
     tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid,
   }), [tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid]);
 
+  const isOpponentPondering = currentPlayerIndex === opponentIndex && phase === 'playing';
+
   const opponentPanelProps = useMemo(() => ({
-    opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid,
-  }), [opponentPlayer, currentPlayerIndex, isRaidMode]);
+    opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid, isPondering: isOpponentPondering,
+  }), [opponentPlayer, currentPlayerIndex, isRaidMode, isOpponentPondering]);
 
   return (
     <motion.div
@@ -652,6 +670,7 @@ export const GameBoard = () => {
                   isRaidMode={isRaidMode && currentPlayerIndex === localPlayerIndex}
                   onRaidCard={handlePirateRaid}
                   layout="tablet"
+                  isPondering={isOpponentPondering}
                 />
               )}
               <ScoreBoard />
@@ -737,6 +756,7 @@ export const GameBoard = () => {
                   isCurrentPlayer={currentPlayerIndex === opponentIndex}
                   isOpponent
                   isRaidMode={isRaidMode && currentPlayerIndex === localPlayerIndex}
+                  isPondering={isOpponentPondering}
                   onRaidCard={handlePirateRaid}
                   layout="desktop"
                 />

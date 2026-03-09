@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen } from 'lucide-react';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
+import { useGameStore } from '@/store/gameStore';
+import { useTutorialStore } from '@/store/tutorialStore';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
@@ -59,12 +61,14 @@ export const SettingsPanel = () => {
     musicVolume,
     actionNotificationDuration,
     optionalRules,
+    theme,
     setSoundEnabled,
     setMusicEnabled,
     setSoundVolume,
     setMusicVolume,
     setActionNotificationDuration,
     setOptionalRule,
+    setTheme,
   } = useSettingsStore();
 
   const {
@@ -78,11 +82,15 @@ export const SettingsPanel = () => {
     resetConsent,
   } = useConsentStore();
 
+  const { phase } = useGameStore();
+  const { start: startTutorial } = useTutorialStore();
+
   const navigate = useNavigate();
   const [showConsentModal, setShowConsentModal] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
           <Settings className="w-5 h-5" />
@@ -177,6 +185,40 @@ export const SettingsPanel = () => {
                     step={0.5}
                     className="w-full"
                   />
+                </div>
+              </div>
+
+              {/* Separator */}
+              <div className="border-t border-border" />
+
+              {/* Theme Toggle */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Theme</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setTheme('dark')}
+                    className={cn(
+                      'flex items-center justify-center gap-2 min-h-[44px] rounded-lg border font-semibold text-sm transition-all',
+                      theme === 'dark'
+                        ? 'bg-primary/10 border-primary text-primary'
+                        : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+                    )}
+                  >
+                    <Moon className="w-4 h-4" />
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => setTheme('parchment')}
+                    className={cn(
+                      'flex items-center justify-center gap-2 min-h-[44px] rounded-lg border font-semibold text-sm transition-all',
+                      theme === 'parchment'
+                        ? 'bg-primary/10 border-primary text-primary'
+                        : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+                    )}
+                  >
+                    <Sun className="w-4 h-4" />
+                    Parchment
+                  </button>
                 </div>
               </div>
 
@@ -302,6 +344,22 @@ export const SettingsPanel = () => {
                 <BookOpen className="w-4 h-4 mr-1" />
                 How to Play
               </Button>
+
+              {/* Replay Tutorial — only during a game */}
+              {phase === 'playing' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={() => {
+                    startTutorial();
+                    setOpen(false);
+                  }}
+                >
+                  <GraduationCap className="w-4 h-4 mr-1" />
+                  Replay Tutorial
+                </Button>
+              )}
             </div>
           </div>
         </ScrollArea>
