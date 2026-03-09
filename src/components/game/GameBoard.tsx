@@ -411,9 +411,11 @@ export const GameBoard = () => {
     tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid,
   }), [tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid]);
 
+  const isOpponentPondering = currentPlayerIndex === opponentIndex && phase === 'playing';
+
   const opponentPanelProps = useMemo(() => ({
-    opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid,
-  }), [opponentPlayer, currentPlayerIndex, isRaidMode]);
+    opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid, isPondering: isOpponentPondering,
+  }), [opponentPlayer, currentPlayerIndex, isRaidMode, isOpponentPondering]);
 
   return (
     <motion.div
