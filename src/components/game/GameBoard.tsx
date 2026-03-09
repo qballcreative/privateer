@@ -8,6 +8,7 @@ import { useMultiplayerStore } from '@/store/multiplayerStore';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionNotification } from './ActionNotification';
 import { InterstitialAd } from './InterstitialAd';
+import { VideoInterstitialAd } from './VideoInterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
