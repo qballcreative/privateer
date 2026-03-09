@@ -89,6 +89,7 @@ export const useRemoteConfigStore = create<RemoteConfigState>((set, get) => ({
           : DEFAULTS.defaultAIDifficulty,
         enabledRules: Array.isArray(data.enabledRules) ? data.enabledRules : DEFAULTS.enabledRules,
         maxPlayers: typeof data.maxPlayers === 'number' && data.maxPlayers >= 2 ? data.maxPlayers : DEFAULTS.maxPlayers,
+        iceServers: Array.isArray(data.iceServers) ? data.iceServers : DEFAULTS.iceServers,
       };
 
       set({ config: merged, loaded: true, error: null });
