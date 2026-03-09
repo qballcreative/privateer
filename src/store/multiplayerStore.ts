@@ -31,6 +31,7 @@ interface MultiplayerStore {
   joinGame: (hostId: string, playerName: string) => Promise<void>;
   reconnect: (gameCode: string, playerName: string) => Promise<void>;
   sendMessage: (message: GameMessage) => void;
+  sendForfeit: () => void;
   sendPing: () => void;
   startHeartbeat: () => void;
   stopHeartbeat: () => void;
