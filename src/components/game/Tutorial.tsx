@@ -36,8 +36,16 @@ export const Tutorial = () => {
   // Find target element with retry
   const measureTarget = useCallback((): HighlightRect | null => {
     if (!step?.highlightId) return null;
-    const el = document.querySelector<HTMLElement>(`[data-tutorial-id="${step.highlightId}"]`);
-    if (!el || el.offsetWidth === 0) return null;
+    // Find the VISIBLE element — multiple layouts may have the same data-tutorial-id
+    const candidates = document.querySelectorAll<HTMLElement>(`[data-tutorial-id="${step.highlightId}"]`);
+    let el: HTMLElement | null = null;
+    for (const candidate of candidates) {
+      if (candidate.offsetWidth > 0 && candidate.offsetHeight > 0) {
+        el = candidate;
+        break;
+      }
+    }
+    if (!el) return null;
     const r = el.getBoundingClientRect();
     return { top: r.top, left: r.left, width: r.width, height: r.height };
   }, [step?.highlightId]);
@@ -55,8 +63,9 @@ export const Tutorial = () => {
     const tryFind = () => {
       const measured = measureTarget();
       if (measured) {
-        // Scroll into view if needed
-        const el = document.querySelector<HTMLElement>(`[data-tutorial-id="${step?.highlightId}"]`);
+        // Find visible element for scrolling
+        const candidates = document.querySelectorAll<HTMLElement>(`[data-tutorial-id="${step?.highlightId}"]`);
+        const el = Array.from(candidates).find(c => c.offsetWidth > 0 && c.offsetHeight > 0);
         if (el) {
           const inView = measured.top >= 0 && measured.top + measured.height <= window.innerHeight;
           if (!inView) {
