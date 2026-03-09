@@ -125,7 +125,8 @@ export const UnloadChest = ({
   const [isUnloading, setIsUnloading] = useState(false);
   const [showSparkles, setShowSparkles] = useState(false);
   const [earnedTokens, setEarnedTokens] = useState<{ value: number; type: 'doubloon' | 'bonus' }[]>([]);
-  const { lastAction } = useGameStore();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { lastAction, tokenStacks } = useGameStore();
   const [announcement, setAnnouncement] = useState('');
   const processedAction = useRef<typeof lastAction>(null);
 
