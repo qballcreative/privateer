@@ -4,7 +4,7 @@ export const PRELOAD_IMAGES = [
   '/images/supply.webp', '/images/ledger-bg.webp', '/images/trading-post-bg.webp',
   '/images/cargo-hold-bg.webp', '/images/wood-bg.webp',
   '/Icons/Doubloon.webp', '/Icons/rum.webp', '/Icons/cannonballs.webp',
-  '/Icons/silks.png', '/Icons/silver.png', '/Icons/gold.webp', '/Icons/gemstones.webp',
+  '/Icons/silks.webp', '/Icons/silver.webp', '/Icons/gold.webp', '/Icons/gemstones.webp',
   '/Icons/RedSeal.webp', '/Icons/SilverSeal.webp', '/Icons/GoldSeal.webp',
   '/Icons/Claim.webp', '/Icons/Trade.webp',
 ];

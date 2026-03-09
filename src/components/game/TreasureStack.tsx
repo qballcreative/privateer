@@ -13,8 +13,8 @@ const treasureConfig: Record<GoodsType, {
 }> = {
   rum: { image: '/Icons/rum.webp', label: 'Rum' },
   cannonballs: { image: '/Icons/cannonballs.webp', label: 'Iron' },
-  silks: { image: '/Icons/silks.png', label: 'Silk' },
-  silver: { image: '/Icons/silver.png', label: 'Silver' },
+  silks: { image: '/Icons/silks.webp', label: 'Silk' },
+  silver: { image: '/Icons/silver.webp', label: 'Silver' },
   gold: { image: '/Icons/gold.webp', label: 'Gold' },
   gemstones: { image: '/Icons/gemstones.webp', label: 'Gems' },
 };
