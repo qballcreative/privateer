@@ -580,7 +580,7 @@ export const GameBoard = () => {
               <img src="/images/fleet.png" alt="Fleet" className="w-4 h-4 object-contain" />
               <span className="text-accent">{opponentPlayer?.ships.length || 0}</span>
             </div>
-          </div
+          </div>
 
           {/* Drawer triggers bar */}
           <div className="flex items-center justify-between gap-2">
