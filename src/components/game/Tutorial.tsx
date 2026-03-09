@@ -63,8 +63,9 @@ export const Tutorial = () => {
     const tryFind = () => {
       const measured = measureTarget();
       if (measured) {
-        // Scroll into view if needed
-        const el = document.querySelector<HTMLElement>(`[data-tutorial-id="${step?.highlightId}"]`);
+        // Find visible element for scrolling
+        const candidates = document.querySelectorAll<HTMLElement>(`[data-tutorial-id="${step?.highlightId}"]`);
+        const el = Array.from(candidates).find(c => c.offsetWidth > 0 && c.offsetHeight > 0);
         if (el) {
           const inView = measured.top >= 0 && measured.top + measured.height <= window.innerHeight;
           if (!inView) {
