@@ -4,6 +4,7 @@ import { Card, HAND_LIMIT } from '@/types/game';
 import CargoObject from './CargoObject';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/store/gameStore';
+import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
 import { cn } from '@/lib/utils';
 import { Anchor, ArrowLeftRight, AlertTriangle, Ship } from 'lucide-react';
 
@@ -125,9 +126,15 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
 
   return (
     <div data-tutorial-id="tutorial-trading-post" className="space-y-3 sm:space-y-4">
-      {/* Mode Toggle */}
-      {isPlayerTurn && phase === 'playing' && (
-        <div data-tutorial-id="tutorial-actions" className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
+      {/* Mode Toggle — always render during tutorial for highlight, otherwise only when it's the player's turn */}
+      {(() => {
+        const tutorialState = useTutorialStore.getState();
+        const tutorialNeedsActions = tutorialState.isActive && TUTORIAL_STEPS[tutorialState.currentStep]?.highlightId === 'tutorial-actions';
+        const showActions = (isPlayerTurn && phase === 'playing') || tutorialNeedsActions;
+        if (!showActions) return null;
+        const isDimmed = tutorialNeedsActions && !(isPlayerTurn && phase === 'playing');
+        return (
+        <div data-tutorial-id="tutorial-actions" className={cn("flex items-center justify-center gap-2 mb-2 sm:mb-4", isDimmed && "opacity-60 pointer-events-none")}>
           <Button
             variant={mode === 'take' ? 'default' : 'outline'}
             size="sm"
@@ -152,7 +159,8 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
             Trade Goods
           </Button>
         </div>
-      )}
+        );
+      })()}
 
       {/* Trading Post — Dock Table Surface */}
       <div className={cn(

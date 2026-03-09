@@ -1,46 +1,86 @@
+# Privateer: Letters of Marque — Implementation Plan
 
+> Last updated: 2026-03-09
 
-## Tutorial Highlight Fix
+---
 
-### Problems Identified
+## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
 
-1. **Steps 2-3 (Trading Post, Actions):** The `tutorial-actions` div only renders when `isPlayerTurn && phase === 'playing'`. If the tutorial fires before the player's turn is confirmed, the element doesn't exist in the DOM — no highlight appears.
+| Category | Score | Status |
+|----------|-------|--------|
+| Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
+| Game Mechanics | 8.0 | ✅ Sell confirmation added |
+| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
+| UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
+| Mobile | 7.5 | ✅ Mini-info bar shows key stats |
+| Multiplayer | 6.0 | ✅ TURN server config ready |
+| Onboarding | 7.5 | ✅ Naming fixed |
+| Performance | 8.0 | ✅ Preload extracted |
+| Code Quality | 8.0 | ✅ AI extracted, immutable state |
+| Monetization | 6.0 | Ad space reserved |
 
-2. **Steps 4-5 (Ship's Hold, Sell Cargo):** On phone layout, the Ship's Hold is wrapped in an `AnimatePresence` that hides it when `isExchangeMode` is true. If the mode state is wrong, the element is unmounted.
+---
 
-3. **Steps 6-7 (Market Prices, Commission Seals):** On phone layout, these elements live inside a Sheet drawer that is closed by default. The `data-tutorial-id` elements are not in the visible DOM, so `querySelector` returns null and no highlight renders.
+## ✅ Completed
 
-4. **Tooltip positioning covers the highlighted area:** The current logic uses `step.position` (e.g. `right`) which can place the tooltip directly over the highlighted element, especially on narrow viewports.
+### Quick Wins
+- Copyright year → 2026
+- "Iron" → "Cannonballs" in HowToPlay
+- Invalid action feedback wired to TradingPost
+- Preload images extracted to shared module
 
-### Plan
+### P0 Bugs
+- ✅ AI first-move bug fixed
+- ✅ Next-round first player (already implemented correctly)
+- ✅ Restart preserves firstPlayer (already implemented)
 
-#### 1. Tutorial-aware element visibility (Tutorial.tsx)
-- When a step has a `highlightId`, check if the element exists in the DOM. If not, attempt to reveal it:
-  - For `tutorial-market-prices` and `tutorial-bonus`: programmatically open the treasure drawer by dispatching a callback
-  - For `tutorial-actions`: always render the actions div (even if dimmed) during tutorial, or move `data-tutorial-id` to a parent that's always visible
-- Add a retry mechanism: if the element isn't found after the first attempt, wait 300ms and retry (up to 3 times) to handle animation delays.
+### P1 UX
+- ✅ Sell confirmation dialog with doubloon preview
+- ✅ Reduced in-game logo size ~30%
+- ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
 
-#### 2. Auto-open drawers during tutorial (PhoneLayout.tsx)
-- Accept a prop or use the tutorial store directly in PhoneLayout to auto-open `treasureDrawerOpen` when the current tutorial step targets `tutorial-market-prices` or `tutorial-bonus`.
-- Ensure `tradingPostCollapsed` is forced to `false` when tutorial targets `tutorial-trading-post` or `tutorial-actions`.
-- Ensure `isExchangeMode` doesn't hide the hold during tutorial steps targeting `tutorial-ships-hold`.
+### P2 Multiplayer
+- ✅ ICE servers now loaded from remote config (supports TURN when added)
+- ✅ Heartbeat/ping-pong already implemented
+- ✅ DisconnectModal with countdown already exists
 
-#### 3. Always render action buttons during tutorial (TradingPost.tsx)
-- Change the conditional `{isPlayerTurn && phase === 'playing' && (` to also render when the tutorial is active and current step targets `tutorial-actions`. The buttons can be visually dimmed but must exist in the DOM.
+### P3 Architecture
+- ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
+- ✅ Fixed syncEngineRules no-op
+- ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
 
-#### 4. Fix tooltip positioning logic (Tutorial.tsx)
-- Replace the current `step.position` system with a simpler two-option approach:
-  - **Primary:** Place the highlighted element at the top of the viewport (scroll to `block: 'start'`), tooltip below it
-  - **Fallback:** If not enough room below (element is near bottom), scroll to `block: 'end'` and place tooltip above
-- Remove `left`/`right` positioning options — always place tooltip vertically relative to the highlighted element, horizontally centered and viewport-clamped
+### Visual Polish
+- ✅ AI "thinking" overlay (already implemented in ShipsHold)
 
-#### 5. Remove `position` field from tutorial steps (tutorialStore.ts)
-- Remove all `position` properties from `TUTORIAL_STEPS` since positioning will now be automatic (below if possible, above if not).
+---
 
-### Files to modify
-- `src/components/game/Tutorial.tsx` — retry logic, new positioning algorithm
-- `src/store/tutorialStore.ts` — remove `position` fields
-- `src/components/game/TradingPost.tsx` — always render action buttons during tutorial
-- `src/components/game/layouts/PhoneLayout.tsx` — auto-open drawers/sections during tutorial steps
-- `src/components/game/layouts/types.ts` — if new props needed
+## Remaining Roadmap
 
+### 🟢 P3 — Architecture
+
+#### ✅ Split GameBoard Layouts
+Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
+
+---
+
+### 🔵 P4 — Monetization
+
+#### Real Ad SDK Integration
+Replace stubs with Google AdSense or similar.
+
+**Files:** `src/lib/adProvider.ts`, ad components
+
+---
+
+## Visual Polish Backlog
+
+- [x] Parchment theme CSS variables (already implemented)
+- [x] Custom pirate favicon (skull & crossbones with coins)
+- [x] Victory screen treasure chest opening animation (already implemented)
+- [x] Round-end "Wax Seal" animation (already implemented)
+
+---
+
+## ✅ Plan Complete
+
+All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.

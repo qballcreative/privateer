@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateScore } from '@/store/gameStore';
+import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
+import { TREASURE_DRAWER_STEPS, TRADING_POST_STEPS, HOLD_STEPS } from '../Tutorial';
 import { TradingPost } from '../TradingPost';
 import { ShipsHold } from '../ShipsHold';
 import { TreasureSupplyPanel } from './TreasureSupplyPanel';
@@ -18,7 +21,26 @@ export const PhoneLayout = ({
   treasureDrawerOpen, setTreasureDrawerOpen,
   opponentDrawerOpen, setOpponentDrawerOpen,
   tradingPostCollapsed, setTradingPostCollapsed, players,
-}: LayoutProps) => (
+}: LayoutProps) => {
+  const { isActive: tutorialActive, currentStep } = useTutorialStore();
+  const currentHighlightId = tutorialActive ? TUTORIAL_STEPS[currentStep]?.highlightId : undefined;
+
+  // Auto-open drawers/sections when tutorial targets elements inside them
+  useEffect(() => {
+    if (!tutorialActive || !currentHighlightId) return;
+
+    if (TREASURE_DRAWER_STEPS.includes(currentHighlightId)) {
+      setTreasureDrawerOpen(true);
+    }
+    if (TRADING_POST_STEPS.includes(currentHighlightId)) {
+      setTradingPostCollapsed(false);
+    }
+  }, [tutorialActive, currentHighlightId]);
+
+  // Force hold visible during tutorial
+  const forceShowHold = tutorialActive && currentHighlightId && HOLD_STEPS.includes(currentHighlightId);
+
+  return (
   <div className="block md:hidden space-y-3">
     {/* Mini scoreboard bar */}
     <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-card/60 border border-border text-xs">
@@ -123,7 +145,7 @@ export const PhoneLayout = ({
 
     {/* Ship's Hold */}
     <AnimatePresence>
-      {!isExchangeMode && (
+      {(!isExchangeMode || forceShowHold) && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
@@ -141,4 +163,5 @@ export const PhoneLayout = ({
       )}
     </AnimatePresence>
   </div>
-);
+  );
+};
