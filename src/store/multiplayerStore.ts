@@ -273,6 +273,15 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
     }
   },
 
+  sendForfeit: () => {
+    const { connection } = get();
+    if (connection && connection.open) {
+      connection.send({ type: 'action', payload: { action: 'forfeit' } });
+    }
+    // Small delay to let message send before disconnecting
+    setTimeout(() => get().disconnect(), 100);
+  },
+
   sendPing: () => {
     const { connection, missedPings } = get();
     if (connection && connection.open) {
