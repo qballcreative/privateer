@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
-import { usePlayerStore } from '@/store/playerStore';
+import { usePlayerStore, VoyageRecord } from '@/store/playerStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore } from '@/store/consentStore';
 import { useRemoteConfigStore } from '@/store/remoteConfigStore';
@@ -14,6 +14,9 @@ import { AdBanner } from './AdBanner';
 import { InstallPrompt } from './InstallPrompt';
 import { HeroSection } from './HeroSection';
 import { SetSailPanel } from './SetSailPanel';
+import { Badge } from '@/components/ui/badge';
+import { ChevronDown, ChevronUp, ScrollText } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const HowToPlunder = lazy(() => import('./HowToPlunder').then(m => ({ default: m.HowToPlunder })));
 const VictoryConditions = lazy(() => import('./VictoryConditions').then(m => ({ default: m.VictoryConditions })));
@@ -30,10 +33,68 @@ const PRELOAD_IMAGES = [
 ];
 PRELOAD_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
 
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: 'Deckhand',
+  medium: 'Bosun',
+  hard: 'Privateer',
+  expert: 'Admiral',
+};
+
+const RecentVoyages = ({ voyages }: { voyages: VoyageRecord[] }) => {
+  const [open, setOpen] = useState(false);
+  if (voyages.length === 0) return null;
+
+  return (
+    <div className="max-w-lg mx-auto px-4 mt-4">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-card/80 border border-border text-sm hover:bg-card transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <ScrollText className="w-4 h-4 text-primary" />
+          <span className="font-pirate text-primary">Recent Voyages</span>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-lg border border-border bg-card/60 overflow-hidden">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="py-1.5 px-3 text-left font-medium">Result</th>
+                <th className="py-1.5 px-3 text-left font-medium">Difficulty</th>
+                <th className="py-1.5 px-3 text-center font-medium">Score</th>
+                <th className="py-1.5 px-3 text-right font-medium">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {voyages.map((v, i) => (
+                <tr key={i} className={cn("border-b border-border/50 last:border-0", v.won ? "bg-primary/5" : "bg-destructive/5")}>
+                  <td className="py-1.5 px-3">
+                    <Badge variant={v.won ? 'default' : 'destructive'} className="text-[10px] px-1.5 py-0">
+                      {v.won ? 'Victory' : 'Defeat'}
+                    </Badge>
+                  </td>
+                  <td className="py-1.5 px-3 text-foreground">{DIFFICULTY_LABELS[v.difficulty]}</td>
+                  <td className="py-1.5 px-3 text-center text-foreground">{v.playerScore} – {v.opponentScore}</td>
+                  <td className="py-1.5 px-3 text-right text-muted-foreground">
+                    {new Date(v.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const LandingPage = () => {
   const {
     playerName: savedPlayerName,
     lastDifficulty,
+    recentVoyages,
     setPlayerName: savePlayerName,
     setLastDifficulty,
   } = usePlayerStore();
@@ -50,6 +111,7 @@ export const LandingPage = () => {
   const [bestOf, setBestOf] = useState<1 | 3>(1);
   const [firstPlayer, setFirstPlayer] = useState<'host' | 'random'>('host');
   const [showMultiplayer, setShowMultiplayer] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   const { startGame } = useGameStore();
   const navigate = useNavigate();
@@ -65,6 +127,7 @@ export const LandingPage = () => {
   };
 
   const handleStart = () => {
+    setStarting(true);
     const name = playerName.trim() || 'Captain';
     savePlayerName(name);
     const rules = restrictedMode
@@ -118,9 +181,13 @@ export const LandingPage = () => {
             onCreateRoom={handleCreateRoom}
             onJoinRoom={handleJoinRoom}
             restrictedMode={restrictedMode}
+            loading={starting}
           />
         )}
       </AnimatePresence>
+
+      {/* Recent Voyages */}
+      {!showMultiplayer && <RecentVoyages voyages={recentVoyages} />}
 
       {/* Educational sections */}
       {!showMultiplayer && (
