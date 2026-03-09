@@ -9,6 +9,8 @@ interface SettingsState {
   musicVolume: number;
   actionNotificationDuration: number;
   optionalRules: OptionalRules;
+  theme: 'dark' | 'parchment';
+  hasSeenMusicHint: boolean;
   
   // Actions
   setSoundEnabled: (enabled: boolean) => void;
@@ -18,6 +20,8 @@ interface SettingsState {
   setActionNotificationDuration: (duration: number) => void;
   setOptionalRule: (key: keyof OptionalRules, value: boolean) => void;
   setOptionalRules: (rules: OptionalRules) => void;
+  setTheme: (theme: 'dark' | 'parchment') => void;
+  setHasSeenMusicHint: (seen: boolean) => void;
 }
 
 const defaultOptionalRules: OptionalRules = {
@@ -35,6 +39,8 @@ export const useSettingsStore = create<SettingsState>()(
       musicVolume: 0.3,
       actionNotificationDuration: 3,
       optionalRules: defaultOptionalRules,
+      theme: 'dark',
+      hasSeenMusicHint: false,
 
       setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
       setMusicEnabled: (enabled) => set({ musicEnabled: enabled }),
@@ -45,6 +51,8 @@ export const useSettingsStore = create<SettingsState>()(
         optionalRules: { ...state.optionalRules, [key]: value },
       })),
       setOptionalRules: (rules) => set({ optionalRules: rules }),
+      setTheme: (theme) => set({ theme }),
+      setHasSeenMusicHint: (seen) => set({ hasSeenMusicHint: seen }),
     }),
     {
       name: 'plunder-settings',
