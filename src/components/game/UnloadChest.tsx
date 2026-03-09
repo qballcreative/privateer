@@ -105,8 +105,8 @@ const TickingScore = ({ value, label }: { value: number; label: string }) => {
 
   return (
     <span className="text-muted-foreground flex items-center gap-1">
-      {label === 'Doubloons' && <img src="/images/doubloons.webp" alt="Doubloons" className="w-7 h-7 object-contain -my-2" />}
-      {label === 'Comm' && <img src="/images/commissions.webp" alt="Commissions" className="w-7 h-7 object-contain -my-2" />}
+      {label === 'Doubloons' && <img src="/images/doubloons.png" alt="Doubloons" className="w-7 h-7 object-contain -my-2" />}
+      {label === 'Comm' && <img src="/images/commissions.png" alt="Commissions" className="w-7 h-7 object-contain -my-2" />}
       {label !== 'Doubloons' && label !== 'Comm' && <>{label}: </>}
       <span className="font-bold text-primary">{display}</span>
     </span>
@@ -242,7 +242,7 @@ export const UnloadChest = ({
             {hasSelection && allSameType && selectedType && (
               <div className="flex items-center gap-1.5">
                 <img
-                  src={`/Icons/${selectedType}.webp`}
+                  src={`/Icons/${selectedType}.png`}
                   alt={selectedType}
                   className={cn('object-contain', isPhone ? 'w-6 h-6' : 'w-7 h-7')}
                 />
@@ -267,7 +267,7 @@ export const UnloadChest = ({
               )}
               size="sm"
             >
-              <img src="/images/supply.webp" alt="Sell Cargo" className={cn(isPhone ? 'w-4 h-4' : 'w-5 h-5', 'mr-1 object-contain')} />
+              <img src="/images/supply.png" alt="Sell Cargo" className={cn(isPhone ? 'w-4 h-4' : 'w-5 h-5', 'mr-1 object-contain')} />
               Sell Cargo{hasSelection ? ` (${selectedCards.length})` : ''}
             </Button>
 
@@ -289,7 +289,7 @@ export const UnloadChest = ({
               <AlertDialogHeader>
                 <AlertDialogTitle className="font-pirate text-primary flex items-center gap-2">
                   {selectedType && (
-                    <img src={`/Icons/${selectedType}.webp`} alt="" className="w-7 h-7 object-contain" />
+                    <img src={`/Icons/${selectedType}.png`} alt="" className="w-7 h-7 object-contain" />
                   )}
                   Sell Cargo?
                 </AlertDialogTitle>

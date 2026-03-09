@@ -58,22 +58,22 @@ const HowToPlay = () => {
               {
                 title: 'Trading Post',
                 desc: '5 cargo goods are dealt face-up on the dock. This is where you\'ll claim and trade goods each turn.',
-                icon: '/Icons/Trade.webp',
+                icon: '/Icons/Trade.png',
               },
               {
                 title: "Ship's Hold",
                 desc: 'Your personal cargo bay. You can hold a maximum of 7 cargo at the end of your turn — ships are stored separately in your fleet and don\'t count toward this limit.',
-                icon: '/Icons/Claim.webp',
+                icon: '/Icons/Claim.png',
               },
               {
                 title: 'Trading Post Supply',
                 desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Trading Post supply.',
-                icon: '/images/supply.webp',
+                icon: '/images/supply.png',
               },
               {
                 title: 'Market Prices',
                 desc: 'Stacked doubloon tokens for each goods type. The top token is the most valuable — prices drop as goods are sold.',
-                icon: '/Icons/Doubloon.webp',
+                icon: '/Icons/Doubloon.png',
               },
             ].map((item) => (
               <div key={item.title} className="game-box-card p-4 flex items-start gap-4">
@@ -96,7 +96,7 @@ const HowToPlay = () => {
 
           <div className="space-y-4">
             <ActionCard
-              icon={<img src="/Icons/Claim.webp" alt="Claim" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Claim.png" alt="Claim" className="w-8 h-8 object-contain" />}
               title="Claim Cargo"
               desc="Take 1 good from the Trading Post and add it to your Hold. The empty slot is refilled from the Trading Post supply."
             />
@@ -106,12 +106,12 @@ const HowToPlay = () => {
               desc="Take ALL ships from the Trading Post at once! Ships don't count toward your hand limit. The player with the most ships earns 5 bonus doubloons at round end."
             />
             <ActionCard
-              icon={<img src="/Icons/exchange.webp" alt="Trade" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/exchange.png" alt="Trade" className="w-8 h-8 object-contain" />}
               title="Trade Goods"
               desc="Exchange 2 or more goods between your Hold and the Trading Post. You cannot trade a goods type for the same type (e.g., trading away rum to take rum). You can use ships from your fleet as part of the trade — great for upgrading cheap goods to expensive ones!"
             />
             <ActionCard
-              icon={<img src="/Icons/sell.webp" alt="Sell" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/sell.png" alt="Sell" className="w-8 h-8 object-contain" />}
               title="Sell Cargo"
               desc="Sell 2+ matching goods from your Hold to earn doubloon tokens. For premium goods (gold, silver, gems), you must sell at least 2. Sell 3, 4, or 5+ to earn bonus Commission Seals!"
             />
@@ -170,9 +170,9 @@ const HowToPlay = () => {
           </p>
           <div className="flex flex-wrap gap-4">
             {[
-              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.webp' },
-              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.webp' },
-              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.webp' },
+              { count: '3 cards', values: '1–3 bonus', img: '/Icons/RedSeal.png' },
+              { count: '4 cards', values: '4–6 bonus', img: '/Icons/SilverSeal.png' },
+              { count: '5+ cards', values: '8–10 bonus', img: '/Icons/GoldSeal.png' },
             ].map((b) => (
               <div key={b.count} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
                 <img src={b.img} alt={b.count} className="w-8 h-8 object-contain" />
@@ -207,17 +207,17 @@ const HowToPlay = () => {
           </p>
           <div className="space-y-4">
             <ActionCard
-              icon={<img src="/Icons/Storm.webp" alt="Storm" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Storm.png" alt="Storm" className="w-8 h-8 object-contain" />}
               title="Storm Rule"
               desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Trading Post supply. Keep your strategy flexible — the market can shift without warning."
             />
             <ActionCard
-              icon={<img src="/Icons/Raid.webp" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Raid.png" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
               title="Pirate Raid"
               desc="Once per game, you can launch a Pirate Raid on your opponent! Steal 1 random cargo from their Hold. Use it strategically — you only get one raid per game."
             />
             <ActionCard
-              icon={<img src="/Icons/bonus.webp" alt="Treasure Chest" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/bonus.png" alt="Treasure Chest" className="w-8 h-8 object-contain" />}
               title="Treasure Chest"
               desc="When enabled, each player accumulates hidden treasure tokens throughout the round. These are revealed at the end and added to your doubloon total — an exciting surprise that can swing the outcome!"
             />

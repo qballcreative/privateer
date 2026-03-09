@@ -11,12 +11,12 @@ const treasureConfig: Record<GoodsType, {
   image: string; 
   label: string;
 }> = {
-  rum: { image: '/Icons/rum.webp', label: 'Rum' },
-  cannonballs: { image: '/Icons/cannonballs.webp', label: 'Iron' },
-  silks: { image: '/Icons/silks.webp', label: 'Silk' },
-  silver: { image: '/Icons/silver.webp', label: 'Silver' },
-  gold: { image: '/Icons/gold.webp', label: 'Gold' },
-  gemstones: { image: '/Icons/gemstones.webp', label: 'Gems' },
+  rum: { image: '/Icons/rum.png', label: 'Rum' },
+  cannonballs: { image: '/Icons/cannonballs.png', label: 'Iron' },
+  silks: { image: '/Icons/silks.png', label: 'Silk' },
+  silver: { image: '/Icons/silver.png', label: 'Silver' },
+  gold: { image: '/Icons/gold.png', label: 'Gold' },
+  gemstones: { image: '/Icons/gemstones.png', label: 'Gems' },
 };
 
 export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
@@ -49,7 +49,7 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
               animate={{ scale: 1, y: 0 }}
               layout
             >
-              <img src="/Icons/Doubloon.webp" alt="doubloon" className="w-full h-full" />
+              <img src="/Icons/Doubloon.png" alt="doubloon" className="w-full h-full" />
               {index === tokens.slice(0, 4).length - 1 && topToken && (
                 <span className="absolute inset-0 flex items-center justify-center font-bold text-sm" style={{ color: '#1a0f00', textShadow: '0 1px 2px rgba(255,220,100,0.6)' }}>
                   {topToken.value}

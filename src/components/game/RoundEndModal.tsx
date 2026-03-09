@@ -21,10 +21,10 @@ interface RoundEndModalProps {
 const WaxSeal = ({ round, isWinner }: { round: number; isWinner: boolean }) => {
   // Choose seal based on round
   const sealSrc = round === 3 
-    ? '/Icons/GoldSeal.webp' 
+    ? '/Icons/GoldSeal.png' 
     : round === 2 
-      ? '/Icons/SilverSeal.webp' 
-      : '/Icons/RedSeal.webp';
+      ? '/Icons/SilverSeal.png' 
+      : '/Icons/RedSeal.png';
 
   return (
     <motion.div

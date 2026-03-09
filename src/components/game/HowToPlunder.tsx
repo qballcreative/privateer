@@ -2,19 +2,19 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 const steps = [
   {
-    img: '/Icons/Claim.webp',
+    img: '/Icons/Claim.png',
     num: 1,
     title: 'Claim Cargo',
     description: 'Take goods from the Trading Post to fill your Ship\'s Hold, or commandeer all ships at once.',
   },
   {
-    img: '/Icons/Trade.webp',
+    img: '/Icons/Trade.png',
     num: 2,
     title: 'Trade Goods',
     description: 'Exchange 2+ goods between your Hold and the Trading Post. Ships act as wildcards!',
   },
   {
-    img: '/Icons/Sell.webp',
+    img: '/Icons/Sell.png',
     num: 3,
     title: 'Sell Cargo',
     description: 'Sell matching cargo for doubloons. Larger shipments earn bonus Commission Medallions!',
