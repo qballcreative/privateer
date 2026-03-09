@@ -22,16 +22,8 @@ const HowToPlunder = lazy(() => import('./HowToPlunder').then(m => ({ default: m
 const VictoryConditions = lazy(() => import('./VictoryConditions').then(m => ({ default: m.VictoryConditions })));
 
 // Preload game board images while user is on landing page
-const PRELOAD_IMAGES = [
-  '/images/doubloons.png', '/images/commissions.png', '/images/fleet.png',
-  '/images/supply.png', '/images/ledger-bg.png', '/images/trading-post-bg.png',
-  '/images/cargo-hold-bg.png', '/images/wood-bg.png',
-  '/Icons/Doubloon.png', '/Icons/rum.png', '/Icons/cannonballs.png',
-  '/Icons/silks.png', '/Icons/silver.png', '/Icons/gold.png', '/Icons/gemstones.png',
-  '/Icons/RedSeal.png', '/Icons/SilverSeal.png', '/Icons/GoldSeal.png',
-  '/Icons/Claim.png', '/Icons/Trade.png',
-];
-PRELOAD_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
+import { preloadImages } from '@/lib/preloadImages';
+preloadImages();
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: 'Deckhand',
