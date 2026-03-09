@@ -11,7 +11,7 @@ const infoBadges = [
 
 export const HeroSection = () => {
   return (
-    <section className="relative w-full h-[36vh] md:h-[44vh] lg:h-[50vh] flex items-center justify-center overflow-hidden mb-8 md:mb-12">
+    <section className="relative w-full min-h-[40vh] md:min-h-[44vh] lg:min-h-[50vh] flex items-center justify-center overflow-hidden mb-8 md:mb-12 py-8">
       {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
