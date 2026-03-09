@@ -12,11 +12,16 @@ const infoBadges = [
 export const HeroSection = () => {
   return (
     <section className="relative w-full min-h-[40vh] md:min-h-[44vh] lg:min-h-[50vh] flex items-center justify-center overflow-hidden mb-8 md:mb-12 py-8">
-      {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBg})` }}>
-        
+      {/* Background - using img for LCP discoverability + fetchPriority */}
+      <div className="absolute inset-0">
+        <img
+          src={heroBg}
+          alt=""
+          // @ts-ignore
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
       </div>
 
