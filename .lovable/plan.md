@@ -1,280 +1,201 @@
 
+# Privateer: Letters of Marque — Implementation Plan
 
-# Visual Redesign Plan: Privateer: Letters of Marque
-
-## Vision Summary
-Transform "Plunder" into "Privateer: Letters of Marque" - a premium tactile experience where players handle physical cargo objects on a weathered dock table, rather than abstract cards. Every interaction should feel like physically placing, swapping, or unloading cargo under a Letter of Marque.
+> Last updated: 2026-03-09
 
 ---
 
-## Design Philosophy
+## Site Evaluation
 
-### Core Spatial Metaphors
-| Current Term | New Metaphor | Visual Representation |
-|--------------|--------------|----------------------|
-| Market | **Trading Post** | Weathered dock table with cargo crates |
-| Player Hand | **Ship's Hold** | Cargo bay with physical inventory slots |
-| Cards | **Cargo Objects** | 3D-style physical goods (crates, barrels, chests) |
-| Sell Action | **Unload Cargo** | Goods being offloaded → coins + commission medallions |
-| Token Stacks | **Coin Purses** | Stacked doubloons with leather pouch aesthetic |
-| Deck | **Supply Ship** | Silhouette of arriving cargo ship with count |
+### Strengths
+- ✅ Strong thematic design (Pirata One typography, gold/ocean palette, wood textures)
+- ✅ Full AI opponent with 4 difficulty tiers and strategic heuristics
+- ✅ Rules engine plugin system (storm, pirate raid, treasure chest optional rules)
+- ✅ P2P multiplayer via PeerJS (WebRTC)
+- ✅ Best-of-1 / Best-of-3 match structure with persistent W/L stats
+- ✅ PWA support (manifest, service worker, install prompt)
+- ✅ Age consent + restricted mode for COPPA compliance
+- ✅ Remote config store (feature flags, difficulty defaults)
+- ✅ Debug panel + ring-buffer debug logging
+- ✅ Vitest unit tests for the rules engine
 
-### Visual Tone
-- Materials: Wood grain, brass fittings, rope texture, aged leather, parchment
-- Lighting: Warm lantern glow, harbor at dusk ambiance
-- Typography: Maintains `Pirata One` for headers, `Crimson Text` for body
-- No cartoonish elements - grounded, premium tabletop aesthetic
+### Weaknesses / Issues Found
+- ❌ **BUG (FIXED):** AI doesn't move when it is selected as the first player (random start)
+- ❌ P2P multiplayer has no TURN server fallback → fails behind strict NAT
+- ❌ No reconnection flow when a peer disconnects mid-game
+- ❌ Ad system is stubbed (no real SDK integrated)
+- ❌ No IAP / premium unlock flow
+- ❌ No E2E test coverage (only unit tests)
+- ❌ No theme toggle (dark-only)
+- ❌ Tutorial tooltips not yet implemented on the game board
+- ❌ Loading states missing (no skeleton screens during game start / AI thinking)
+- ❌ `nextRound` always resets `currentPlayerIndex` to 0, ignoring who won the prior round
+- ❌ `restartGame` doesn't preserve the `firstPlayer` preference
 
 ---
 
-## Phase 1: Foundation and Core Components
+## Priority Roadmap
 
-### 1.1 Rename and Rebrand
-- Update title from "Plunder" to "Privateer: Letters of Marque"
-- Update subtitle to "A Trading Duel"
-- Update footer credits
+### 🔴 P0 — Critical Bugs
 
-**Files**: `LandingPage.tsx`, `GameBoard.tsx`, `index.html`
+#### 1. AI First-Move Bug ✅ FIXED
+**Problem:** When `firstPlayer = 'random'` lands on the AI, `startGame` called `set(initialState)` without scheduling `makeAIMove()`. The AI sat "pondering" forever.
 
-### 1.2 New Component: CargoObject (replaces GameCard)
-Replace the card metaphor with physical cargo objects:
-
-```text
-+------------------+
-|  ┌────────────┐  |  ← Wooden crate texture
-|  │   [ICON]   │  |  ← Cargo icon (barrel, chest, etc.)
-|  │    RUM     │  |  ← Brass label plate
-|  └────────────┘  |
-+------------------+
+**Fix applied** in `src/store/gameStore.ts`:
+```typescript
+// After set(initialState) in startGame:
+if (initialState.players[initialState.currentPlayerIndex]?.isAI) {
+  const notifDuration = useSettingsStore.getState().actionNotificationDuration;
+  setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+}
 ```
 
-**Cargo visuals by type**:
-- **Rum**: Wooden barrel + bottle combo (single unit)
-- **Cannonballs**: Iron-bound crate with visible balls
-- **Silks**: Wrapped bale with fabric texture
-- **Silver**: Metal-banded strongbox
-- **Gold**: Ornate chest with gold trim
-- **Gemstones**: Velvet-lined jewelry case
-- **Ships**: Miniature ship model on stand
+#### 2. Next-Round First Player
+**Problem:** `nextRound()` hardcodes `currentPlayerIndex: 0`. In most trading card games the loser of the previous round goes first (or the winner — should be configurable).
 
-**Files**: Create `src/components/game/CargoObject.tsx`
+**Fix:** After determining `roundWinner`, store loser index and use it as starting player in `nextRound`.
 
-### 1.3 Update CSS Variables and Textures
-Add new texture-based styling:
-- Wood plank backgrounds for containers
-- Rope border patterns
-- Brass button/badge styling
-- Parchment overlays for information panels
+**File:** `src/store/gameStore.ts` → `nextRound()`
 
-**Files**: `src/index.css`
+#### 3. Restart Game Preserves Settings
+**Problem:** `restartGame()` calls `startGame(playerName, difficulty, optionalRules)` without passing `firstPlayer`, so random-first is lost on rematch.
+
+**Fix:** Store `firstPlayer` preference in game state and pass it through `restartGame`.
+
+**File:** `src/store/gameStore.ts`, `src/types/game.ts`
 
 ---
 
-## Phase 2: Trading Post (Market)
+### 🟠 P1 — Multiplayer Robustness
 
-### 2.1 New Component: TradingPost (replaces Market)
-Transform from card display to dock table surface:
+#### 4. TURN Server Fallback
+**Problem:** PeerJS WebRTC connections fail behind symmetric NAT (corporate, mobile carrier networks). Without a TURN server, ~15–20% of connection attempts fail.
 
-```text
-╔══════════════════════════════════════════════════╗
-║              TRADING POST                        ║
-║  ┌──────────────────────────────────────────┐   ║
-║  │   [WOOD PLANKS TEXTURE BACKGROUND]       │   ║
-║  │                                           │   ║
-║  │   🪵  🛢️  📦  💎  ⛵                      │   ║
-║  │  (cargo objects arranged on dock)        │   ║
-║  │                                           │   ║
-║  └──────────────────────────────────────────┘   ║
-║                                                  ║
-║  Supply Ship: ▓▓▓░░ 23 cargo remaining          ║
-╚══════════════════════════════════════════════════╝
-```
+**Plan:**
+1. Add `iceServers` config to PeerJS constructor pointing at a public TURN server (e.g., Metered.ca free tier, or self-hosted coturn).
+2. Surface connection quality in the `ConnectionIndicator` component.
+3. Store the TURN credentials in `public/config/remote.json` (or as env secrets).
 
-- Dock table surface with wood plank texture
-- Cargo objects sit on the table (not floating cards)
-- "Supply Ship" indicator replaces "Deck" count
-- Rope border framing
+**Files:** `src/store/multiplayerStore.ts`, `src/components/game/ConnectionIndicator.tsx`, `public/config/remote.json`
 
-**Files**: Create `src/components/game/TradingPost.tsx`, update `GameBoard.tsx`
+#### 5. Reconnection UX
+**Problem:** If a peer disconnects, the opponent sees a spinner but no clear feedback or recovery path.
 
-### 2.2 Action Mode Toggles
-Rename and restyle:
-- "Take" → "Claim Cargo" (hand reaching icon)
-- "Exchange" → "Trade Goods" (swap arrows over crates)
-- "Take All Ships" → "Commandeer Fleet" (nautical wheel icon)
+**Plan:**
+1. Add a 30-second reconnection window in `multiplayerStore` — attempt to re-establish the peer connection using the same room ID.
+2. Show a `DisconnectModal` with countdown: "Waiting for [Opponent] to reconnect… 28s"
+3. After timeout, offer: "Claim Victory" (record as win) or "Return to Port" (no record).
+4. Emit a `ping`/`pong` heartbeat every 5s to detect silent disconnects faster.
+
+**Files:** `src/store/multiplayerStore.ts`, `src/components/game/DisconnectModal.tsx`
 
 ---
 
-## Phase 3: Ship's Hold (Player Hand)
+### 🟡 P2 — Polish
 
-### 3.1 New Component: ShipsHold (replaces PlayerHand)
-Transform player hand into cargo bay visualization:
+#### 6. Loading States / Skeleton Screens
+**Problem:** Game board appears instantly but AI "thinking" has no visual feedback beyond the turn banner.
 
-```text
-╔══════════════════════════════════════════════════╗
-║  CAPTAIN'S HOLD                    ⚓ Fleet: 3   ║
-╠══════════════════════════════════════════════════╣
-║  ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐   ║
-║  │ 🛢️  │ 📦  │ 💎  │ 🥇  │     │     │     │   ║  ← 7 cargo slots
-║  │ Rum │Silk │ Gem │Gold │     │     │     │   ║
-║  └─────┴─────┴─────┴─────┴─────┴─────┴─────┘   ║
-║                                                  ║
-║  [UNLOAD CARGO]        Doubloons: 45 | Bonus: 8 ║
-╚══════════════════════════════════════════════════╝
-```
+**Plan:**
+- Add a pulsing "Thinking…" overlay on the AI player's hold area during AI turn.
+- Add skeleton placeholders on the `TradingPost` during the brief game-start transition.
+- Show a loading spinner in `SetSailPanel` after "Start Game" is clicked until the board renders.
 
-- Visual slot system (7 slots for hand limit)
-- Empty slots show as wooden compartments
-- "Unload Cargo" replaces "Sell"
-- Fleet count shows ship collection
+**Files:** `src/components/game/GameBoard.tsx`, `src/components/game/ShipsHold.tsx`, `src/components/game/SetSailPanel.tsx`
 
-**Files**: Create `src/components/game/ShipsHold.tsx`, update `GameBoard.tsx`
+#### 7. Theme Toggle (Dark / Light / Parchment)
+**Problem:** App is dark-only. A sepia "parchment" theme would complement the pirate aesthetic and improve daytime readability.
 
-### 3.2 Opponent's Hold
-Show opponent's cargo as obscured/covered crates:
-- Tarp-covered cargo silhouettes
-- Count indicator visible
-- During Pirate Raid: tarps lift to reveal options
+**Plan:**
+1. Add `theme` field to `settingsStore` (`'dark' | 'light' | 'parchment'`).
+2. Define CSS variable overrides for each theme in `index.css`.
+3. Add theme toggle button to `SettingsPanel`.
+4. Persist via zustand `persist` middleware (already in place).
 
----
+**Files:** `src/store/settingsStore.ts`, `src/index.css`, `src/components/game/SettingsPanel.tsx`
 
-## Phase 4: Treasure Display
+#### 8. Tutorial Tooltips on Game Board
+**Problem:** The tutorial exists as a separate page but first-time players get no in-context guidance on the game board.
 
-### 4.1 New Component: TreasureChest (replaces TokenStack)
-Replace circular tokens with stacked doubloons:
+**Plan:**
+1. Add a `tutorialStore` step tracker (already exists — review and extend).
+2. Wrap key UI areas (`TradingPost`, `ShipsHold`, `UnloadChest`) in a `TutorialTooltip` component.
+3. Show dismissible tooltips that advance through 6 steps on first game only.
+4. "Skip Tutorial" link in step 1.
 
-```text
-    ╭──────────╮
-    │   RUM    │  ← Leather label
-    ├──────────┤
-    │ ⬤ ⬤ ⬤   │  ← Stacked coins
-    │  ⬤ ⬤    │
-    │   ⬤     │
-    │   [4]   │  ← Top coin shows value
-    ╰──────────╯
-       5 left
-```
-
-**Files**: Create `src/components/game/TreasureStack.tsx`
-
-### 4.2 Update BonusTokens Display
-Transform to "Commission Medallions":
-- Bronze/Silver/Gold medallions for 3/4/5 card bonuses
-- Wax seal aesthetic
-
-**Files**: Update `src/components/game/BonusTokens.tsx`
+**Files:** `src/store/tutorialStore.ts`, `src/components/game/Tutorial.tsx`, `src/components/game/GameBoard.tsx`
 
 ---
 
-## Phase 5: Scoreboard and UI Chrome
+### 🟢 P3 — Monetization
 
-### 5.1 Update ScoreBoard
-Rename to "Captain's Ledger":
-- Parchment texture background
-- Quill/ink aesthetic for scores
-- Round indicators become wax seals
+#### 9. Real Ad SDK Integration
+**Problem:** `adProvider.ts` and all ad components (`AdBanner`, `InterstitialAd`, `RewardedAd`) are stubbed with mock implementations.
 
-### 5.2 Header Updates
-- Game title: "Privateer: Letters of Marque"
-- Optional rules icons get thematic frames (rope circles)
-- Turn indicator: "Your Move, Captain" / "Opponent is trading..."
+**Plan:**
+1. Evaluate SDK options: **Google AdSense** (web), **AdMob** (if wrapping in Capacitor), or **Playwire** (game-focused).
+2. Implement `platform.ts` detection to serve different ad units for PWA vs. browser.
+3. Wire `InterstitialAd` to fire between rounds (already gated by `remoteConfig.showInterstitialAds`).
+4. Wire `RewardedAd` to unlock an extra turn or reveal AI's hand temporarily.
 
-### 5.3 Action Notification Updates
-Transform to "Harbor Master's Log":
-- Parchment scroll appearance
-- Handwritten-style descriptions
-- Cargo icons instead of card previews
+**Files:** `src/lib/adProvider.ts`, `src/lib/platform.ts`, ad component files
 
-**Files**: Update `ScoreBoard.tsx`, `GameBoard.tsx`, `ActionNotification.tsx`
+#### 10. IAP / Premium Unlock
+**Problem:** No premium tier exists.
 
----
+**Plan:**
+1. Define premium features: remove ads, unlock "Admiral" AI difficulty always, custom player avatar.
+2. Integrate **Stripe** for web payments (one-time purchase, $2.99).
+3. Store `isPremium` in `playerStore` (persist locally; validate on Lovable Cloud edge function).
+4. Add "Go Premium" CTA in `SettingsPanel` and after a loss to an ad.
 
-## Phase 6: Landing Page Redesign
-
-### 6.1 Title and Branding
-- Main title: "Privateer" (large, ornate)
-- Subtitle: "Letters of Marque" (smaller, elegant)
-- Tagline: "A Trading Duel" (replaces "A Pirate Trading Card Game")
-
-### 6.2 Goods Showcase
-Replace card icons with cargo object previews:
-- Mini 3D-style cargo representations
-- Tooltip: "Rum Barrels", "Silk Bales", etc.
-
-### 6.3 How to Play Section
-Update terminology:
-- "Take" → "Claim cargo from the Trading Post"
-- "Exchange" → "Trade goods with the harbor"
-- "Sell" → "Unload cargo for doubloons and commission"
-
-**Files**: Update `LandingPage.tsx`
+**Files:** `src/store/playerStore.ts`, new `src/pages/Premium.tsx`, edge function
 
 ---
 
-## Phase 7: Victory/End Screens
+### 🔵 P4 — Testing
 
-### 7.1 Round End Modal
-- "Voyage Complete" header
-- Score shown as "Treasure Manifest"
-- Ship comparison as fleet silhouettes
+#### 11. E2E Test Coverage (Playwright)
+**Problem:** Only unit tests exist for the rules engine. No end-to-end coverage of user flows.
 
-### 7.2 Game End Modal
-- "Letters of Marque Awarded" for winner
-- Treasure chest animation opening
-- Final tally on aged parchment
+**Plan — test scenarios:**
+| Scenario | Priority |
+|----------|----------|
+| Start AI game (human first) and take a card | P0 |
+| Start AI game (random first → AI goes first) | P0 |
+| Sell cards, verify token awarded | P1 |
+| Exchange cards (valid + invalid same-type) | P1 |
+| Complete a full round, verify round-end modal | P1 |
+| Best-of-3 — play to game end | P2 |
+| Multiplayer — create room + join (same browser, two tabs) | P2 |
 
-**Files**: Update modals in `GameBoard.tsx`
-
----
-
-## Asset Requirements
-
-### New Images Needed
-1. Wood plank texture (dock surface)
-2. Cargo crate base texture
-3. Leather/rope border elements
-4. Parchment texture (for modals/scoreboard)
-5. Brass plate texture (for labels)
-
-### Cargo Object Icons (to replace card images)
-- Rum: Barrel + bottle combo
-- Cannonballs: Iron crate with visible balls
-- Silks: Wrapped fabric bale
-- Silver: Metal strongbox
-- Gold: Ornate treasure chest
-- Gemstones: Jewelry case
-- Ships: Miniature model
+**Files:** New `e2e/` directory with `playwright.config.ts`
 
 ---
 
-## Implementation Order
+## Implementation Order (Recommended)
 
-1. **Foundation** (Phase 1): Rename, new CSS variables, CargoObject component
-2. **Core Gameplay** (Phase 2-3): TradingPost + ShipsHold
-3. **Scoring** (Phase 4-5): TreasureStack + Ledger updates
-4. **Polish** (Phase 6-7): Landing page + Victory screens
+| # | Task | Effort | Impact |
+|---|------|--------|--------|
+| 1 | ✅ AI first-move bug | XS | P0 |
+| 2 | Next-round first player fix | S | P0 |
+| 3 | Restart preserves settings | XS | P0 |
+| 4 | Loading states / AI thinking UI | S | UX |
+| 5 | Tutorial tooltips | M | Retention |
+| 6 | Theme toggle | S | Polish |
+| 7 | TURN server config | S | Multiplayer reach |
+| 8 | Reconnect UX | M | Multiplayer retention |
+| 9 | Playwright E2E setup | M | Quality |
+| 10 | Real Ad SDK | L | Revenue |
+| 11 | IAP / Stripe | L | Revenue |
 
 ---
 
-## Technical Notes
+## Visual Design Plan (Existing — carried forward)
 
-### Component Mapping
-| Old Component | New Component | Status |
-|---------------|---------------|--------|
-| `GameCard.tsx` | `CargoObject.tsx` | Create new |
-| `Market.tsx` | `TradingPost.tsx` | Create new |
-| `PlayerHand.tsx` | `ShipsHold.tsx` | Create new |
-| `TokenStack.tsx` | `TreasureStack.tsx` | Create new |
-| `BonusTokens.tsx` | Update in place | Modify |
-| `ScoreBoard.tsx` | Update in place | Modify |
+The original design plan (CargoObject metaphor, TradingPost, ShipsHold, TreasureStack) has been **implemented**. The following visual polish items remain:
 
-### Backward Compatibility
-- Game logic in stores remains unchanged
-- Types remain the same (Card, Token, etc.)
-- Only visual/presentation layer changes
-
-### Animation Updates
-- Card flip → Crate lid opening
-- Card selection → Cargo glow/lift effect
-- Token collection → Coins dropping into purse
-
+- [ ] Parchment theme CSS variables
+- [ ] AI "thinking" overlay animation on opponent's hold
+- [ ] Victory screen treasure chest opening animation (framer-motion)
+- [ ] Round-end "Wax Seal" animation for round winner indicator
