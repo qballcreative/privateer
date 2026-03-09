@@ -212,7 +212,7 @@ const HowToPlay = () => {
               desc="Every 3rd turn, a storm hits the Trading Post! 2 random goods are swept overboard and replaced from the Trading Post supply. Keep your strategy flexible — the market can shift without warning."
             />
             <ActionCard
-              icon={<img src="/Icons/Raid.png" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
+              icon={<img src="/Icons/Raid.webp" alt="Pirate Raid" className="w-8 h-8 object-contain" />}
               title="Pirate Raid"
               desc="Once per game, you can launch a Pirate Raid on your opponent! Steal 1 random cargo from their Hold. Use it strategically — you only get one raid per game."
             />
