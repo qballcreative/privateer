@@ -29,6 +29,7 @@ import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
 import { Home, Swords, CloudLightning, Crosshair, Gift, X, Anchor, Coins, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import bannerLogo from '@/assets/BannerLogo.png';
+import { toast } from '@/components/ui/sonner';
 
 // ─── Preload static images at module level ───
 const PRELOAD_IMAGES = [
