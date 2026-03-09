@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { AdBottomBanner } from '../AdBottomBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateScore } from '@/store/gameStore';
 import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
