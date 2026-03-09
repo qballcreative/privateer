@@ -166,8 +166,23 @@ export const UnloadChest = ({
   }, [lastAction]);
 
   const handleUnload = useCallback(() => {
+    setShowConfirm(false);
     onUnload();
   }, [onUnload]);
+
+  // Calculate expected doubloon value for confirmation
+  const getExpectedValue = useCallback(() => {
+    if (!hasSelection || !selectedType) return 0;
+    const type = selectedType as GoodsType;
+    const stack = tokenStacks?.[type];
+    if (!stack) return 0;
+    return stack.slice(0, selectedCards.length).reduce((sum, t) => sum + t.value, 0);
+  }, [selectedCards, selectedType, tokenStacks, hasSelection]);
+
+  const CARGO_LABELS: Record<string, string> = {
+    cannonballs: 'Cannonballs', rum: 'Rum', silver: 'Silver',
+    silks: 'Silk', gold: 'Gold', gemstones: 'Gems',
+  };
 
   const selectedType = hasSelection
     ? player.hand.find((c) => selectedCards.includes(c.id))?.type
