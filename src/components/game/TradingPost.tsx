@@ -43,6 +43,9 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
     lastAction,
   } = useGameStore();
   
+  const tutorialIsActive = useTutorialStore((s) => s.isActive);
+  const tutorialStep = useTutorialStore((s) => s.currentStep);
+  
   const [selectedMarketCards, setSelectedMarketCards] = useState<string[]>([]);
   const [selectedHandCards, setSelectedHandCards] = useState<string[]>([]);
   const [mode, setMode] = useState<'take' | 'exchange'>('take');
