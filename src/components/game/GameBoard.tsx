@@ -33,7 +33,7 @@ export const GameBoard = () => {
   const [ready, setReady] = useState(false);
   const { 
     players, currentPlayerIndex, tokenStacks, bonusTokens,
-    phase, lastAction, nextRound, resetGame, restartGame,
+    phase, lastAction, nextRound, resetGame, restartGame, claimVictory,
     getRoundWinner, getWinner, round, optionalRules, turnCount,
     canUsePirateRaid, pirateRaid, hiddenTreasures,
     isMultiplayer, applyGameState, getSerializableState, deck,
@@ -42,7 +42,7 @@ export const GameBoard = () => {
   const { actionNotificationDuration, musicEnabled, hasSeenMusicHint, setHasSeenMusicHint } = useSettingsStore();
   const { recordGameResult } = usePlayerStore();
   const { playActionSound, playSound, playMusic, stopMusic } = useGameAudio();
-  const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect } = useMultiplayerStore();
+  const { sendMessage, opponentName, isHost, hostId, peerId, latency, state: multiplayerState, onMessage: registerMessageHandler, reset: resetMultiplayer, reconnect, sendForfeit } = useMultiplayerStore();
   const isMobile = useIsMobile();
   const { hasSeenTutorial, start: startTutorial, isActive: isTutorialActive } = useTutorialStore();
 
@@ -59,6 +59,7 @@ export const GameBoard = () => {
   const isDeckLow = phase === 'playing' && deck.length <= 10;
   const creakRef = useRef<HTMLAudioElement | null>(null);
   const [roundFlourish, setRoundFlourish] = useState(false);
+  const [opponentForfeited, setOpponentForfeited] = useState(false);
 
   const currentPlayer = players[currentPlayerIndex];
   const localPlayerIndex = isMultiplayer ? 0 : players.findIndex((p) => !p.isAI);
