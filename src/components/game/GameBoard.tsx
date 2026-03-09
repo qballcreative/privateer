@@ -8,6 +8,7 @@ import { useMultiplayerStore } from '@/store/multiplayerStore';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionNotification } from './ActionNotification';
 import { InterstitialAd } from './InterstitialAd';
+import { VideoInterstitialAd } from './VideoInterstitialAd';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { TurnBanner } from './TurnBanner';
@@ -275,6 +276,7 @@ export const GameBoard = () => {
       <TurnBanner show={showTurnBanner} />
       <ActionNotification action={lastAction} show={showAction} />
       <InterstitialAd trigger={phase === 'roundEnd'} round={round} />
+      <VideoInterstitialAd trigger={phase === 'roundEnd'} round={round} />
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}

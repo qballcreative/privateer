@@ -11,6 +11,7 @@ export interface RemoteConfig {
   adsEnabled: boolean;
   interstitialFrequency: string;
   rewardedEnabled: boolean;
+  videoInterstitialEnabled: boolean;
   defaultAIDifficulty: Difficulty;
   enabledRules: string[];
   maxPlayers: number;
@@ -27,6 +28,7 @@ const DEFAULTS: RemoteConfig = {
   adsEnabled: true,
   interstitialFrequency: 'round_end:capped=1;cooldown=120s',
   rewardedEnabled: true,
+  videoInterstitialEnabled: true,
   defaultAIDifficulty: 'easy',
   enabledRules: [],
   maxPlayers: 2,
@@ -84,6 +86,7 @@ export const useRemoteConfigStore = create<RemoteConfigState>((set, get) => ({
         adsEnabled: typeof data.adsEnabled === 'boolean' ? data.adsEnabled : DEFAULTS.adsEnabled,
         interstitialFrequency: typeof data.interstitialFrequency === 'string' ? data.interstitialFrequency : DEFAULTS.interstitialFrequency,
         rewardedEnabled: typeof data.rewardedEnabled === 'boolean' ? data.rewardedEnabled : DEFAULTS.rewardedEnabled,
+        videoInterstitialEnabled: typeof data.videoInterstitialEnabled === 'boolean' ? data.videoInterstitialEnabled : DEFAULTS.videoInterstitialEnabled,
         defaultAIDifficulty: ['easy', 'medium', 'hard', 'expert'].includes(data.defaultAIDifficulty)
           ? data.defaultAIDifficulty
           : DEFAULTS.defaultAIDifficulty,

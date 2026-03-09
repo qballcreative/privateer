@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useConsentStore } from '@/store/consentStore';
 import { createAdProvider, requestInterstitial } from '@/lib/adProvider';
 import { emitAdEvent } from '@/lib/adAnalytics';
+import { platform } from '@/lib/platform';
 import { RemoveAdsButton } from './RemoveAdsButton';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -13,9 +14,9 @@ interface InterstitialAdProps {
 }
 
 /**
- * Shows at most 1 interstitial per round at round-end.
- * Skipped on desktop (lg+) since they have persistent sidebar ads.
- * Shows a "Remove Ads" nudge on mobile/tablet after closing.
+ * Static interstitial ad shown at round-end on ALL platforms.
+ * On native app: shows "Remove Ads" nudge after closing.
+ * On web: no removal option.
  */
 export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
   const shouldShowAds = useConsentStore((s) => s.shouldShowAds());
@@ -27,9 +28,6 @@ export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
 
   useEffect(() => {
     if (!trigger || !shouldShowAds || shownForRoundRef.current === round) return;
-
-    // Skip interstitials on desktop — they already have sidebar ads
-    if (typeof window !== 'undefined' && window.innerWidth >= 1024) return;
 
     const provider = createAdProvider(personalized);
     requestInterstitial(provider).then((shown) => {
@@ -43,7 +41,7 @@ export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
 
   const handleClose = () => {
     setVisible(false);
-    // Show remove-ads nudge on mobile/tablet
+    // Show remove-ads nudge only on native app
     if (canRemove) {
       setShowNudge(true);
       setTimeout(() => setShowNudge(false), 5000);
@@ -82,7 +80,7 @@ export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
         </motion.div>
       )}
 
-      {/* Post-close "Remove Ads" nudge — mobile/tablet only */}
+      {/* Post-close "Remove Ads" nudge — native app only */}
       {showNudge && !visible && (
         <motion.div
           className="fixed bottom-16 left-0 right-0 z-50 flex justify-center px-4"
