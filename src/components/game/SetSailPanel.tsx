@@ -3,10 +3,10 @@ import { Users, Anchor, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty } from '@/types/game';
 import { Input } from '@/components/ui/input';
-import deckhandImg from '@/assets/difficulty/deckhand.png';
-import bosunImg from '@/assets/difficulty/bosun.png';
-import privateerImg from '@/assets/difficulty/privateer.png';
-import admiralImg from '@/assets/difficulty/admiral.png';
+import deckhandImg from '@/assets/difficulty/deckHand.webp';
+import bosunImg from '@/assets/difficulty/bosun.webp';
+import privateerImg from '@/assets/difficulty/privateer.webp';
+import admiralImg from '@/assets/difficulty/admiral.webp';
 
 interface PlayerStats {
   gamesPlayed: number;

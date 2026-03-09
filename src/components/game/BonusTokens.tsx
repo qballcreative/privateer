@@ -10,9 +10,9 @@ interface BonusTokensProps {
 }
 
 const sealImages = {
-  three: '/Icons/RedSeal.png',
-  four: '/Icons/SilverSeal.png',
-  five: '/Icons/GoldSeal.png',
+  three: '/Icons/redseal.webp',
+  four: '/Icons/silverseal.webp',
+  five: '/Icons/goldseal.webp',
 };
 
 const tierLabels = {

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { Shield, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import privateerLogo from '@/assets/Privateer.png';
+import privateerLogo from '@/assets/privateer.webp';
 
 interface AgeConsentModalProps {
   onComplete?: () => void;

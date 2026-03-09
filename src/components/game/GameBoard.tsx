@@ -23,7 +23,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Card } from '@/types/game';
 import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import bannerLogo from '@/assets/BannerLogo.png';
+import bannerLogo from '@/assets/bannerlogo.webp';
 import { toast } from '@/components/ui/sonner';
 import { PhoneLayout, TabletLayout, DesktopLayout } from './layouts';
 
