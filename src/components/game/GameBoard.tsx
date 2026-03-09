@@ -266,7 +266,15 @@ export const GameBoard = () => {
       const winner = getWinner();
       if (winner) {
         const playerWon = !winner.isAI;
-        recordGameResult(playerWon);
+        const pScore = calculateScore(humanPlayer, players);
+        const oScore = calculateScore(opponentPlayer, players);
+        const { lastDifficulty } = usePlayerStore.getState();
+        recordGameResult(playerWon, {
+          date: new Date().toISOString(),
+          difficulty: lastDifficulty,
+          playerScore: pScore,
+          opponentScore: oScore,
+        });
       }
     }
   }, [phase, prevPhase, isMultiplayer, getWinner, recordGameResult]);
