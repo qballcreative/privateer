@@ -6,7 +6,6 @@ export interface TutorialStep {
   title: string;
   description: string;
   highlightId?: string; // data-tutorial-id on the element to spotlight
-  position?: 'top' | 'bottom' | 'left' | 'right';
   optional?: boolean; // for optional-rule steps
 }
 
