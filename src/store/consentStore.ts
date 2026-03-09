@@ -1,13 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useRemoteConfigStore } from './remoteConfigStore';
+import { platform } from '@/lib/platform';
 
 export type AgeGroup = 'under13' | '13-15' | '16-17' | '18+';
-
-/** Returns true when the viewport is desktop-sized (lg+) */
-function isDesktop(): boolean {
-  return typeof window !== 'undefined' && window.innerWidth >= 1024;
-}
 
 interface ConsentState {
   ageGroup: AgeGroup | null;
@@ -20,7 +16,7 @@ interface ConsentState {
   // Derived
   shouldShowAds: () => boolean;
   shouldShowRewarded: () => boolean;
-  /** Returns true if the current platform allows the user to purchase ad-free (mobile/tablet only) */
+  /** Returns true only on native app (Capacitor) where IAP is available */
   canRemoveAds: () => boolean;
 
   // Actions
@@ -43,9 +39,9 @@ export const useConsentStore = create<ConsentState>()(
         const s = get();
         const remoteEnabled = useRemoteConfigStore.getState().config.adsEnabled;
         if (!s.adsEnabled || !remoteEnabled) return false;
-        // Desktop: always show ads (no paid removal)
-        if (isDesktop()) return true;
-        // Mobile/tablet: respect paidAdFree
+        // Web: always show ads (no removal option)
+        if (!platform.isNative) return true;
+        // Native app: respect IAP paid status
         return !s.paidAdFree;
       },
 
@@ -53,14 +49,14 @@ export const useConsentStore = create<ConsentState>()(
         const s = get();
         const rc = useRemoteConfigStore.getState().config;
         if (!s.adsEnabled || !rc.adsEnabled || !rc.rewardedEnabled) return false;
-        if (isDesktop()) return true;
+        if (!platform.isNative) return true;
         return !s.paidAdFree;
       },
 
       canRemoveAds: () => {
         const s = get();
-        // Only mobile/tablet users who have ads enabled and haven't already paid
-        return s.adsEnabled && !s.paidAdFree && !isDesktop();
+        // Only native app users can purchase ad-free via IAP
+        return s.adsEnabled && !s.paidAdFree && platform.isNative;
       },
 
       setConsent: (ageGroup, personalizedAds) => {

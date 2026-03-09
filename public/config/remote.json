@@ -2,6 +2,7 @@
   "adsEnabled": true,
   "interstitialFrequency": "round_end:capped=1;cooldown=60s",
   "rewardedEnabled": true,
+  "videoInterstitialEnabled": true,
   "defaultAIDifficulty": "easy",
   "enabledRules": [],
   "maxPlayers": 2,

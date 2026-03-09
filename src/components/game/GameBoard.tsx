@@ -276,6 +276,7 @@ export const GameBoard = () => {
       <TurnBanner show={showTurnBanner} />
       <ActionNotification action={lastAction} show={showAction} />
       <InterstitialAd trigger={phase === 'roundEnd'} round={round} />
+      <VideoInterstitialAd trigger={phase === 'roundEnd'} round={round} />
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
