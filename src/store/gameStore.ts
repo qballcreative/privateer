@@ -892,6 +892,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
+  claimVictory: (winnerIndex: number) => {
+    const { roundWins, round, players } = get();
+    const newRoundWins = [...roundWins];
+    // Award enough round wins for the winner to clinch the game
+    newRoundWins[winnerIndex] = Math.max(newRoundWins[winnerIndex], 2);
+    const newRoundWinners = [...(get().roundWinners || [])];
+    // Fill remaining rounds as won by the claimer
+    while (newRoundWinners.length < round) {
+      newRoundWinners.push(players[winnerIndex]?.id || null);
+    }
+    set({
+      phase: 'gameEnd',
+      roundWins: newRoundWins,
+      roundWinners: newRoundWinners,
+    });
+  },
+
   restartGame: () => {
     const { difficulty, optionalRules, players, firstPlayer } = get();
     const playerName = players.find((p) => !p.isAI && p.isLocal)?.name || 'Player';
