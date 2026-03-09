@@ -3,27 +3,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useConsentStore } from '@/store/consentStore';
 import { createAdProvider, requestInterstitial } from '@/lib/adProvider';
 import { emitAdEvent } from '@/lib/adAnalytics';
+import { RemoveAdsButton } from './RemoveAdsButton';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface InterstitialAdProps {
-  /** Should be true when phase === 'roundEnd' */
   trigger: boolean;
-  /** Current round number — used to limit 1 per round */
   round: number;
 }
 
 /**
- * Shows at most 1 interstitial per round at round-end, with a 120s global cooldown.
+ * Shows at most 1 interstitial per round at round-end.
+ * Skipped on desktop (lg+) since they have persistent sidebar ads.
+ * Shows a "Remove Ads" nudge on mobile/tablet after closing.
  */
 export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
   const shouldShowAds = useConsentStore((s) => s.shouldShowAds());
+  const canRemove = useConsentStore((s) => s.canRemoveAds());
   const personalized = useConsentStore((s) => s.personalizedAds);
   const [visible, setVisible] = useState(false);
+  const [showNudge, setShowNudge] = useState(false);
   const shownForRoundRef = useRef<number>(-1);
 
   useEffect(() => {
     if (!trigger || !shouldShowAds || shownForRoundRef.current === round) return;
+
+    // Skip interstitials on desktop — they already have sidebar ads
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) return;
 
     const provider = createAdProvider(personalized);
     requestInterstitial(provider).then((shown) => {
@@ -34,6 +40,15 @@ export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
       }
     });
   }, [trigger, round, shouldShowAds, personalized]);
+
+  const handleClose = () => {
+    setVisible(false);
+    // Show remove-ads nudge on mobile/tablet
+    if (canRemove) {
+      setShowNudge(true);
+      setTimeout(() => setShowNudge(false), 5000);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -51,20 +66,34 @@ export const InterstitialAd = ({ trigger, round }: InterstitialAdProps) => {
             exit={{ scale: 0.9 }}
           >
             <p className="text-xs text-muted-foreground mb-4">Advertisement</p>
-            {/* Placeholder for real ad content */}
             <div className="h-[250px] bg-muted/30 rounded-lg flex items-center justify-center mb-4 border border-border/50">
               <span className="text-muted-foreground/40 text-sm">Ad Content</span>
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setVisible(false)}
+              onClick={handleClose}
               className="gap-1"
             >
               <X className="w-4 h-4" />
               Close
             </Button>
           </motion.div>
+        </motion.div>
+      )}
+
+      {/* Post-close "Remove Ads" nudge — mobile/tablet only */}
+      {showNudge && !visible && (
+        <motion.div
+          className="fixed bottom-16 left-0 right-0 z-50 flex justify-center px-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+        >
+          <div className="bg-card border border-primary/30 rounded-xl px-4 py-3 shadow-lg flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Tired of ads?</span>
+            <RemoveAdsButton compact />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

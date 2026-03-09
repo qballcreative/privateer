@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { TradingPost } from '../TradingPost';
 import { ShipsHold } from '../ShipsHold';
+import { AdSidebar } from '../AdSidebar';
 import { ScoreBoard } from '../ScoreBoard';
 import { TreasureSupplyPanel } from './TreasureSupplyPanel';
 import { cn } from '@/lib/utils';
@@ -53,6 +54,7 @@ export const DesktopLayout = ({
           />
         )}
         <ScoreBoard />
+        <AdSidebar />
       </aside>
     </div>
   </div>

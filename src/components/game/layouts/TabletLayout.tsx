@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { AdBottomBanner } from '../AdBottomBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateScore } from '@/store/gameStore';
 import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';
@@ -162,8 +163,13 @@ export const TabletLayout = ({
               <ShipsHold player={humanPlayer} isCurrentPlayer={currentPlayerIndex === localPlayerIndex} layout="tablet" />
             )}
           </motion.div>
-        )}
-      </AnimatePresence>
+      )}
+    </AnimatePresence>
+
+    {/* Fixed bottom ad banner */}
+    <AdBottomBanner />
+    {/* Spacer so content isn't hidden behind the fixed banner */}
+    <div className="h-[50px]" />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
 import { AgeConsentModal } from './AgeConsentModal';
 import { AdBanner } from './AdBanner';
+import { RemoveAdsButton } from './RemoveAdsButton';
 import { InstallPrompt } from './InstallPrompt';
 import { HeroSection } from './HeroSection';
 import { SetSailPanel } from './SetSailPanel';
@@ -189,9 +190,12 @@ export const LandingPage = () => {
         </Suspense>
       )}
 
-      {/* Ad Banner */}
-      <div className="relative px-4 py-3 max-w-4xl mx-auto w-full">
+      {/* Ad Banner + Remove Ads CTA */}
+      <div className="relative px-4 py-3 max-w-4xl mx-auto w-full space-y-2">
         <AdBanner />
+        <div className="flex justify-center">
+          <RemoveAdsButton compact />
+        </div>
       </div>
 
       {/* Footer */}

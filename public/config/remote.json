@@ -1,6 +1,6 @@
 {
   "adsEnabled": true,
-  "interstitialFrequency": "round_end:capped=1;cooldown=120s",
+  "interstitialFrequency": "round_end:capped=1;cooldown=60s",
   "rewardedEnabled": true,
   "defaultAIDifficulty": "easy",
   "enabledRules": [],
