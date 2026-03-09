@@ -502,7 +502,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (ships.length === 0) return;
 
     const player = players[currentPlayerIndex];
-    player.ships.push(...ships);
+    
+    // Create new ships array immutably
+    const newShips = [...player.ships, ...ships];
 
     // Remove ships and refill market
     let newMarket = market.filter((c) => c.type !== 'ships');
@@ -510,7 +512,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     newMarket = [...newMarket, ...deck.slice(0, cardsNeeded)];
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player };
+    newPlayers[currentPlayerIndex] = { ...player, ships: newShips };
 
     set({
       market: newMarket,
