@@ -226,6 +226,11 @@ export const GameBoard = () => {
   useEffect(() => {
     if (phase === 'playing') {
       playMusic();
+      // One-time hint if music is off
+      if (!musicEnabled && !hasSeenMusicHint) {
+        toast('🎵 Background music is available — enable it in Settings.');
+        setHasSeenMusicHint(true);
+      }
     } else if (phase === 'lobby') {
       stopMusic();
     }
