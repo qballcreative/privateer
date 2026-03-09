@@ -242,7 +242,7 @@ export const UnloadChest = ({
             {hasSelection && allSameType && selectedType && (
               <div className="flex items-center gap-1.5">
                 <img
-                  src={`/Icons/${selectedType}.png`}
+                  src={`/Icons/${selectedType}.webp`}
                   alt={selectedType}
                   className={cn('object-contain', isPhone ? 'w-6 h-6' : 'w-7 h-7')}
                 />
