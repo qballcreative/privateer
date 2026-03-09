@@ -89,7 +89,7 @@ export const SetSailPanel = ({
           <ModeButton
             active={mode === 'aai'}
             onClick={() => setMode('aai')}
-            label="Challenge AI"
+            label="Duel AI"
             variant="gold"
           />
           {!restrictedMode && (
