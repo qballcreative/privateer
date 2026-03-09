@@ -1,73 +1,143 @@
-# Welcome Privateer: Letters of Marque
+# ⚓ Privateer: Letters of Marque – A Trading Duel
 
-## Project info
+**Privateer: Letters of Marque** is a fast‑paced, tactical trading duel set in the Age of Sail.  
+Build wealth, trade cargo, claim commissions, raid rivals, battle storms, and outmaneuver competing captains — human or AI.
 
-**URL**: https://lovable.dev/projects/d904d748-d9b7-4786-8c79-81c3ddc88cb6
+This repository contains the full source code for the Privateer web game, featuring custom nautical artwork, optimized UI, and a fully interactive multiplayer + AI duel engine.
 
-## How can I edit this code?
+Live Project:  
+https://privateer.lovable.app
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🧭 About the Game
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d904d748-d9b7-4786-8c79-81c3ddc88cb6) and start prompting.
+Privateer is designed as a **competitive head‑to‑head duel**, where two captains race to earn the most doubloons through:
 
-Changes made via Lovable will be committed automatically to this repo.
+- Buying and selling cargo  
+- Completing commission bonuses  
+- Weathering storms  
+- Raiding enemy ships  
+- Upgrading their fleet and roles  
+- Managing a captain’s ledger  
 
-**Use your preferred IDE**
+The game includes a full custom visual asset suite:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 3D‑style resource tokens (gold, silver, gems, rum, iron, silk, cargo crates, ships, fleet markers, roles, actions)  
+- Nautical UI elements (compasses, cutlasses, seals, arrows, banners)  
+- Dynamic ship‑hold and ledger backgrounds  
+- Animated end‑of‑game cinematic (MP4/WebM)  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+All assets are optimized for performance and clarity while maintaining a cohesive Age‑of‑Sail aesthetic.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+## 🛠 Tech Stack
+
+This project is built using:
+
+- **Vite** — blazing‑fast dev server and bundler  
+- **React** — component‑based UI  
+- **TypeScript** — type‑safe game logic  
+- **Tailwind CSS** — utility‑first styling  
+- **shadcn/ui** — accessible, themeable UI components  
+- **Vitest** — lightweight testing framework  
+
+---
+
+## 📦 Running the Project Locally
+
+### 1. Clone the repository
+
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+cd privateer
+npm install
+or
+bun install
 npm run dev
-```
+or
+bun dev
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 3. Start the development server
 
-**Use GitHub Codespaces**
+npm run dev
+or
+bun dev
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This launches the game with hot‑reloading via Vite.
 
-## What technologies are used for this project?
+## How to Edit the Game
 
-This project is built with:
+### Option A — Use Lovable (Recommended)
+Edit the game using prompt‑based development:
+https://lovable.dev/projects/d904d748-d9b7-4786-8c79-81c3ddc88cb6
+All changes commit automatically to this GitHub repo.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Option B — Edit Locally in Your IDE
 
-## How can I deploy this project?
+Clone the repository
+Install dependencies
+Run the dev server
+Commit your changes
+Push to GitHub
 
-Simply open [Lovable](https://lovable.dev/projects/d904d748-d9b7-4786-8c79-81c3ddc88cb6) and click on Share -> Publish.
+Changes instantly sync to Lovable.
 
-## Can I connect a custom domain to my Lovable project?
+### Option C — Edit Directly in GitHub
 
-Yes, you can!
+Open any file
+Click the ✏️ Edit button
+Commit your changes
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Option D — GitHub Codespaces
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Open the repository
+Click Code → Codespaces
+Create a new Codespace
+Develop fully in the cloud
+
+## Deployment
+Deployment is handled via Lovable.
+To publish:
+
+Open the Lovable project
+Click Share → Publish
+Your updated version deploys instantly
+
+## Custom Domains
+You can attach your own domain:
+
+Go to Project → Settings → Domains
+Click Connect Domain
+Add the DNS records provided by Lovable
+
+Documentation:
+https://docs.lovable.dev/features/custom-domain#custom-domain
+
+## Testing
+
+Run tests via Vitest:
+
+npm test
+or
+bun test
+
+## Contributing
+Contributions are welcome. Guidelines:
+
+Use TypeScript
+Maintain accessibility
+Match the established nautical visual theme
+Ensure no gameplay regressions
+Run lint + tests before submitting
+
+
+## License
+This project is proprietary and part of the Privateer: Letters of Marque game ecosystem.
+Unauthorized commercial use or redistribution is prohibited.
+
+## Credits
+Game design, artwork, icons, UX, and development by qballcreative (Darrell Portz).
+Built with Lovable, React, TypeScript, Vite, Tailwind CSS, and shadcn/ui.
+Fair winds and following seas, Captain. ⚓
