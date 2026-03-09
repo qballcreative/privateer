@@ -74,7 +74,7 @@ Replace stubs with Google AdSense or similar.
 
 ## Visual Polish Backlog
 
-- [ ] Parchment theme CSS variables
+- [x] Parchment theme CSS variables (already implemented)
+- [x] Custom pirate favicon (skull & crossbones with coins)
 - [ ] Victory screen treasure chest opening animation
 - [ ] Round-end "Wax Seal" animation
-- [ ] Custom pirate favicon
