@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import heroBg from '@/assets/hero-bg.jpg';
+const heroBg = '/images/hero-bg.jpg';
 import privateerLogo from '@/assets/Privateer.png';
 import { Users, Clock, Dices } from 'lucide-react';
 
