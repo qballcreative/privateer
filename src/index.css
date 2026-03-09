@@ -132,6 +132,9 @@
     --sidebar-accent-foreground: 35 40% 95%;
     --sidebar-border: 35 25% 72%;
     --sidebar-ring: 38 70% 38%;
+
+    --shadow-card: 0 4px 16px hsl(25, 20%, 60%, 0.3);
+    --shadow-elevated: 0 8px 24px hsl(25, 20%, 50%, 0.3);
   }
 }
 

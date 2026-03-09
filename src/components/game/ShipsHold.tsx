@@ -205,7 +205,7 @@ export const ShipsHold = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-card/70 backdrop-blur-[2px]"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-black/50 backdrop-blur-[2px]"
             >
               <motion.div
                 animate={{ opacity: [0.6, 1, 0.6] }}
