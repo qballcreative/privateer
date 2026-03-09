@@ -86,7 +86,7 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
       </div>
 
       {/* Count indicator */}
-      <span className="text-xs text-primary font-bold">{tokens.length} left</span>
+      <span className="text-xs text-primary font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length} left</span>
     </div>
   );
 });
