@@ -9,7 +9,7 @@ export const ScoreBoard = memo(() => {
 
   return (
     <div className="p-4 rounded-xl border border-primary/20 relative overflow-hidden" style={{ backgroundImage: 'url(/images/ledger-bg.png)', backgroundSize: '100% 100%', opacity: 1 }}>
-      <div className="absolute inset-0 bg-background/40 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" />
       <div className="relative z-10">
       {/* Captain's Ledger header */}
       <div className="flex items-center justify-center gap-2 mb-4">

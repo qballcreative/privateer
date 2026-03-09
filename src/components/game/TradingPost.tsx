@@ -162,7 +162,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange }: TradingPostPro
         }}
       >
         {/* Subdued overlay to keep cargo readable */}
-        <div className="absolute inset-0 rounded-xl bg-card/80 pointer-events-none" />
+        <div className="absolute inset-0 rounded-xl bg-black/50 pointer-events-none" />
         {/* Trading Post Label */}
         {!isPhone && (
           <div className="absolute -top-3 left-4 z-10">
