@@ -28,7 +28,7 @@ export const TreasureStack = memo(({ type, tokens }: TreasureStackProps) => {
     <div className="flex flex-col items-center justify-center gap-1 w-full">
       {/* Leather label */}
       <div className="px-2 py-0.5 rounded leather-texture">
-        <span className="text-xs text-foreground/90 font-medium">{config.label}</span>
+        <span className="text-xs text-foreground/90 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{config.label}</span>
       </div>
       
       {/* Doubloon + cargo icon row */}
