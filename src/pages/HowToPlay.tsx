@@ -68,7 +68,7 @@ const HowToPlay = () => {
               {
                 title: 'Trading Post Supply',
                 desc: 'The remaining cargo deck. When goods leave the Trading Post, they\'re replaced from the Trading Post supply.',
-                icon: '/images/supply.png',
+                icon: '/images/supply.webp',
               },
               {
                 title: 'Market Prices',
