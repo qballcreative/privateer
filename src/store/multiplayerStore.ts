@@ -165,18 +165,11 @@ export const useMultiplayerStore = create<MultiplayerStore>((set, get) => ({
 
   joinGame: async (hostId: string, playerName: string) => {
     return new Promise((resolve, reject) => {
-      // Configure with public STUN/TURN servers for better NAT traversal
+      // Get ICE servers from remote config (supports TURN when configured)
+      const iceServers = useRemoteConfigStore.getState().config.iceServers;
+      
       const peer = new Peer({
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' },
-          ]
-        },
+        config: { iceServers },
         debug: 1, // Log errors only
       });
       
