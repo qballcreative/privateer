@@ -137,9 +137,10 @@ interface OpponentPanelProps {
   currentPlayerIndex: number;
   isRaidMode: boolean;
   onRaidCard: (card: Card) => void;
+  isPondering?: boolean;
 }
 
-const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard }: OpponentPanelProps) => (
+const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard, isPondering }: OpponentPanelProps) => (
   <div className="space-y-4">
     {opponentPlayer && (
       <ShipsHold
@@ -148,6 +149,7 @@ const OpponentPanel = memo(({ opponentPlayer, currentPlayerIndex, isRaidMode, on
         isOpponent
         isRaidMode={isRaidMode && currentPlayerIndex === 0}
         onRaidCard={onRaidCard}
+        isPondering={isPondering}
       />
     )}
     <ScoreBoard />
