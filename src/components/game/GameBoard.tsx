@@ -248,8 +248,7 @@ export const GameBoard = () => {
       }}
       animate={roundFlourish ? { scale: [1, 1.008, 0.998, 1] } : { scale: 1 }}
       transition={roundFlourish ? { duration: 1.2, ease: 'easeInOut' } : undefined}
-      onAnimationComplete={() => { if (!ready) setReady(true); }}
-      ref={() => { if (!ready) requestAnimationFrame(() => setReady(true)); }}
+      ref={(el) => { if (el && !ready) requestAnimationFrame(() => setReady(true)); }}
     >
       <AnimatePresence>
         {isDeckLow && (
