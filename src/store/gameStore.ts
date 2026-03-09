@@ -610,34 +610,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const expensive: GoodsType[] = ['gold', 'silver', 'gemstones'];
     if (expensive.includes(type) && cardsToSell.length < MIN_SELL_EXPENSIVE) return;
 
-    // Take tokens
-    const tokens = tokenStacks[type].splice(0, cardsToSell.length);
-    player.tokens.push(...tokens);
+    // Take tokens immutably
+    const tokensToAward = tokenStacks[type].slice(0, cardsToSell.length);
+    const newTokenStack = tokenStacks[type].slice(cardsToSell.length);
+    const newTokenStacks = { ...tokenStacks, [type]: newTokenStack };
 
-    // Award bonus token
+    // Build new player tokens
+    const newPlayerTokens = [...player.tokens, ...tokensToAward];
+
+    // Award bonus token immutably
     let bonus: BonusToken | undefined;
+    let newBonusTokens = { ...bonusTokens };
+    
     if (cardsToSell.length >= 5 && bonusTokens.five.length > 0) {
-      bonus = bonusTokens.five.shift();
+      bonus = bonusTokens.five[0];
+      newBonusTokens = { ...newBonusTokens, five: bonusTokens.five.slice(1) };
     } else if (cardsToSell.length === 4 && bonusTokens.four.length > 0) {
-      bonus = bonusTokens.four.shift();
+      bonus = bonusTokens.four[0];
+      newBonusTokens = { ...newBonusTokens, four: bonusTokens.four.slice(1) };
     } else if (cardsToSell.length === 3 && bonusTokens.three.length > 0) {
-      bonus = bonusTokens.three.shift();
+      bonus = bonusTokens.three[0];
+      newBonusTokens = { ...newBonusTokens, three: bonusTokens.three.slice(1) };
     }
-    if (bonus) player.bonusTokens.push(bonus);
+    
+    const newPlayerBonusTokens = bonus 
+      ? [...player.bonusTokens, bonus] 
+      : player.bonusTokens;
 
     // Remove cards from hand
     const newHand = player.hand.filter((c) => !cardIds.includes(c.id));
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { ...player, hand: newHand };
+    newPlayers[currentPlayerIndex] = { 
+      ...player, 
+      hand: newHand, 
+      tokens: newPlayerTokens, 
+      bonusTokens: newPlayerBonusTokens,
+    };
 
-    const tokensValue = tokens.reduce((sum, t) => sum + t.value, 0);
+    const tokensValue = tokensToAward.reduce((sum, t) => sum + t.value, 0);
     const bonusValue = bonus?.value || 0;
 
     set({
       players: newPlayers,
-      tokenStacks: { ...tokenStacks },
-      bonusTokens: { ...bonusTokens },
+      tokenStacks: newTokenStacks,
+      bonusTokens: newBonusTokens,
       lastAction: {
         type: 'sell',
         playerName: player.name,
