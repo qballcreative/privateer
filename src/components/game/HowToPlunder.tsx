@@ -14,7 +14,7 @@ const steps = [
     description: 'Exchange 2+ goods between your Hold and the Trading Post. Ships act as wildcards!',
   },
   {
-    img: '/Iconsell.webpng',
+    img: '/Icons/sell.webp',
     num: 3,
     title: 'Sell Cargo',
     description: 'Sell matching cargo for doubloons. Larger shipments earn bonus Commission Medallions!',

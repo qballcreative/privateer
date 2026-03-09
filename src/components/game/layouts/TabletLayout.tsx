@@ -78,7 +78,7 @@ export const TabletLayout = ({
           })}
         </div>
         <div className="flex items-center gap-1.5">
-          <img src="/images/fleetwebpg" alt="Fleet" className="w-5 h-5 object-contain" />
+          <img src="/images/fleet.webp" alt="Fleet" className="w-5 h-5 object-contain" />
           <span className="text-accent">{opponentPlayer?.ships.length || 0}</span>
         </div>
       </div>

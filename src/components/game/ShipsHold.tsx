@@ -126,7 +126,7 @@ export const ShipsHold = ({
         isPhone ? "p-2 min-h-[80px]" : "p-3 min-h-[120px]"
       )}
         style={{
-          backgroundImage: `url('/images/cargo-hold-bgwebpg')`,
+          backgroundImage: `url('/images/cargo-hold-bg.webp')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

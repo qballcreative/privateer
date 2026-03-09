@@ -78,7 +78,7 @@ export const PhoneLayout = ({
         })}
       </div>
       <div className="flex items-center gap-1">
-        <img src="/images/fleetwebpg" alt="Fleet" className="w-4 h-4 object-contain" />
+        <img src="/images/fleet.webp" alt="Fleet" className="w-4 h-4 object-contain" />
         <span className="text-accent">{opponentPlayer?.ships.length || 0}</span>
       </div>
     </div>
