@@ -167,7 +167,7 @@ export const SetSailPanel = ({
                           : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
                       )}
                     >
-                      <img src={img} alt={label} className="w-10 h-10 object-contain" />
+                      <img src={img} alt={label} className="w-10 h-10 object-contain" width={40} height={40} loading="lazy" decoding="async" />
                       <span className="text-xs font-bold">{label}</span>
                     </button>
                   );

@@ -26,6 +26,11 @@ export const HeroSection = () => {
         <motion.img
           src={privateerLogo}
           alt="Privateer: Letters of Marque"
+          width={448}
+          height={448}
+          // @ts-ignore - fetchPriority is valid HTML but not in React types yet
+          fetchPriority="high"
+          decoding="async"
           className="w-[50vw] max-w-[20rem] md:w-[35vw] md:max-w-[24rem] lg:w-[28vw] lg:max-w-[28rem] object-contain drop-shadow-[0_0_30px_hsl(var(--brass)/0.5)]"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
