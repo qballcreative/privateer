@@ -17,10 +17,9 @@ export const HeroSection = () => {
         <img
           src={heroBg}
           alt=""
-          // @ts-ignore
-          fetchPriority="high"
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover object-center"
+          ref={(el) => { if (el) el.setAttribute('fetchpriority', 'high'); }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
       </div>
