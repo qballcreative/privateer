@@ -191,7 +191,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
           "flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1 bg-card rounded-full border border-border shadow-md z-10",
           isPhone ? "mb-2 w-fit mx-auto" : "absolute -top-3 right-4"
         )}>
-          <img src="/images/supply.png" alt="Supply" className="w-5 h-5 sm:w-6 sm:h-6 object-contain -my-1" />
+          <img src="/images/supply.webp" alt="Supply" className="w-5 h-5 sm:w-6 sm:h-6 object-contain -my-1" />
           <span className="text-muted-foreground">Supply:</span>
           <span className="font-bold text-foreground">{deck.length}</span>
         </div>
