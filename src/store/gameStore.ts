@@ -411,6 +411,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hiddenTreasures: [],
       isMultiplayer: true,
       roundWinners: [],
+      firstPlayer: 'host',
     };
 
     const ctx = buildCtx(initialState);
