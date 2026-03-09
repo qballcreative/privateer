@@ -55,33 +55,53 @@ export const Tutorial = () => {
     if (!highlightRect) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
-    const pos = step.position || 'bottom';
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     const pad = 16;
+    const margin = 8;
+    const tooltipW = Math.min(320, vw - margin * 2);
+    const tooltipH = 200; // estimated max height
+
+    const clampLeft = (idealLeft: number) =>
+      Math.max(margin, Math.min(idealLeft, vw - tooltipW - margin));
+
+    const clampTop = (idealTop: number) =>
+      Math.max(margin, Math.min(idealTop, vh - tooltipH - margin));
+
+    const centerX = highlightRect.left + highlightRect.width / 2 - tooltipW / 2;
+    const centerY = highlightRect.top + highlightRect.height / 2 - tooltipH / 2;
+
+    let pos = step.position || 'bottom';
+
+    // Auto-flip vertical if it would overflow
+    if (pos === 'bottom' && highlightRect.bottom + pad + tooltipH > vh - margin) {
+      pos = 'top';
+    } else if (pos === 'top' && highlightRect.top - pad - tooltipH < margin) {
+      pos = 'bottom';
+    }
+
     switch (pos) {
       case 'top':
         return {
-          bottom: `${window.innerHeight - highlightRect.top + pad}px`,
-          left: `${highlightRect.left + highlightRect.width / 2}px`,
-          transform: 'translateX(-50%)',
+          top: `${clampTop(highlightRect.top - pad - tooltipH)}px`,
+          left: `${clampLeft(centerX)}px`,
         };
       case 'left':
         return {
-          top: `${highlightRect.top + highlightRect.height / 2}px`,
-          right: `${window.innerWidth - highlightRect.left + pad}px`,
-          transform: 'translateY(-50%)',
+          top: `${clampTop(centerY)}px`,
+          left: `${clampLeft(highlightRect.left - pad - tooltipW)}px`,
         };
       case 'right':
         return {
-          top: `${highlightRect.top + highlightRect.height / 2}px`,
-          left: `${highlightRect.right + pad}px`,
-          transform: 'translateY(-50%)',
+          top: `${clampTop(centerY)}px`,
+          left: `${clampLeft(highlightRect.right + pad)}px`,
         };
       case 'bottom':
       default:
         return {
-          top: `${highlightRect.bottom + pad}px`,
-          left: `${highlightRect.left + highlightRect.width / 2}px`,
-          transform: 'translateX(-50%)',
+          top: `${clampTop(highlightRect.bottom + pad)}px`,
+          left: `${clampLeft(centerX)}px`,
         };
     }
   };
