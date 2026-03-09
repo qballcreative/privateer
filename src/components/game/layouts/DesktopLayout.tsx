@@ -56,4 +56,5 @@ export const DesktopLayout = ({
       </aside>
     </div>
   </div>
-);
+  );
+};

@@ -56,4 +56,5 @@ export const TabletLayout = ({
       </aside>
     </div>
   </div>
-);
+  );
+};
