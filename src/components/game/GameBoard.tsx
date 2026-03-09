@@ -187,15 +187,29 @@ export const GameBoard = () => {
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
+  // Handle multiplayer messages including forfeit
   useEffect(() => {
     if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
       const unsubscribe = registerMessageHandler((message) => {
         if (message.type === 'game-state') applyGameState((message.payload as any).gameState, true);
         else if (message.type === 'next-round') nextRound();
+        else if (message.type === 'action' && (message.payload as any)?.action === 'forfeit') {
+          setOpponentForfeited(true);
+        }
       });
       return unsubscribe;
     }
   }, [isMultiplayer, phase, applyGameState, registerMessageHandler, nextRound]);
+
+  // Send forfeit on tab close during multiplayer
+  useEffect(() => {
+    if (!isMultiplayer || phase === 'lobby' || phase === 'gameEnd') return;
+    const handleBeforeUnload = () => {
+      sendForfeit();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isMultiplayer, phase, sendForfeit]);
 
   const prevLastActionRef = useRef(lastAction);
   useEffect(() => {
