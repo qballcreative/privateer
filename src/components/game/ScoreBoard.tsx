@@ -100,7 +100,7 @@ export const ScoreBoard = memo(() => {
 
               {/* Fleet bonus row */}
               <div className="flex items-center gap-1.5 mt-1 text-sm overflow-visible" title={`Fleet: ${player.ships.length} ships${hasFleetBonus ? ' — Largest Fleet +5' : ''}`}>
-                <img src="/images/flwebpebpng" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
+                <img src="/images/fleet.webp" alt="Fleet" className="w-8 h-8 object-contain -my-2" />
                 <span className="text-foreground/80" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{player.ships.length}</span>
                 {hasFleetBonus && (
                   <span className="text-xs font-bold text-primary ml-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>+5</span>
