@@ -11,6 +11,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { MultiplayerLobby } from './MultiplayerLobby';
 import { AgeConsentModal } from './AgeConsentModal';
 import { AdBanner } from './AdBanner';
+import { RemoveAdsButton } from './RemoveAdsButton';
 import { InstallPrompt } from './InstallPrompt';
 import { HeroSection } from './HeroSection';
 import { SetSailPanel } from './SetSailPanel';
