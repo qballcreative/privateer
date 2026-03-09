@@ -25,9 +25,11 @@ export const PhoneLayout = ({
   const { isActive: tutorialActive, currentStep } = useTutorialStore();
   const currentHighlightId = tutorialActive ? TUTORIAL_STEPS[currentStep]?.highlightId : undefined;
 
-  // Auto-open drawers/sections when tutorial targets elements inside them
+  // Auto-open drawers/sections when tutorial targets elements inside them (phone only)
   useEffect(() => {
     if (!tutorialActive || !currentHighlightId) return;
+    // Only run on phone-sized screens to avoid opening drawers on tablet/desktop
+    if (window.innerWidth >= 768) return;
 
     if (TREASURE_DRAWER_STEPS.includes(currentHighlightId)) {
       setTreasureDrawerOpen(true);
