@@ -101,22 +101,40 @@ export const GameBoard = () => {
   }, [phase, prevPhase, getRoundWinner, getWinner, playSound]);
 
   useEffect(() => {
-    if (phase === 'gameEnd' && prevPhase !== 'gameEnd' && !isMultiplayer) {
+    if (phase === 'gameEnd' && prevPhase !== 'gameEnd') {
       const winner = getWinner();
       if (winner) {
-        const playerWon = !winner.isAI;
-        const pScore = calculateScore(humanPlayer, players);
-        const oScore = calculateScore(opponentPlayer, players);
-        const { lastDifficulty } = usePlayerStore.getState();
-        recordGameResult(playerWon, {
-          date: new Date().toISOString(),
-          difficulty: lastDifficulty,
-          playerScore: pScore,
-          opponentScore: oScore,
-        });
+        if (!isMultiplayer) {
+          // Solo: record based on AI flag
+          const playerWon = !winner.isAI;
+          const pScore = calculateScore(humanPlayer, players);
+          const oScore = calculateScore(opponentPlayer, players);
+          const { lastDifficulty } = usePlayerStore.getState();
+          recordGameResult(playerWon, {
+            date: new Date().toISOString(),
+            difficulty: lastDifficulty,
+            playerScore: pScore,
+            opponentScore: oScore,
+          });
+        } else {
+          // Multiplayer: record based on local player
+          const playerWon = winner.isLocal === true;
+          const pScore = calculateScore(humanPlayer, players);
+          const oScore = calculateScore(opponentPlayer, players);
+          recordGameResult(playerWon, {
+            date: new Date().toISOString(),
+            difficulty: 'medium',
+            playerScore: pScore,
+            opponentScore: oScore,
+          });
+          // Host broadcasts final state to guest
+          if (isHost) {
+            sendMessage({ type: 'game-state', payload: { gameState: getSerializableState() } });
+          }
+        }
       }
     }
-  }, [phase, prevPhase, isMultiplayer, getWinner, recordGameResult]);
+  }, [phase, prevPhase, isMultiplayer, isHost, getWinner, recordGameResult, sendMessage, getSerializableState]);
 
   useEffect(() => {
     if (lastAction) {

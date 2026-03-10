@@ -63,6 +63,14 @@ Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard re
 
 ---
 
+### ✅ P2 — Multiplayer End-of-Game & Disconnect Fixes
+- Guest now receives `gameEnd` state (message handler listens on all non-lobby phases)
+- `getSerializableState` includes `roundWinners` and `maxRounds`
+- Host broadcasts final state on `gameEnd` transition
+- Multiplayer game results recorded for both players
+- Disconnect timer reduced to 10s intervals with repeating "Claim Victory" / "Wait 10 more" loop
+- Opponent forfeit triggers instant auto-claim victory
+
 ### 🔵 P4 — Monetization
 
 #### Real Ad SDK Integration
