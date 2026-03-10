@@ -188,9 +188,9 @@ export const GameBoard = () => {
     prevMultiplayerStateRef.current = multiplayerState;
   }, [isMultiplayer, isHost, phase, multiplayerState, sendMessage, getSerializableState]);
 
-  // Handle multiplayer messages including forfeit
+  // Handle multiplayer messages including forfeit — listen on all non-lobby phases
   useEffect(() => {
-    if (isMultiplayer && (phase === 'playing' || phase === 'roundEnd')) {
+    if (isMultiplayer && phase !== 'lobby') {
       const unsubscribe = registerMessageHandler((message) => {
         if (message.type === 'game-state') applyGameState((message.payload as any).gameState, true);
         else if (message.type === 'next-round') nextRound();
