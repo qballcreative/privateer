@@ -254,7 +254,9 @@ export const GameBoard = () => {
 
   const opponentPanelProps = useMemo(() => ({
     opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid, isPondering: isOpponentPondering,
-  }), [opponentPlayer, currentPlayerIndex, isRaidMode, isOpponentPondering, handlePirateRaid]);
+    optionalRules, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid, setIsRaidMode,
+  }), [opponentPlayer, currentPlayerIndex, isRaidMode, isOpponentPondering, handlePirateRaid,
+    optionalRules, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid]);
 
   const layoutProps = useMemo(() => ({
     treasureSupplyProps, opponentPanelProps, isRaidMode, setIsRaidMode,

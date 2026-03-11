@@ -23,6 +23,13 @@ export interface OpponentPanelProps {
   isRaidMode: boolean;
   onRaidCard: (card: Card) => void;
   isPondering?: boolean;
+  optionalRules: { pirateRaid?: boolean; stormRule?: boolean; treasureChest?: boolean };
+  localPlayerIndex: number;
+  phase: string;
+  humanPlayer: Player;
+  currentPlayer: Player;
+  canUsePirateRaid: () => boolean;
+  setIsRaidMode: (v: boolean) => void;
 }
 
 export interface LayoutProps {
