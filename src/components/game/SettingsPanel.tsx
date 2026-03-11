@@ -26,24 +26,21 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const optionalRulesConfig = [
   {
     key: 'stormRule' as keyof OptionalRules,
-    icon: CloudLightning,
+    image: '/Icons/storm.webp',
     label: 'Storm Rule',
     description: 'Every 3rd turn, discard 2 random market cards',
-    color: 'text-blue-400',
   },
   {
     key: 'pirateRaid' as keyof OptionalRules,
-    icon: Crosshair,
+    image: '/Icons/raid.webp',
     label: 'Pirate Raid',
     description: 'Steal one card from opponent once per game',
-    color: 'text-red-400',
   },
   {
     key: 'treasureChest' as keyof OptionalRules,
-    icon: Gift,
+    image: '/Icons/treasure.webp',
     label: 'Treasure Chest',
     description: 'Hidden bonus tokens revealed at round end',
-    color: 'text-amber-400',
   },
 ];
 
