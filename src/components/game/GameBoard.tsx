@@ -21,7 +21,7 @@ import { useTutorialStore } from '@/store/tutorialStore';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Card } from '@/types/game';
-import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor } from 'lucide-react';
+import { Home, Swords, Crosshair, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import bannerLogo from '@/assets/bannerlogo.webp';
 import { toast } from '@/components/ui/sonner';

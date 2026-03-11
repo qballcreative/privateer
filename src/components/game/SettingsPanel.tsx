@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { useGameStore } from '@/store/gameStore';
