@@ -246,10 +246,12 @@ export const SettingsPanel = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <rule.icon
+                          <img
+                            src={rule.image}
+                            alt={rule.label}
                             className={cn(
-                              'w-5 h-5',
-                              optionalRules[rule.key] ? rule.color : 'text-muted-foreground'
+                              'w-6 h-6 object-contain',
+                              !optionalRules[rule.key] && 'opacity-40 grayscale'
                             )}
                           />
                           <div>

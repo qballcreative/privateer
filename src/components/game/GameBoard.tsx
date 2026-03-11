@@ -307,17 +307,17 @@ export const GameBoard = () => {
               <div className="flex items-center gap-1">
                 {optionalRules.stormRule && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30" title="Storm Rule Active">
-                    <CloudLightning className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
+                    <img src="/Icons/storm.webp" alt="Storm Rule" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
                 {optionalRules.pirateRaid && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-red-500/20 border border-red-500/30" title="Pirate Raid Active">
-                    <Crosshair className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400" />
+                    <img src="/Icons/raid.webp" alt="Pirate Raid" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
                 {optionalRules.treasureChest && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30" title="Treasure Chest Active">
-                    <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                    <img src="/Icons/treasure.webp" alt="Treasure Chest" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
               </div>
