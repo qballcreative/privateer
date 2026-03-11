@@ -6,15 +6,6 @@ export interface TreasureSupplyPanelProps {
   compact?: boolean;
   tokenStacks: Record<GoodsType, Token[]>;
   bonusTokens: { three: BonusToken[]; four: BonusToken[]; five: BonusToken[] };
-  optionalRules: { pirateRaid?: boolean; stormRule?: boolean; treasureChest?: boolean };
-  currentPlayerIndex: number;
-  localPlayerIndex: number;
-  phase: string;
-  humanPlayer: Player;
-  currentPlayer: Player;
-  canUsePirateRaid: () => boolean;
-  isRaidMode: boolean;
-  setIsRaidMode: (v: boolean) => void;
 }
 
 export interface OpponentPanelProps {
