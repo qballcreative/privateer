@@ -1,12 +1,10 @@
 import { memo } from 'react';
 import { TreasureStack } from '../TreasureStack';
 import { BonusTokens } from '../BonusTokens';
-import { Button } from '@/components/ui/button';
-import { Crosshair, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TreasureSupplyPanelProps, GOODS_ORDER } from './types';
 
-export const TreasureSupplyPanel = memo(({ compact = false, tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid, isRaidMode, setIsRaidMode }: TreasureSupplyPanelProps) => (
+export const TreasureSupplyPanel = memo(({ compact = false, tokenStacks, bonusTokens }: TreasureSupplyPanelProps) => (
   <div className="space-y-4">
     <div data-tutorial-id="tutorial-market-prices" className={cn("p-4 rounded-xl border border-primary/20 relative overflow-hidden", compact && "p-3")} style={{ backgroundImage: 'url(/images/ledger-bg.webp)', backgroundSize: '100% 100%' }}>
       <div className="absolute inset-0 bg-black/40 pointer-events-none" />
