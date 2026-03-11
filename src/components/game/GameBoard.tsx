@@ -21,7 +21,7 @@ import { useTutorialStore } from '@/store/tutorialStore';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Card } from '@/types/game';
-import { Home, Swords, CloudLightning, Crosshair, Gift, Anchor } from 'lucide-react';
+import { Home, Swords, Crosshair, Anchor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import bannerLogo from '@/assets/bannerlogo.webp';
 import { toast } from '@/components/ui/sonner';
@@ -307,17 +307,17 @@ export const GameBoard = () => {
               <div className="flex items-center gap-1">
                 {optionalRules.stormRule && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30" title="Storm Rule Active">
-                    <CloudLightning className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
+                    <img src="/Icons/storm.webp" alt="Storm Rule" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
                 {optionalRules.pirateRaid && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-red-500/20 border border-red-500/30" title="Pirate Raid Active">
-                    <Crosshair className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400" />
+                    <img src="/Icons/raid.webp" alt="Pirate Raid" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
                 {optionalRules.treasureChest && (
                   <div className="p-1 sm:p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30" title="Treasure Chest Active">
-                    <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                    <img src="/Icons/treasure.webp" alt="Treasure Chest" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                   </div>
                 )}
               </div>
@@ -328,7 +328,7 @@ export const GameBoard = () => {
             {isMultiplayer && phase === 'playing' && <ConnectionIndicator className="hidden sm:flex" />}
             {optionalRules.stormRule && (
               <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <CloudLightning className="w-4 h-4 text-blue-400" />
+                <img src="/Icons/storm.webp" alt="Storm" className="w-4 h-4 object-contain" />
                 <span className="text-xs text-blue-400">{3 - (turnCount % 3)} turn{3 - (turnCount % 3) !== 1 ? 's' : ''} to storm</span>
               </div>
             )}

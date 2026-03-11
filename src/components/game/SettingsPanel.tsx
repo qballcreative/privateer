@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Volume2, VolumeX, Music, Clock, Scroll, CloudLightning, Crosshair, Gift, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';
+import { Settings, Volume2, VolumeX, Music, Clock, Scroll, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useConsentStore, AgeGroup } from '@/store/consentStore';
 import { useGameStore } from '@/store/gameStore';
@@ -26,24 +26,21 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const optionalRulesConfig = [
   {
     key: 'stormRule' as keyof OptionalRules,
-    icon: CloudLightning,
+    image: '/Icons/storm.webp',
     label: 'Storm Rule',
     description: 'Every 3rd turn, discard 2 random market cards',
-    color: 'text-blue-400',
   },
   {
     key: 'pirateRaid' as keyof OptionalRules,
-    icon: Crosshair,
+    image: '/Icons/raid.webp',
     label: 'Pirate Raid',
     description: 'Steal one card from opponent once per game',
-    color: 'text-red-400',
   },
   {
     key: 'treasureChest' as keyof OptionalRules,
-    icon: Gift,
+    image: '/Icons/treasure.webp',
     label: 'Treasure Chest',
     description: 'Hidden bonus tokens revealed at round end',
-    color: 'text-amber-400',
   },
 ];
 
@@ -249,10 +246,12 @@ export const SettingsPanel = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <rule.icon
+                          <img
+                            src={rule.image}
+                            alt={rule.label}
                             className={cn(
-                              'w-5 h-5',
-                              optionalRules[rule.key] ? rule.color : 'text-muted-foreground'
+                              'w-6 h-6 object-contain',
+                              !optionalRules[rule.key] && 'opacity-40 grayscale'
                             )}
                           />
                           <div>
