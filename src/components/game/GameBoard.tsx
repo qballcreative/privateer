@@ -249,8 +249,8 @@ export const GameBoard = () => {
   const isOpponentPondering = currentPlayerIndex === opponentIndex && phase === 'playing';
 
   const treasureSupplyProps = useMemo(() => ({
-    tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid,
-  }), [tokenStacks, bonusTokens, optionalRules, currentPlayerIndex, localPlayerIndex, phase, humanPlayer, currentPlayer, canUsePirateRaid]);
+    tokenStacks, bonusTokens,
+  }), [tokenStacks, bonusTokens]);
 
   const opponentPanelProps = useMemo(() => ({
     opponentPlayer, currentPlayerIndex, isRaidMode, onRaidCard: handlePirateRaid, isPondering: isOpponentPondering,
