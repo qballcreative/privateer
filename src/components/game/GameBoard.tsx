@@ -328,7 +328,7 @@ export const GameBoard = () => {
             {isMultiplayer && phase === 'playing' && <ConnectionIndicator className="hidden sm:flex" />}
             {optionalRules.stormRule && (
               <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <CloudLightning className="w-4 h-4 text-blue-400" />
+                <img src="/Icons/storm.webp" alt="Storm" className="w-4 h-4 object-contain" />
                 <span className="text-xs text-blue-400">{3 - (turnCount % 3)} turn{3 - (turnCount % 3) !== 1 ? 's' : ''} to storm</span>
               </div>
             )}
