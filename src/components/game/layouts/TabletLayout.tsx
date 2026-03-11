@@ -94,7 +94,7 @@ export const TabletLayout = ({
           </SheetTrigger>
           <SheetContent side="left" className="w-[60vw] max-w-md bg-card border-primary/20 p-5 overflow-y-auto">
             <SheetTitle className="font-pirate text-primary text-xl mb-4">Treasure Supply</SheetTitle>
-            <TreasureSupplyPanel compact {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
+            <TreasureSupplyPanel compact {...treasureSupplyProps} />
           </SheetContent>
         </Sheet>
 

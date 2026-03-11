@@ -24,7 +24,7 @@ export interface OpponentPanelProps {
 }
 
 export interface LayoutProps {
-  treasureSupplyProps: Omit<TreasureSupplyPanelProps, 'isRaidMode' | 'setIsRaidMode'>;
+  treasureSupplyProps: TreasureSupplyPanelProps;
   opponentPanelProps: OpponentPanelProps;
   isRaidMode: boolean;
   setIsRaidMode: (v: boolean) => void;

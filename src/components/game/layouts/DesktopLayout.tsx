@@ -22,7 +22,7 @@ export const DesktopLayout = ({
   <div className="hidden lg:block">
     <div className="grid grid-cols-4 gap-6">
       <aside className="col-span-1 space-y-4">
-        <TreasureSupplyPanel {...treasureSupplyProps} isRaidMode={isRaidMode} setIsRaidMode={setIsRaidMode} />
+        <TreasureSupplyPanel {...treasureSupplyProps} />
       </aside>
 
       <main className={cn("col-span-2 space-y-6", phase === 'playing' && currentPlayerIndex === localPlayerIndex ? 'zone-active' : 'zone-dimmed')}>
