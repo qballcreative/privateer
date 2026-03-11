@@ -120,7 +120,7 @@ export const VictoryScreen = memo(({ players, roundWins, winner, maxRounds, onPl
           >
             {isPlayerVictory ? (
               <video
-                src="/videos/victory.mov"
+                src="/videos/victory.mp4"
                 autoPlay
                 muted
                 playsInline
