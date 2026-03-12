@@ -54,7 +54,7 @@ export const TabletLayout = ({
         </div>
         <span className="text-muted-foreground">vs</span>
         <div className="flex items-center gap-2">
-          <span className="text-foreground font-medium">{opponentPlayer?.name?.split(' ')[0]}</span>
+          <span className="text-foreground font-medium">{opponentPlayer?.name}</span>
           <span className="text-accent font-pirate text-lg">{calculateScore(opponentPlayer!, players)}</span>
         </div>
       </div>

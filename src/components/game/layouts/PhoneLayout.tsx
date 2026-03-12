@@ -54,7 +54,7 @@ export const PhoneLayout = ({
       </div>
       <span className="text-muted-foreground">vs</span>
       <div className="flex items-center gap-1.5">
-        <span className="text-foreground font-medium">{opponentPlayer?.name?.split(' ')[0]}</span>
+        <span className="text-foreground font-medium">{opponentPlayer?.name}</span>
         <span className="text-accent font-pirate">{calculateScore(opponentPlayer!, players)}</span>
       </div>
     </div>
