@@ -49,12 +49,12 @@ export const TabletLayout = ({
       <div className="flex items-center justify-between px-4 py-2 rounded-lg bg-card/60 border border-border text-sm">
         <div className="flex items-center gap-2">
           <Coins className="w-4 h-4 text-primary" />
-          <span className="text-foreground font-medium">{humanPlayer?.name?.split(' ')[0]}</span>
+          <span className="text-foreground font-medium">{humanPlayer?.name}</span>
           <span className="text-primary font-pirate text-lg">{calculateScore(humanPlayer, players)}</span>
         </div>
         <span className="text-muted-foreground">vs</span>
         <div className="flex items-center gap-2">
-          <span className="text-foreground font-medium">{opponentPlayer?.name?.split(' ')[0]}</span>
+          <span className="text-foreground font-medium">{opponentPlayer?.name}</span>
           <span className="text-accent font-pirate text-lg">{calculateScore(opponentPlayer!, players)}</span>
         </div>
       </div>
