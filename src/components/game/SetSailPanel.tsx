@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Users, Anchor, Trophy, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Anchor, Trophy, Loader2, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Difficulty, OptionalRules } from '@/types/game';
 import { useSettingsStore } from '@/store/settingsStore';
