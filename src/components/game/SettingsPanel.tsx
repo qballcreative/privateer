@@ -223,54 +223,6 @@ export const SettingsPanel = () => {
               {/* Separator */}
               <div className="border-t border-border" />
 
-              {/* Game Rules Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Scroll className="w-5 h-5 text-primary" />
-                  <Label className="text-base font-semibold">Game Rules</Label>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Optional rules to add variety to your games
-                </p>
-                
-                <div className="space-y-3">
-                  {optionalRulesConfig.map((rule) => (
-                    <div
-                      key={rule.key}
-                      className={cn(
-                        'p-3 rounded-lg border transition-all duration-200',
-                        optionalRules[rule.key]
-                          ? 'border-primary/30 bg-primary/5'
-                          : 'border-border bg-muted/30'
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={rule.image}
-                            alt={rule.label}
-                            className={cn(
-                              'w-6 h-6 object-contain',
-                              !optionalRules[rule.key] && 'opacity-40 grayscale'
-                            )}
-                          />
-                          <div>
-                            <Label className="text-sm font-medium">{rule.label}</Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {rule.description}
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={optionalRules[rule.key]}
-                          onCheckedChange={(checked) => setOptionalRule(rule.key, checked)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Separator */}
               <div className="border-t border-border" />
 

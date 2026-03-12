@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { Users, Anchor, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Difficulty } from '@/types/game';
+import { Difficulty, OptionalRules } from '@/types/game';
+import { useSettingsStore } from '@/store/settingsStore';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import deckhandImg from '@/assets/difficulty/deckHand.webp';
 import bosunImg from '@/assets/difficulty/bosun.webp';
@@ -40,6 +43,12 @@ const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
   { key: 'expert', label: 'Admiral', img: admiralImg },
 ];
 
+const optionalRulesConfig = [
+  { key: 'stormRule' as keyof OptionalRules, image: '/Icons/storm.webp', label: 'Storm', description: 'Every 3rd turn, discard 2 random market cards' },
+  { key: 'pirateRaid' as keyof OptionalRules, image: '/Icons/raid.webp', label: 'Raid', description: 'Steal one card from opponent once per game' },
+  { key: 'treasureChest' as keyof OptionalRules, image: '/Icons/treasure.webp', label: 'Treasure', description: 'Hidden bonus tokens revealed at round end' },
+];
+
 export const SetSailPanel = ({
   playerName, onNameChange, stats,
   mode, setMode, difficulty, onDifficultyChange,
@@ -48,6 +57,7 @@ export const SetSailPanel = ({
   loading = false,
 }: SetSailPanelProps) => {
   const winRate = stats.gamesPlayed > 0 ? Math.round((stats.wins / stats.gamesPlayed) * 100) : 0;
+  const { optionalRules, setOptionalRule } = useSettingsStore();
 
   return (
     <motion.div
@@ -172,6 +182,37 @@ export const SetSailPanel = ({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Optional Rules */}
+        {!restrictedMode && (
+          <>
+            <hr className="my-5 border-border" />
+            <div>
+              <p className="text-sm text-muted-foreground mb-2 font-semibold">Optional Rules</p>
+              <div className="grid grid-cols-3 gap-2">
+                {optionalRulesConfig.map((rule) => (
+                  <button
+                    key={rule.key}
+                    onClick={() => setOptionalRule(rule.key, !optionalRules[rule.key])}
+                    className={cn(
+                      'rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border min-h-[72px]',
+                      optionalRules[rule.key]
+                        ? 'bg-primary/10 border-primary text-primary'
+                        : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+                    )}
+                  >
+                    <img
+                      src={rule.image}
+                      alt={rule.label}
+                      className={cn('w-8 h-8 object-contain', !optionalRules[rule.key] && 'opacity-40 grayscale')}
+                    />
+                    <span className="text-xs font-bold">{rule.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </>
