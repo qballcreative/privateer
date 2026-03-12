@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Coins, CloudLightning, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LayoutProps, GOODS_ORDER } from './types';
+import { LayoutProps, GOODS_ORDER, GOODS_IMAGES } from './types';
 
 export const TabletLayout = ({
   treasureSupplyProps, opponentPanelProps, isRaidMode, setIsRaidMode,
