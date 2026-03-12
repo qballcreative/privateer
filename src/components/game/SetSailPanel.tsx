@@ -43,6 +43,12 @@ const difficultyLevels: { key: Difficulty; label: string; img: string }[] = [
   { key: 'expert', label: 'Admiral', img: admiralImg },
 ];
 
+const optionalRulesConfig = [
+  { key: 'stormRule' as keyof OptionalRules, image: '/Icons/storm.webp', label: 'Storm', description: 'Every 3rd turn, discard 2 random market cards' },
+  { key: 'pirateRaid' as keyof OptionalRules, image: '/Icons/raid.webp', label: 'Raid', description: 'Steal one card from opponent once per game' },
+  { key: 'treasureChest' as keyof OptionalRules, image: '/Icons/treasure.webp', label: 'Treasure', description: 'Hidden bonus tokens revealed at round end' },
+];
+
 export const SetSailPanel = ({
   playerName, onNameChange, stats,
   mode, setMode, difficulty, onDifficultyChange,
