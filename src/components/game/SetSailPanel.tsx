@@ -279,3 +279,66 @@ const ActionButton = ({
     )}
   </button>
 );
+
+const RuleToggle = ({
+  rule, active, onToggle,
+}: {
+  rule: { key: string; image: string; label: string; description: string };
+  active: boolean;
+  onToggle: () => void;
+}) => {
+  const [showInfo, setShowInfo] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className={cn(
+          'w-full rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border min-h-[72px] relative',
+          active
+            ? 'bg-primary/10 border-primary text-primary'
+            : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+        )}
+      >
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setShowInfo(!showInfo); }}
+          className="absolute top-1 right-1 p-0.5 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={`Info about ${rule.label}`}
+        >
+          <Info className="w-3.5 h-3.5" />
+        </button>
+        <img
+          src={rule.image}
+          alt={rule.label}
+          className={cn('w-8 h-8 object-contain', !active && 'opacity-40 grayscale')}
+        />
+        <span className="text-xs font-bold">{rule.label}</span>
+      </button>
+
+      <AnimatePresence>
+        {showInfo && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-full mt-2 left-1/2 -translate-x-1/2 w-52 p-3 rounded-lg border border-primary/20 bg-card shadow-lg"
+          >
+            <button
+              onClick={() => setShowInfo(false)}
+              className="absolute top-1.5 right-1.5 p-0.5 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-3 h-3" />
+            </button>
+            <div className="flex items-center gap-2 mb-1.5">
+              <img src={rule.image} alt={rule.label} className="w-5 h-5 object-contain" />
+              <span className="font-bold text-sm text-foreground">{rule.label}</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">{rule.description}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
