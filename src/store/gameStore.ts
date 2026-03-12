@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { useRemoteConfigStore } from './remoteConfigStore';
-import { useSettingsStore } from './settingsStore';
+import { create } from "zustand";
+import { useRemoteConfigStore } from "./remoteConfigStore";
+import { useSettingsStore } from "./settingsStore";
 import {
   GameState,
   Card,
@@ -22,11 +22,11 @@ import {
   HAND_LIMIT,
   MARKET_SIZE,
   MIN_SELL_EXPENSIVE,
-} from '@/types/game';
-import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from '@/lib/security';
-import { validateGameState } from '@/lib/validateGameState';
-import { debugLog } from '@/lib/debugLog';
-import { computeAIMove, AIGameView, AIActions } from '@/lib/aiPlayer';
+} from "@/types/game";
+import { generateSecureId, secureShuffle, secureRandomInt, secureRandom } from "@/lib/security";
+import { validateGameState } from "@/lib/validateGameState";
+import { debugLog } from "@/lib/debugLog";
+import { computeAIMove, AIGameView, AIActions } from "@/lib/aiPlayer";
 import {
   RulesEngine,
   RuleContext,
@@ -35,7 +35,7 @@ import {
   stormRule,
   pirateRaidRule,
   treasureChestRule,
-} from '@/rules';
+} from "@/rules";
 
 // ─── Rules Engine singleton ─────────────────────────────────────────
 const rulesEngine = new RulesEngine();
@@ -46,9 +46,9 @@ rulesEngine.register(treasureChestRule);
 /** Maps the legacy OptionalRules booleans to engine plugin ids. */
 const syncEngineRules = (rules: OptionalRules) => {
   const ids: string[] = [];
-  if (rules.stormRule) ids.push('storm');
-  if (rules.pirateRaid) ids.push('pirate_raid');
-  if (rules.treasureChest) ids.push('treasure_chest');
+  if (rules.stormRule) ids.push("storm");
+  if (rules.pirateRaid) ids.push("pirate_raid");
+  if (rules.treasureChest) ids.push("treasure_chest");
   rulesEngine.setEnabled(ids);
 };
 
@@ -58,7 +58,9 @@ const buildCtx = (state: GameState): RuleContext => ({
   currentPlayerIndex: state.currentPlayerIndex,
   currentPlayer: state.players[state.currentPlayerIndex],
   opponents: state.players.filter((_, i) => i !== state.currentPlayerIndex),
-  pushAction: (action) => { state.lastAction = action; },
+  pushAction: (action) => {
+    state.lastAction = action;
+  },
   shuffle: secureShuffle,
   generateId: generateSecureId,
 });
@@ -140,11 +142,13 @@ const createHiddenTreasures = (playerIds: string[]): HiddenTreasure[] => {
   const shuffledValues = shuffle(TREASURE_CHEST_VALUES);
   return playerIds.map((playerId, index) => ({
     playerId,
-    tokens: [{
-      id: generateId(),
-      cardsCount: 3 as const,
-      value: shuffledValues[index % shuffledValues.length],
-    }],
+    tokens: [
+      {
+        id: generateId(),
+        cardsCount: 3 as const,
+        value: shuffledValues[index % shuffledValues.length],
+      },
+    ],
   }));
 };
 
@@ -190,17 +194,26 @@ const defaultOptionalRules: OptionalRules = {
 };
 
 /** Helper: get the next player index using ring-buffer rotation. */
-const nextPlayerIndex = (current: number, total: number): number =>
-  (current + 1) % total;
+const nextPlayerIndex = (current: number, total: number): number => (current + 1) % total;
 
 /** Helper: get the first opponent index (for 2-player compat). */
-const getOpponentIndex = (current: number, total: number): number =>
-  (current + 1) % total;
+const getOpponentIndex = (current: number, total: number): number => (current + 1) % total;
 
 interface GameStore extends GameState {
   // Actions
-  startGame: (playerName: string, difficulty: Difficulty, optionalRules?: OptionalRules, maxRounds?: number, firstPlayer?: 'host' | 'random') => void;
-  startMultiplayerGame: (playerName: string, opponentName: string, optionalRules: OptionalRules, isHost: boolean) => void;
+  startGame: (
+    playerName: string,
+    difficulty: Difficulty,
+    optionalRules?: OptionalRules,
+    maxRounds?: number,
+    firstPlayer?: "host" | "random",
+  ) => void;
+  startMultiplayerGame: (
+    playerName: string,
+    opponentName: string,
+    optionalRules: OptionalRules,
+    isHost: boolean,
+  ) => void;
   applyGameState: (state: Partial<GameState>, swapPlayers?: boolean) => void;
   getSerializableState: () => Partial<GameState>;
   takeCard: (cardId: string) => void;
@@ -213,21 +226,21 @@ interface GameStore extends GameState {
   resetGame: () => void;
   restartGame: () => void;
   claimVictory: (winnerIndex: number) => void;
-  
+
   // AI
   makeAIMove: () => void;
-  
+
   // Validators (return {ok, reason?})
   canTakeOne: (cardId: string) => ActionValidation;
   canTakeAllShips: () => ActionValidation;
   canExchange: (handCardIds: string[], marketCardIds: string[]) => ActionValidation;
   canSell: (cardIds: string[]) => ActionValidation;
-  
+
   // Legacy compat (boolean wrappers)
   canTakeCard: (cardId: string) => boolean;
   canSellCards: (cardIds: string[]) => boolean;
   canUsePirateRaid: () => boolean;
-  
+
   // Computed
   getCurrentPlayer: () => Player;
   getOpponent: () => Player;
@@ -240,46 +253,46 @@ interface GameStore extends GameState {
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  phase: 'lobby',
+  phase: "lobby",
   market: [],
   deck: [],
   tokenStacks: createTokenStacks(),
   bonusTokens: createBonusTokens(),
-  players: [createPlayer('1', 'Player', false, true), createPlayer('2', getRandomPirateName(), true)],
+  players: [createPlayer("1", "Player", false, true), createPlayer("2", getRandomPirateName(), true)],
   currentPlayerIndex: 0,
   round: 1,
   maxRounds: 3,
   roundWins: [0, 0],
   lastAction: null,
-  difficulty: 'medium',
+  difficulty: "medium",
   optionalRules: defaultOptionalRules,
   turnCount: 0,
   hiddenTreasures: [],
   isMultiplayer: false,
   roundWinners: [],
-  firstPlayer: 'host',
+  firstPlayer: "host",
 
-  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = 'host') => {
+  startGame: (playerName, difficulty, optionalRules = defaultOptionalRules, maxRounds = 3, firstPlayer = "host") => {
     const deck = createDeck();
     const market: Card[] = [];
     const players: Player[] = [
-      createPlayer('1', playerName, false, true),
-      createPlayer('2', getRandomPirateName(), true),
+      createPlayer("1", playerName, false, true),
+      createPlayer("2", getRandomPirateName(), true),
     ];
 
     // Deal initial market (3 ships + 2 from deck)
     let shipCount = 0;
     const remainingDeck: Card[] = [];
-    
+
     for (const card of deck) {
-      if (shipCount < 3 && card.type === 'ships') {
+      if (shipCount < 3 && card.type === "ships") {
         market.push(card);
         shipCount++;
       } else {
         remainingDeck.push(card);
       }
     }
-    
+
     // Add 2 more cards to market
     market.push(...remainingDeck.splice(0, 2));
 
@@ -288,7 +301,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       for (const player of players) {
         const card = remainingDeck.shift();
         if (card) {
-          if (card.type === 'ships') {
+          if (card.type === "ships") {
             player.ships.push(card);
           } else {
             player.hand.push(card);
@@ -301,13 +314,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     syncEngineRules(optionalRules);
 
     const initialState: GameState = {
-      phase: 'playing',
+      phase: "playing",
       deck: remainingDeck,
       market,
       players,
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      currentPlayerIndex: firstPlayer === 'random' ? secureRandomInt(2) : 0,
+      currentPlayerIndex: firstPlayer === "random" ? secureRandomInt(2) : 0,
       round: 1,
       maxRounds,
       roundWins: players.map(() => 0),
@@ -331,7 +344,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If AI goes first (random first player landed on AI), kick off its move
     if (initialState.players[initialState.currentPlayerIndex]?.isAI) {
       const notifDuration = useSettingsStore.getState().actionNotificationDuration;
-      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+      setTimeout(() => get().makeAIMove(), notifDuration * 1000 + 500);
     }
   },
 
@@ -344,18 +357,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const deck = createDeck();
     const market: Card[] = [];
-    
+
     // Host is player 0, guest is player 1
-    const hostPlayer = createPlayer('1', playerName, false, true);
-    const guestPlayer = createPlayer('2', opponentName, false, false);
+    const hostPlayer = createPlayer("1", playerName, false, true);
+    const guestPlayer = createPlayer("2", opponentName, false, false);
     const players: Player[] = [hostPlayer, guestPlayer];
 
     // Deal initial market (3 ships + 2 from deck)
     let shipCount = 0;
     const remainingDeck: Card[] = [];
-    
+
     for (const card of deck) {
-      if (shipCount < 3 && card.type === 'ships') {
+      if (shipCount < 3 && card.type === "ships") {
         market.push(card);
         shipCount++;
       } else {
@@ -369,7 +382,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       for (const player of players) {
         const card = remainingDeck.shift();
         if (card) {
-          if (card.type === 'ships') player.ships.push(card);
+          if (card.type === "ships") player.ships.push(card);
           else player.hand.push(card);
         }
       }
@@ -378,7 +391,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     syncEngineRules(optionalRules);
 
     const initialState: GameState = {
-      phase: 'playing',
+      phase: "playing",
       deck: remainingDeck,
       market,
       players,
@@ -389,13 +402,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       maxRounds: 3,
       roundWins: players.map(() => 0),
       lastAction: null,
-      difficulty: 'medium',
+      difficulty: "medium",
       optionalRules,
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: true,
       roundWinners: [],
-      firstPlayer: 'host',
+      firstPlayer: "host",
     };
 
     const ctx = buildCtx(initialState);
@@ -410,7 +423,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Validate incoming state before applying
     const validated = validateGameState(state);
     if (!validated) {
-      debugLog('engine', 'P2P Validation', 'Rejected invalid game state from peer');
+      debugLog("engine", "P2P Validation", "Rejected invalid game state from peer");
       return;
     }
 
@@ -468,7 +481,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newShips = player.ships;
     let newHand = player.hand;
 
-    if (card.type === 'ships') {
+    if (card.type === "ships") {
       newShips = [...player.ships, card];
     } else {
       if (player.hand.length >= HAND_LIMIT) return;
@@ -489,7 +502,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       deck: deck.slice(1),
       players: newPlayers,
       lastAction: {
-        type: card.type === 'ships' ? 'take-ships' : 'take',
+        type: card.type === "ships" ? "take-ships" : "take",
         playerName: player.name,
         description: `took a ${card.type}`,
         cardsInvolved: [card],
@@ -501,16 +514,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   takeAllShips: () => {
     const { market, deck, players, currentPlayerIndex } = get();
-    const ships = market.filter((c) => c.type === 'ships');
+    const ships = market.filter((c) => c.type === "ships");
     if (ships.length === 0) return;
 
     const player = players[currentPlayerIndex];
-    
+
     // Create new ships array immutably
     const newShips = [...player.ships, ...ships];
 
     // Remove ships and refill market
-    let newMarket = market.filter((c) => c.type !== 'ships');
+    let newMarket = market.filter((c) => c.type !== "ships");
     const cardsNeeded = MARKET_SIZE - newMarket.length;
     newMarket = [...newMarket, ...deck.slice(0, cardsNeeded)];
 
@@ -522,9 +535,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       deck: deck.slice(cardsNeeded),
       players: newPlayers,
       lastAction: {
-        type: 'take-ships',
+        type: "take-ships",
         playerName: player.name,
-        description: `commandeered ${ships.length} ship${ships.length > 1 ? 's' : ''}`,
+        description: `commandeered fleet of ${ships.length} ship${ships.length > 1 ? "s" : ""}`,
         cardsInvolved: ships,
       },
     });
@@ -547,34 +560,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (totalFromHand < 2) return;
 
     // Reject same-type swaps: cannot trade away a goods type you are also taking
-    const handTypes = new Set([...handCards, ...handShips].map(c => c.type));
-    const marketTypes = new Set(marketCards.map(c => c.type));
+    const handTypes = new Set([...handCards, ...handShips].map((c) => c.type));
+    const marketTypes = new Set(marketCards.map((c) => c.type));
     for (const t of handTypes) {
       if (marketTypes.has(t)) return;
     }
 
     // Calculate resulting hand size (ships don't count toward hand limit)
-    const nonShipMarketCards = marketCards.filter((c) => c.type !== 'ships').length;
+    const nonShipMarketCards = marketCards.filter((c) => c.type !== "ships").length;
     const newHandSize = player.hand.length - handCards.length + nonShipMarketCards;
     if (newHandSize > HAND_LIMIT) return;
 
     // Perform exchange
     const newHand = player.hand.filter((c) => !handCardIds.includes(c.id));
     const newShips = player.ships.filter((c) => !handCardIds.includes(c.id));
-    
+
     marketCards.forEach((card) => {
-      if (card.type === 'ships') {
+      if (card.type === "ships") {
         newShips.push(card);
       } else {
         newHand.push(card);
       }
     });
 
-    const newMarket = [
-      ...market.filter((c) => !marketCardIds.includes(c.id)),
-      ...handCards,
-      ...handShips,
-    ];
+    const newMarket = [...market.filter((c) => !marketCardIds.includes(c.id)), ...handCards, ...handShips];
 
     const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = {
@@ -587,7 +596,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       market: newMarket,
       players: newPlayers,
       lastAction: {
-        type: 'exchange',
+        type: "exchange",
         playerName: player.name,
         description: `exchanged ${marketCards.length} cards`,
         cardsGiven: [...handCards, ...handShips],
@@ -610,7 +619,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!cardsToSell.every((c) => c.type === type)) return;
 
     // Check minimum for expensive goods
-    const expensive: GoodsType[] = ['gold', 'silver', 'gemstones'];
+    const expensive: GoodsType[] = ["gold", "silver", "gemstones"];
     if (expensive.includes(type) && cardsToSell.length < MIN_SELL_EXPENSIVE) return;
 
     // Take tokens immutably
@@ -624,7 +633,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Award bonus token immutably
     let bonus: BonusToken | undefined;
     let newBonusTokens = { ...bonusTokens };
-    
+
     if (cardsToSell.length >= 5 && bonusTokens.five.length > 0) {
       bonus = bonusTokens.five[0];
       newBonusTokens = { ...newBonusTokens, five: bonusTokens.five.slice(1) };
@@ -635,19 +644,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       bonus = bonusTokens.three[0];
       newBonusTokens = { ...newBonusTokens, three: bonusTokens.three.slice(1) };
     }
-    
-    const newPlayerBonusTokens = bonus 
-      ? [...player.bonusTokens, bonus] 
-      : player.bonusTokens;
+
+    const newPlayerBonusTokens = bonus ? [...player.bonusTokens, bonus] : player.bonusTokens;
 
     // Remove cards from hand
     const newHand = player.hand.filter((c) => !cardIds.includes(c.id));
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { 
-      ...player, 
-      hand: newHand, 
-      tokens: newPlayerTokens, 
+    newPlayers[currentPlayerIndex] = {
+      ...player,
+      hand: newHand,
+      tokens: newPlayerTokens,
       bonusTokens: newPlayerBonusTokens,
     };
 
@@ -659,7 +666,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tokenStacks: newTokenStacks,
       bonusTokens: newBonusTokens,
       lastAction: {
-        type: 'sell',
+        type: "sell",
         playerName: player.name,
         description: `sold ${cardsToSell.length} ${type}`,
         cardsInvolved: cardsToSell,
@@ -695,14 +702,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const opponent = players[targetOpponentIndex];
     const stolenCard = opponent.hand[cardIndex];
-    
+
     // Remove from opponent and add to player
     const newOpponentHand = opponent.hand.filter((c) => c.id !== targetCardId);
     const newPlayerHand = [...player.hand, stolenCard];
 
     const newPlayers = [...players];
-    newPlayers[currentPlayerIndex] = { 
-      ...player, 
+    newPlayers[currentPlayerIndex] = {
+      ...player,
       hand: newPlayerHand,
       hasUsedPirateRaid: true,
     };
@@ -711,7 +718,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       players: newPlayers,
       lastAction: {
-        type: 'raid',
+        type: "raid",
         playerName: player.name,
         description: `raided ${opponent.name}'s ${stolenCard.type}!`,
         cardsInvolved: [stolenCard],
@@ -750,7 +757,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({
         players: fullState.players,
         hiddenTreasures: fullState.hiddenTreasures,
-        phase: skipRoundEnd ? 'gameEnd' : 'roundEnd',
+        phase: skipRoundEnd ? "gameEnd" : "roundEnd",
         roundWins,
         roundWinners,
         turnCount: newTurnCount,
@@ -781,17 +788,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If next player is AI and not multiplayer, trigger AI move
     if (players[nextIdx].isAI && !isMultiplayer) {
       const notifDuration = useSettingsStore.getState().actionNotificationDuration;
-      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+      setTimeout(() => get().makeAIMove(), notifDuration * 1000 + 500);
     }
   },
 
   nextRound: () => {
     const { round, maxRounds, roundWins, roundWinners, optionalRules, players: currentPlayers, isMultiplayer } = get();
-    
+
     // Check if game is over — any player has 2 wins or max rounds reached
     const anyWinner = roundWins.some((w) => w >= 2);
     if (round >= maxRounds || anyWinner) {
-      set({ phase: 'gameEnd' });
+      set({ phase: "gameEnd" });
       return;
     }
 
@@ -823,9 +830,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Deal initial market
     let shipCount = 0;
     const remainingDeck: Card[] = [];
-    
+
     for (const card of deck) {
-      if (shipCount < 3 && card.type === 'ships') {
+      if (shipCount < 3 && card.type === "ships") {
         market.push(card);
         shipCount++;
       } else {
@@ -839,7 +846,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       for (const player of players) {
         const card = remainingDeck.shift();
         if (card) {
-          if (card.type === 'ships') player.ships.push(card);
+          if (card.type === "ships") player.ships.push(card);
           else player.hand.push(card);
         }
       }
@@ -847,7 +854,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const newState: GameState = {
       ...get(),
-      phase: 'playing',
+      phase: "playing",
       deck: remainingDeck,
       market,
       players,
@@ -869,18 +876,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If AI goes first in the new round, trigger its move
     if (players[nextStartIndex]?.isAI && !isMultiplayer) {
       const notifDuration = useSettingsStore.getState().actionNotificationDuration;
-      setTimeout(() => get().makeAIMove(), (notifDuration * 1000) + 500);
+      setTimeout(() => get().makeAIMove(), notifDuration * 1000 + 500);
     }
   },
 
   resetGame: () => {
     set({
-      phase: 'lobby',
+      phase: "lobby",
       market: [],
       deck: [],
       tokenStacks: createTokenStacks(),
       bonusTokens: createBonusTokens(),
-      players: [createPlayer('1', 'Player', false, true), createPlayer('2', 'Pirate AI', true)],
+      players: [createPlayer("1", "Player", false, true), createPlayer("2", "Pirate AI", true)],
       currentPlayerIndex: 0,
       round: 1,
       roundWins: [0, 0],
@@ -890,7 +897,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnCount: 0,
       hiddenTreasures: [],
       isMultiplayer: false,
-      firstPlayer: 'host',
+      firstPlayer: "host",
     });
   },
 
@@ -905,7 +912,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newRoundWinners.push(players[winnerIndex]?.id || null);
     }
     set({
-      phase: 'gameEnd',
+      phase: "gameEnd",
       roundWins: newRoundWins,
       roundWinners: newRoundWinners,
     });
@@ -913,7 +920,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   restartGame: () => {
     const { difficulty, optionalRules, players, firstPlayer } = get();
-    const playerName = players.find((p) => !p.isAI && p.isLocal)?.name || 'Player';
+    const playerName = players.find((p) => !p.isAI && p.isLocal)?.name || "Player";
     get().startGame(playerName, difficulty, optionalRules, get().maxRounds, firstPlayer);
   },
 
@@ -947,59 +954,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
   canTakeOne: (cardId) => {
     const { market, players, currentPlayerIndex } = get();
     const card = market.find((c) => c.id === cardId);
-    if (!card) return { ok: false, reason: 'Card not in market' };
-    
+    if (!card) return { ok: false, reason: "Card not in market" };
+
     const player = players[currentPlayerIndex];
-    if (card.type === 'ships') return { ok: true };
-    if (player.hand.length >= HAND_LIMIT) return { ok: false, reason: 'Hold is full' };
+    if (card.type === "ships") return { ok: true };
+    if (player.hand.length >= HAND_LIMIT) return { ok: false, reason: "Hold is full" };
     return { ok: true };
   },
 
   canTakeAllShips: () => {
     const { market } = get();
-    const ships = market.filter((c) => c.type === 'ships');
-    if (ships.length === 0) return { ok: false, reason: 'No ships in market' };
+    const ships = market.filter((c) => c.type === "ships");
+    if (ships.length === 0) return { ok: false, reason: "No ships in market" };
     return { ok: true };
   },
 
   canExchange: (handCardIds, marketCardIds) => {
-    if (handCardIds.length < 2 || marketCardIds.length < 2) 
-      return { ok: false, reason: 'Must exchange at least 2 cards' };
-    if (handCardIds.length !== marketCardIds.length) 
-      return { ok: false, reason: 'Must exchange equal number of cards' };
-    
+    if (handCardIds.length < 2 || marketCardIds.length < 2)
+      return { ok: false, reason: "Must exchange at least 2 cards" };
+    if (handCardIds.length !== marketCardIds.length)
+      return { ok: false, reason: "Must exchange equal number of cards" };
+
     const { players, currentPlayerIndex, market } = get();
     const player = players[currentPlayerIndex];
     const handCards = player.hand.filter((c) => handCardIds.includes(c.id));
     const handShips = player.ships.filter((c) => handCardIds.includes(c.id));
     const marketCards = market.filter((c) => marketCardIds.includes(c.id));
-    
-    if (handCards.length + handShips.length !== marketCards.length)
-      return { ok: false, reason: 'Card count mismatch' };
-    
-    const nonShipMarketCards = marketCards.filter((c) => c.type !== 'ships').length;
+
+    if (handCards.length + handShips.length !== marketCards.length) return { ok: false, reason: "Card count mismatch" };
+
+    const nonShipMarketCards = marketCards.filter((c) => c.type !== "ships").length;
     const newHandSize = player.hand.length - handCards.length + nonShipMarketCards;
-    if (newHandSize > HAND_LIMIT)
-      return { ok: false, reason: 'Would exceed hold capacity' };
-    
+    if (newHandSize > HAND_LIMIT) return { ok: false, reason: "Would exceed hold capacity" };
+
     return { ok: true };
   },
 
   canSell: (cardIds) => {
     const { players, currentPlayerIndex } = get();
     const player = players[currentPlayerIndex];
-    
+
     const cards = player.hand.filter((c) => cardIds.includes(c.id));
-    if (cards.length === 0) return { ok: false, reason: 'No cards selected' };
-    
+    if (cards.length === 0) return { ok: false, reason: "No cards selected" };
+
     const type = cards[0].type;
-    if (!cards.every((c) => c.type === type)) 
-      return { ok: false, reason: 'All cards must be same type' };
-    
-    const expensive = ['gold', 'silver', 'gemstones'];
+    if (!cards.every((c) => c.type === type)) return { ok: false, reason: "All cards must be same type" };
+
+    const expensive = ["gold", "silver", "gemstones"];
     if (expensive.includes(type) && cards.length < MIN_SELL_EXPENSIVE)
       return { ok: false, reason: `Must sell at least ${MIN_SELL_EXPENSIVE} ${type}` };
-    
+
     return { ok: true };
   },
 
@@ -1010,11 +1014,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   canUsePirateRaid: () => {
     const { players, currentPlayerIndex, optionalRules } = get();
     if (!optionalRules.pirateRaid) return false;
-    
+
     const player = players[currentPlayerIndex];
     if (player.hasUsedPirateRaid) return false;
     if (player.hand.length >= HAND_LIMIT) return false;
-    
+
     // Check if any opponent has cards
     const hasTargets = players.some((p, i) => i !== currentPlayerIndex && p.hand.length > 0);
     return hasTargets;
@@ -1042,9 +1046,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   isRoundOver: () => {
     const { deck, tokenStacks, market } = get();
-    
+
     if (deck.length === 0 && market.length < MARKET_SIZE) return true;
-    
+
     const emptyStacks = Object.values(tokenStacks).filter((s) => s.length === 0).length;
     return emptyStacks >= 3;
   },
@@ -1069,30 +1073,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
   getRoundWinner: () => {
     const { players } = get();
     const scores = players.map((p) => calculateScore(p, players));
-    
+
     const maxScore = Math.max(...scores);
-    const winners = scores.reduce<number[]>((acc, s, i) => s === maxScore ? [...acc, i] : acc, []);
-    
+    const winners = scores.reduce<number[]>((acc, s, i) => (s === maxScore ? [...acc, i] : acc), []);
+
     if (winners.length === 1) return players[winners[0]];
-    
+
     // Tie breaker: most bonus tokens
     const tiedPlayers = winners.map((i) => players[i]);
     const maxBonus = Math.max(...tiedPlayers.map((p) => p.bonusTokens.length));
     const bonusWinners = tiedPlayers.filter((p) => p.bonusTokens.length === maxBonus);
     if (bonusWinners.length === 1) return bonusWinners[0];
-    
+
     // Tie breaker: most goods tokens
     const maxTokens = Math.max(...bonusWinners.map((p) => p.tokens.length));
     const tokenWinners = bonusWinners.filter((p) => p.tokens.length === maxTokens);
     if (tokenWinners.length === 1) return tokenWinners[0];
-    
+
     return null;
   },
 
   getRevealedTreasures: () => {
     const { hiddenTreasures, phase, optionalRules } = get();
     if (!optionalRules.treasureChest) return [];
-    if (phase !== 'roundEnd' && phase !== 'gameEnd') return [];
+    if (phase !== "roundEnd" && phase !== "gameEnd") return [];
     return hiddenTreasures;
   },
 }));
