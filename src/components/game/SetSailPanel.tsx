@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { Users, Anchor, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Difficulty } from '@/types/game';
+import { Difficulty, OptionalRules } from '@/types/game';
+import { useSettingsStore } from '@/store/settingsStore';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import deckhandImg from '@/assets/difficulty/deckHand.webp';
 import bosunImg from '@/assets/difficulty/bosun.webp';
