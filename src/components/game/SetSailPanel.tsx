@@ -187,6 +187,37 @@ export const SetSailPanel = ({
           </>
         )}
 
+        {/* Optional Rules */}
+        {!restrictedMode && (
+          <>
+            <hr className="my-5 border-border" />
+            <div>
+              <p className="text-sm text-muted-foreground mb-2 font-semibold">Optional Rules</p>
+              <div className="grid grid-cols-3 gap-2">
+                {optionalRulesConfig.map((rule) => (
+                  <button
+                    key={rule.key}
+                    onClick={() => setOptionalRule(rule.key, !optionalRules[rule.key])}
+                    className={cn(
+                      'rounded-lg p-2 transition-all flex flex-col items-center justify-center gap-1 border min-h-[72px]',
+                      optionalRules[rule.key]
+                        ? 'bg-primary/10 border-primary text-primary'
+                        : 'bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+                    )}
+                  >
+                    <img
+                      src={rule.image}
+                      alt={rule.label}
+                      className={cn('w-8 h-8 object-contain', !optionalRules[rule.key] && 'opacity-40 grayscale')}
+                    />
+                    <span className="text-xs font-bold">{rule.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         <hr className="my-5 border-border" />
 
         {/* Action Buttons */}
