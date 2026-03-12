@@ -65,15 +65,28 @@ export const TabletLayout = ({
           <img src="/images/supply.webp" alt="Supply" className="w-5 h-5 object-contain" />
           <span className="text-muted-foreground">{deck.length}</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {GOODS_ORDER.map((type) => {
-            const isEmpty = tokenStacks[type].length === 0;
+            const count = tokenStacks[type].length;
+            const isEmpty = count === 0;
             return (
               <div
                 key={type}
-                className={cn("w-4 h-4 rounded-sm", isEmpty ? "bg-destructive/40" : "bg-primary/20")}
-                title={`${type}: ${tokenStacks[type].length} left`}
-              />
+                className="relative group"
+                title={`${type}: ${count} left`}
+              >
+                <img
+                  src={GOODS_IMAGES[type]}
+                  alt={type}
+                  className={cn(
+                    'w-6 h-6 object-contain transition-all',
+                    isEmpty && 'grayscale opacity-40'
+                  )}
+                />
+                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-card border border-border text-[10px] font-bold text-foreground opacity-0 group-hover:opacity-100 group-active:opacity-100 pointer-events-none whitespace-nowrap z-10 shadow-sm">
+                  {count}
+                </div>
+              </div>
             );
           })}
         </div>

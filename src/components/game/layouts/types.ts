@@ -1,6 +1,22 @@
 import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
 
+import rumImg from '@/assets/tokens/rum.webp';
+import ironImg from '@/assets/tokens/iron.webp';
+import silverImg from '@/assets/tokens/silver.webp';
+import goldImg from '@/assets/tokens/gold.webp';
+import gemsImg from '@/assets/tokens/gems.webp';
+import silkImg from '@/assets/tokens/silk.webp';
+
 export const GOODS_ORDER: GoodsType[] = ['gemstones', 'gold', 'silver', 'silks', 'cannonballs', 'rum'];
+
+export const GOODS_IMAGES: Record<GoodsType, string> = {
+  gemstones: gemsImg,
+  gold: goldImg,
+  silver: silverImg,
+  silks: silkImg,
+  cannonballs: ironImg,
+  rum: rumImg,
+};
 
 export interface TreasureSupplyPanelProps {
   compact?: boolean;
