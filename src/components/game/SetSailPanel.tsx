@@ -57,6 +57,7 @@ export const SetSailPanel = ({
   loading = false,
 }: SetSailPanelProps) => {
   const winRate = stats.gamesPlayed > 0 ? Math.round((stats.wins / stats.gamesPlayed) * 100) : 0;
+  const { optionalRules, setOptionalRule } = useSettingsStore();
 
   return (
     <motion.div
