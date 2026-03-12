@@ -524,7 +524,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       lastAction: {
         type: 'take-ships',
         playerName: player.name,
-        description: `took ${ships.length} ship${ships.length > 1 ? 's' : ''}`,
+        description: `commandeered ${ships.length} ship${ships.length > 1 ? 's' : ''}`,
         cardsInvolved: ships,
       },
     });
