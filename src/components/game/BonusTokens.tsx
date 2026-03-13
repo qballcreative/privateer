@@ -69,11 +69,11 @@ const MedallionStack = ({
 
 export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
-    <div data-tutorial-id="tutorial-bonus" className="p-3 rounded-lg bg-black/40 border border-primary/20">
-      <span className="text-lg font-pirate text-primary block text-center mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+    <div data-tutorial-id="tutorial-bonus" className="p-3 rounded-lg bg-black/40 border border-primary/20 flex flex-col items-center">
+      <span className="text-lg font-pirate text-primary text-center mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
         Commissions
       </span>
-      <div className="flex items-center justify-start gap-4">
+      <div className="flex items-center justify-center w-full gap-4">
         <MedallionStack tier="three" tokens={threeCards} />
         <MedallionStack tier="four" tokens={fourCards} />
         <MedallionStack tier="five" tokens={fiveCards} />
