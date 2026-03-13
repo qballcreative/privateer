@@ -75,7 +75,7 @@ export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusToke
       <span className="text-lg font-pirate text-primary text-center mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
         Commissions
       </span>
-      <div className="flex items-center justify-center w-full gap-4" style={{ marginLeft: '-50px' }}>
+      <div className="flex items-start justify-center w-full gap-2">
         <MedallionStack tier="three" tokens={threeCards} />
         <MedallionStack tier="four" tokens={fourCards} />
         <MedallionStack tier="five" tokens={fiveCards} />
