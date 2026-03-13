@@ -62,7 +62,7 @@ const MedallionStack = ({
         )}
       </div>
 
-      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length}</span>
+      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', marginLeft: '50px' }}>{tokens.length}</span>
     </div>
   );
 };
