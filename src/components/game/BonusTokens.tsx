@@ -32,8 +32,8 @@ const MedallionStack = ({
   const sealSrc = sealImages[tier];
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] font-semibold text-foreground/80" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tierLabels[tier]} cargo</span>
+    <div className="flex flex-col items-center justify-center gap-1 flex-1">
+      <span className="text-[10px] font-semibold text-foreground/80 text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tierLabels[tier]} cargo</span>
       
       <div className="relative w-10 h-10">
         {/* Stacked seals */}
@@ -62,18 +62,18 @@ const MedallionStack = ({
         )}
       </div>
 
-      <span className="text-xs text-primary font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length}</span>
+      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length}</span>
     </div>
   );
 };
 
 export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
   return (
-    <div data-tutorial-id="tutorial-bonus" className="p-3 rounded-lg bg-black/40 border border-primary/20">
-      <span className="text-lg font-pirate text-primary block text-center mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+    <div data-tutorial-id="tutorial-bonus" className="p-3 rounded-lg bg-black/40 border border-primary/20 flex flex-col items-center">
+      <span className="text-lg font-pirate text-primary text-center mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
         Commissions
       </span>
-      <div className="flex items-center justify-start gap-4">
+      <div className="flex items-center justify-center w-full gap-4">
         <MedallionStack tier="three" tokens={threeCards} />
         <MedallionStack tier="four" tokens={fourCards} />
         <MedallionStack tier="five" tokens={fiveCards} />
