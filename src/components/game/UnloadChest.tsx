@@ -18,7 +18,7 @@ import {
 
 interface UnloadChestProps {
   selectedCards: string[];
-  player: { hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
+  player: { name: string; hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
   onUnload: () => void;
   onClear: () => void;
   canUnload: boolean;
