@@ -32,17 +32,19 @@ const MedallionStack = ({
   const sealSrc = sealImages[tier];
 
   return (
-    <div className="flex flex-col items-center justify-center gap-1 flex-1">
-      <span className="text-[10px] font-semibold text-foreground/80 text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', marginLeft: '50px' }}>{tierLabels[tier]} cargo</span>
+    <div className="flex flex-col items-center justify-center gap-1 flex-1 min-w-0">
+      <div className="px-2 py-0.5 rounded leather-texture">
+        <span className="text-xs text-foreground/90 font-medium text-center whitespace-nowrap" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tierLabels[tier]} cargo</span>
+      </div>
       
-      <div className="relative w-10 h-10">
+      <div className="relative w-12 h-14 flex-shrink-0">
         {/* Stacked seals */}
-        {tokens.slice(0, 3).reverse().map((token, index) => (
+        {tokens.slice(0, 4).reverse().map((token, index) => (
           <motion.div
             key={token.id}
-            className="absolute w-10 h-10"
+            className="absolute w-11 h-11"
             style={{
-              bottom: index * 2,
+              bottom: index * 3,
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: index,
@@ -57,12 +59,12 @@ const MedallionStack = ({
         {/* Empty state */}
         {isEmpty && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain opacity-20" />
+            <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-11 h-11 object-contain opacity-20" />
           </div>
         )}
       </div>
 
-      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', marginLeft: '50px' }}>{tokens.length}</span>
+      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length} left</span>
     </div>
   );
 };
