@@ -36,27 +36,21 @@ export const OpponentPanel = memo(({
             <p className="text-xs text-muted-foreground mb-2">
               Steal one card from your opponent!
             </p>
-            <Button
-              size="sm"
-              variant={isRaidMode ? 'destructive' : 'outline'}
-              className={cn(
-                'w-full',
-                !isRaidMode && 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-              )}
-              onClick={() => setIsRaidMode(!isRaidMode)}
-            >
-              {isRaidMode ? (
-                <>
-                  <X className="w-4 h-4 mr-1" />
-                  Cancel Raid
-                </>
-              ) : (
-                <>
-                  <Crosshair className="w-4 h-4 mr-1" />
-                  Activate Raid
-                </>
-              )}
-            </Button>
+            {isRaidMode ? (
+              <p className="text-xs text-red-400 font-medium animate-pulse">
+                Select a card from your opponent's hold to steal!
+              </p>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10"
+                onClick={() => setIsRaidMode(true)}
+              >
+                <Crosshair className="w-4 h-4 mr-1" />
+                Activate Raid
+              </Button>
+            )}
           </>
         ) : (
           <p className="text-xs text-muted-foreground">
