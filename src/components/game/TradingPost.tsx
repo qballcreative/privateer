@@ -206,7 +206,7 @@ export const TradingPost = ({ layout = 'desktop', onModeChange, onInvalidAction 
               : "flex flex-wrap items-end justify-center gap-4 sm:gap-6 pt-4"
           )}>
             <LayoutGroup id="trading-post">
-              <AnimatePresence mode="sync">
+              <AnimatePresence mode="popLayout">
                 {market.map((card, index) => (
                   <motion.div
                     key={card.id}
