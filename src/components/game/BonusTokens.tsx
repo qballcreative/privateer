@@ -33,7 +33,7 @@ const MedallionStack = ({
 
   return (
     <div className="flex flex-col items-center justify-center gap-1 flex-1">
-      <span className="text-[10px] font-semibold text-foreground/80 text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tierLabels[tier]} cargo</span>
+      <span className="text-[10px] font-semibold text-foreground/80 text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', marginLeft: '50px' }}>{tierLabels[tier]} cargo</span>
       
       <div className="relative w-10 h-10">
         {/* Stacked seals */}
@@ -62,7 +62,7 @@ const MedallionStack = ({
         )}
       </div>
 
-      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length}</span>
+      <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', marginLeft: '50px' }}>{tokens.length}</span>
     </div>
   );
 };
