@@ -18,7 +18,7 @@ import {
 
 interface UnloadChestProps {
   selectedCards: string[];
-  player: { hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
+  player: { name: string; hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
   onUnload: () => void;
   onClear: () => void;
   canUnload: boolean;
@@ -135,7 +135,7 @@ export const UnloadChest = ({
 
   // Track the sell action to trigger animations
   useEffect(() => {
-    if (lastAction?.type === 'sell' && lastAction.cardsInvolved && lastAction !== processedAction.current) {
+    if (lastAction?.type === 'sell' && lastAction.cardsInvolved && lastAction !== processedAction.current && lastAction.playerName === player.name) {
       processedAction.current = lastAction;
       setIsUnloading(true);
       setShowSparkles(true);

@@ -1,30 +1,94 @@
+# Privateer: Letters of Marque — Implementation Plan
 
+> Last updated: 2026-03-09
 
-## Fix: Bonus token animation showing for opponent sells
+---
 
-### Problem
-The `UnloadChest` component listens to `lastAction` and triggers the bonus/doubloon animation whenever *any* player sells cargo. It should only animate when the **local human player** sells.
+## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
 
-### Solution
-In `UnloadChest.tsx`, compare `lastAction.playerName` against the `player.name` prop (which is always the human player since UnloadChest only renders for `isCurrentPlayer && !isOpponent`). If they don't match, skip the animation.
+| Category | Score | Status |
+|----------|-------|--------|
+| Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
+| Game Mechanics | 8.0 | ✅ Sell confirmation added |
+| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
+| UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
+| Mobile | 7.5 | ✅ Mini-info bar shows key stats |
+| Multiplayer | 6.0 | ✅ TURN server config ready |
+| Onboarding | 7.5 | ✅ Naming fixed |
+| Performance | 8.0 | ✅ Preload extracted |
+| Code Quality | 8.0 | ✅ AI extracted, immutable state |
+| Monetization | 6.0 | Ad space reserved |
 
-### Change
-**`src/components/game/UnloadChest.tsx`** — line 138, add a guard check:
+---
 
-```tsx
-// Before:
-if (lastAction?.type === 'sell' && lastAction.cardsInvolved && lastAction !== processedAction.current) {
+## ✅ Completed
 
-// After:
-if (lastAction?.type === 'sell' && lastAction.cardsInvolved && lastAction !== processedAction.current && lastAction.playerName === player.name) {
-```
+### Quick Wins
+- Copyright year → 2026
+- "Iron" → "Cannonballs" in HowToPlay
+- Invalid action feedback wired to TradingPost
+- Preload images extracted to shared module
 
-Where `player.name` comes from the existing `player` prop (which has type `{ hand: Card[]; tokens: ...; bonusTokens: ... }`). We need to extend the prop type to include `name`:
+### P0 Bugs
+- ✅ AI first-move bug fixed
+- ✅ Next-round first player (already implemented correctly)
+- ✅ Restart preserves firstPlayer (already implemented)
 
-**Update the `UnloadChestProps` interface** to include `name` in the player type:
-```tsx
-player: { name: string; hand: Card[]; tokens: { value: number }[]; bonusTokens: { value: number }[] };
-```
+### P1 UX
+- ✅ Sell confirmation dialog with doubloon preview
+- ✅ Reduced in-game logo size ~30%
+- ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
 
-This is a one-line guard addition — no other files need changes since `ShipsHold` already passes the full `Player` object which includes `name`.
+### P2 Multiplayer
+- ✅ ICE servers now loaded from remote config (supports TURN when added)
+- ✅ Heartbeat/ping-pong already implemented
+- ✅ DisconnectModal with countdown already exists
 
+### P3 Architecture
+- ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
+- ✅ Fixed syncEngineRules no-op
+- ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
+
+### Visual Polish
+- ✅ AI "thinking" overlay (already implemented in ShipsHold)
+
+---
+
+## Remaining Roadmap
+
+### 🟢 P3 — Architecture
+
+#### ✅ Split GameBoard Layouts
+Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
+
+---
+
+### ✅ P2 — Multiplayer End-of-Game & Disconnect Fixes
+- Guest now receives `gameEnd` state (message handler listens on all non-lobby phases)
+- `getSerializableState` includes `roundWinners` and `maxRounds`
+- Host broadcasts final state on `gameEnd` transition
+- Multiplayer game results recorded for both players
+- Disconnect timer reduced to 10s intervals with repeating "Claim Victory" / "Wait 10 more" loop
+- Opponent forfeit triggers instant auto-claim victory
+
+### 🔵 P4 — Monetization
+
+#### Real Ad SDK Integration
+Replace stubs with Google AdSense or similar.
+
+**Files:** `src/lib/adProvider.ts`, ad components
+
+---
+
+## Visual Polish Backlog
+
+- [x] Parchment theme CSS variables (already implemented)
+- [x] Custom pirate favicon (skull & crossbones with coins)
+- [x] Victory screen treasure chest opening animation (already implemented)
+- [x] Round-end "Wax Seal" animation (already implemented)
+
+---
+
+## ✅ Plan Complete
+
+All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.
