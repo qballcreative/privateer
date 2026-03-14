@@ -98,7 +98,11 @@ export const PhoneLayout = ({
 
     {/* Drawer triggers */}
     <div className="flex items-center justify-between gap-2">
-      <Sheet open={treasureDrawerOpen} onOpenChange={setTreasureDrawerOpen}>
+      <Sheet open={treasureDrawerOpen} onOpenChange={(open) => {
+          // Don't allow closing during tutorial steps that need the drawer open
+          if (!open && tutorialActive && currentHighlightId && TREASURE_DRAWER_STEPS.includes(currentHighlightId)) return;
+          setTreasureDrawerOpen(open);
+        }}>
         <SheetTrigger asChild>
           <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-primary/30 text-primary">
             <Coins className="w-4 h-4" />
