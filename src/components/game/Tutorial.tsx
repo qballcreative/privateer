@@ -87,8 +87,12 @@ export const Tutorial = () => {
       }
     };
 
-    // Delay slightly for drawer animations
-    timer = setTimeout(tryFind, 150);
+    // Delay more for steps inside drawers (Sheet animation is 500ms)
+    const isDrawerStep = step?.highlightId && (
+      TREASURE_DRAWER_STEPS.includes(step.highlightId) ||
+      HOLD_STEPS.includes(step.highlightId)
+    );
+    timer = setTimeout(tryFind, isDrawerStep ? 600 : 150);
 
     const handleResize = () => {
       const m = measureTarget();
@@ -96,8 +100,20 @@ export const Tutorial = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // For drawer steps, re-measure a few times as animations settle
+    let remeasureTimers: ReturnType<typeof setTimeout>[] = [];
+    if (isDrawerStep) {
+      [800, 1000, 1200].forEach(delay => {
+        remeasureTimers.push(setTimeout(() => {
+          const m = measureTarget();
+          if (m) setRect(m);
+        }, delay));
+      });
+    }
+
     return () => {
       clearTimeout(timer);
+      remeasureTimers.forEach(clearTimeout);
       window.removeEventListener('resize', handleResize);
     };
   }, [isActive, currentStep, measureTarget, step?.highlightId]);
@@ -111,12 +127,19 @@ export const Tutorial = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const gap = 12;
-    const margin = 8;
-    const tooltipW = Math.min(320, vw - margin * 2);
+    const margin = 12;
+    const tooltipW = Math.min(300, vw - margin * 2);
     const tooltipH = tooltip.offsetHeight || 180;
 
     if (!rect) {
-      setTooltipPos({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: `${tooltipW}px` });
+      // Center the tooltip on screen — use calc to ensure it stays within bounds
+      const centeredLeft = Math.max(margin, (vw - tooltipW) / 2);
+      setTooltipPos({
+        top: '50%',
+        left: `${centeredLeft}px`,
+        transform: 'translateY(-50%)',
+        width: `${tooltipW}px`,
+      });
       return;
     }
 
