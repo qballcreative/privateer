@@ -87,8 +87,12 @@ export const Tutorial = () => {
       }
     };
 
-    // Delay slightly for drawer animations
-    timer = setTimeout(tryFind, 150);
+    // Delay more for steps inside drawers (Sheet animation is 500ms)
+    const isDrawerStep = step?.highlightId && (
+      TREASURE_DRAWER_STEPS.includes(step.highlightId) ||
+      HOLD_STEPS.includes(step.highlightId)
+    );
+    timer = setTimeout(tryFind, isDrawerStep ? 600 : 150);
 
     const handleResize = () => {
       const m = measureTarget();
