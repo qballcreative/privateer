@@ -98,7 +98,11 @@ export const TabletLayout = ({
 
       {/* Drawer triggers */}
       <div className="flex items-center justify-between gap-3">
-        <Sheet open={treasureDrawerOpen} onOpenChange={setTreasureDrawerOpen}>
+        <Sheet open={treasureDrawerOpen} onOpenChange={(open) => {
+            // Don't allow closing during tutorial steps that need the drawer open
+            if (!open && tutorialActive && currentHighlightId && TREASURE_DRAWER_STEPS.includes(currentHighlightId)) return;
+            setTreasureDrawerOpen(open);
+          }}>
           <SheetTrigger asChild>
             <Button variant="outline" size="default" className="flex items-center gap-2 border-primary/30 text-primary">
               <Coins className="w-5 h-5" />
