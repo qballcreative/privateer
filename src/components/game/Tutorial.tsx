@@ -115,12 +115,19 @@ export const Tutorial = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const gap = 12;
-    const margin = 8;
-    const tooltipW = Math.min(320, vw - margin * 2);
+    const margin = 12;
+    const tooltipW = Math.min(300, vw - margin * 2);
     const tooltipH = tooltip.offsetHeight || 180;
 
     if (!rect) {
-      setTooltipPos({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: `${tooltipW}px` });
+      // Center the tooltip on screen — use calc to ensure it stays within bounds
+      const centeredLeft = Math.max(margin, (vw - tooltipW) / 2);
+      setTooltipPos({
+        top: '50%',
+        left: `${centeredLeft}px`,
+        transform: 'translateY(-50%)',
+        width: `${tooltipW}px`,
+      });
       return;
     }
 
