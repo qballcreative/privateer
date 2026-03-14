@@ -100,8 +100,20 @@ export const Tutorial = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // For drawer steps, re-measure a few times as animations settle
+    let remeasureTimers: ReturnType<typeof setTimeout>[] = [];
+    if (isDrawerStep) {
+      [800, 1000, 1200].forEach(delay => {
+        remeasureTimers.push(setTimeout(() => {
+          const m = measureTarget();
+          if (m) setRect(m);
+        }, delay));
+      });
+    }
+
     return () => {
       clearTimeout(timer);
+      remeasureTimers.forEach(clearTimeout);
       window.removeEventListener('resize', handleResize);
     };
   }, [isActive, currentStep, measureTarget, step?.highlightId]);
