@@ -243,11 +243,11 @@ export const Tutorial = () => {
               </span>
               <div className="flex gap-2">
                 {!isFirst && (
-                  <Button variant="ghost" size="sm" onClick={prev} className="h-8 px-3">
+                  <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); prev(); }} className="h-8 px-3">
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
                   </Button>
                 )}
-                <Button size="sm" onClick={next} className="h-8 px-3">
+                <Button size="sm" onClick={(e) => { e.stopPropagation(); next(); }} className="h-8 px-3">
                   {isLast ? (
                     <>
                       <Anchor className="w-4 h-4 mr-1" /> Set Sail!
