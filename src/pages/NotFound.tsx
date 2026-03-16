@@ -1,9 +1,17 @@
+/**
+ * 404 Not Found Page
+ *
+ * Displayed when the user navigates to a route that doesn't exist.
+ * Logs the attempted path in development for debugging.
+ */
+
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
   const location = useLocation();
 
+  // Log 404 errors in development to help catch broken links
   useEffect(() => {
     if (import.meta.env.DEV) console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);

@@ -1,3 +1,16 @@
+/**
+ * Optional Rule Plugins — Privateer: Letters of Marque
+ *
+ * Each plugin implements the RulePlugin interface and hooks into the
+ * RulesEngine lifecycle. Plugins are registered once at app startup and
+ * toggled on/off per game session via the settings UI.
+ *
+ * Plugins:
+ *  1. Storm Rule      — Market disruption every 3rd turn
+ *  2. Pirate Raid     — One-time card steal from opponent
+ *  3. Treasure Chest  — Hidden bonus tokens revealed at round end
+ */
+
 import { RulePlugin, TurnEndContext, RoundEndContext, RuleContext } from './RulesEngine';
 import {
   Card,
@@ -7,8 +20,8 @@ import {
 
 // ═══════════════════════════════════════════════════════════════════
 // STORM RULE
-// Every 3rd turn, 2 random non-ship market objects are whisked away
-// and replaced from deck.
+// Every 3rd turn, 2 random non-ship market goods are removed and
+// replaced from the deck. Adds unpredictability to the market.
 // ═══════════════════════════════════════════════════════════════════
 
 export const stormRule: RulePlugin = {
@@ -18,23 +31,32 @@ export const stormRule: RulePlugin = {
   enableByDefault: false,
 
   hooks: {
+    /**
+     * Fires after each turn ends. On every 3rd turn, randomly removes
+     * up to 2 non-ship cards from the market and refills from deck.
+     */
     onTurnEnd(ctx: TurnEndContext) {
       const { state, shuffle } = ctx;
 
+      // Only trigger on turns divisible by 3
       if (state.turnCount % 3 !== 0) return;
       if (state.market.length < 2) return;
 
+      // Select up to 2 random non-ship cards to remove
       const nonShipCards = state.market.filter((c) => c.type !== 'ships');
       const cardsToRemove = shuffle(nonShipCards).slice(0, Math.min(2, nonShipCards.length));
 
+      // Remove selected cards from market
       state.market = state.market.filter(
         (c) => !cardsToRemove.some((r) => r.id === c.id)
       );
 
+      // Refill market from deck to maintain MARKET_SIZE
       const cardsNeeded = MARKET_SIZE - state.market.length;
       state.market = [...state.market, ...state.deck.slice(0, cardsNeeded)];
       state.deck = state.deck.slice(cardsNeeded);
 
+      // Inject a storm action notification for the UI
       ctx.injectedAction = {
         type: 'storm',
         playerName: 'Storm',
@@ -47,10 +69,9 @@ export const stormRule: RulePlugin = {
 
 // ═══════════════════════════════════════════════════════════════════
 // PIRATE RAID
-// Once per game per player, steal 1 random object from opponent's
-// Hold. The raid action is handled by the core store action; this
-// plugin only enforces the "once per game" guard via onBeforeAction
-// and resets the flag on game start.
+// Once per game per player, steal 1 card from an opponent's hand.
+// The actual steal logic lives in gameStore.pirateRaid(); this plugin
+// only manages the "once per game" flag lifecycle.
 // ═══════════════════════════════════════════════════════════════════
 
 export const pirateRaidRule: RulePlugin = {
@@ -60,15 +81,15 @@ export const pirateRaidRule: RulePlugin = {
   enableByDefault: false,
 
   hooks: {
+    /** Reset raid availability for all players at the start of a new game. */
     onGameStart(ctx: RuleContext) {
-      // Ensure all players start with raid available
       ctx.state.players.forEach((p) => {
         p.hasUsedPirateRaid = false;
       });
     },
 
+    /** Reset raid availability at the start of each new round. */
     onDeal(ctx: RuleContext) {
-      // Reset raid on new round for all players
       ctx.state.players.forEach((p) => {
         p.hasUsedPirateRaid = false;
       });
@@ -78,10 +99,12 @@ export const pirateRaidRule: RulePlugin = {
 
 // ═══════════════════════════════════════════════════════════════════
 // TREASURE CHEST
-// At game start, assign hidden bonus tokens to each player.
-// Reveal and add them at round end.
+// At the start of each round (onDeal), assign a hidden bonus token
+// to each player. At round end, reveal and add them to scores.
+// Adds an element of surprise to the final scoring.
 // ═══════════════════════════════════════════════════════════════════
 
+/** Possible values for hidden treasure tokens. */
 const TREASURE_CHEST_VALUES = [2, 3, 4, 5];
 
 export const treasureChestRule: RulePlugin = {
@@ -91,6 +114,10 @@ export const treasureChestRule: RulePlugin = {
   enableByDefault: false,
 
   hooks: {
+    /**
+     * On deal (start of each round), shuffle treasure values and
+     * assign one hidden token to each player.
+     */
     onDeal(ctx: RuleContext) {
       const { state, shuffle, generateId } = ctx;
       const shuffledValues = shuffle([...TREASURE_CHEST_VALUES]);
@@ -107,10 +134,15 @@ export const treasureChestRule: RulePlugin = {
       }));
     },
 
+    /**
+     * At round end, reveal each player's hidden treasure and add the
+     * tokens to their bonusTokens collection for final scoring.
+     */
     onRoundEnd(ctx: RoundEndContext) {
       const { state } = ctx;
       if (!state.hiddenTreasures || state.hiddenTreasures.length === 0) return;
 
+      // Merge hidden treasure tokens into each player's bonus tokens
       state.hiddenTreasures.forEach((treasure: HiddenTreasure) => {
         const playerIndex = state.players.findIndex(
           (p) => p.id === treasure.playerId
