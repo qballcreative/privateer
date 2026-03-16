@@ -1,3 +1,11 @@
+/**
+ * ScoreBoard — Captain's Ledger (Desktop Sidebar)
+ *
+ * Displays both players' current scores with breakdown (doubloons,
+ * commission seals, fleet bonus), round progress, and voyage win indicators.
+ * Only visible on desktop layout — phone/tablet use drawer-based score displays.
+ * Memoized to prevent re-renders from unrelated state changes.
+ */
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';

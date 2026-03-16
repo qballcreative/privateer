@@ -1,3 +1,15 @@
+/**
+ * ShipsHold — Player's Cargo Bay
+ *
+ * Displays a player's hand of goods cards with sell functionality.
+ * Used for both the local player (interactive) and the opponent (read-only
+ * or raid-target). Features:
+ *  - Card selection for selling matching sets
+ *  - Pirate Raid mode (opponent's cards become clickable steal targets)
+ *  - Empty slot indicators showing remaining capacity
+ *  - "Pondering" overlay when the AI is thinking
+ *  - UnloadChest sub-component for sell confirmation
+ */
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Player, Card, HAND_LIMIT } from '@/types/game';

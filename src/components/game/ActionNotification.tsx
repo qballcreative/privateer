@@ -1,3 +1,11 @@
+/**
+ * ActionNotification — Animated Turn Action Banner
+ *
+ * Displays a brief overlay showing what action was just performed
+ * (e.g., "Captain took a gold", "AI sold 3 rum"). Shows action icon,
+ * description, cards involved, tokens earned, and bonus seals.
+ * Auto-dismisses after the configured notification duration.
+ */
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActionDisplay, Card } from '@/types/game';
 import CargoObject from './CargoObject';

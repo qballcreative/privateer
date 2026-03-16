@@ -1,3 +1,13 @@
+/**
+ * TabletLayout — Mid-Size Screen Layout (640px – 1023px)
+ *
+ * Similar to PhoneLayout but with more breathing room. Uses the same
+ * drawer-based approach for Market Prices and Opponent panels but
+ * with larger card sizes and more generous spacing.
+ *
+ * Visible only at the `sm` to `lg` breakpoint range (hidden on phone
+ * and desktop via Tailwind responsive classes).
+ */
 import { useEffect } from 'react';
 import { AdBottomBanner } from '../AdBottomBanner';
 import { motion, AnimatePresence } from 'framer-motion';

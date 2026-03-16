@@ -1,3 +1,14 @@
+/**
+ * DesktopLayout — Full-Width Game Layout (≥ 1024px)
+ *
+ * Three-column layout with everything visible at once:
+ *  - Left: Captain's Ledger (ScoreBoard) + ad sidebar
+ *  - Center: Trading Post + both Ship's Holds (player and opponent)
+ *  - Right: Market Prices (TreasureSupplyPanel)
+ *
+ * No drawers needed since the wide viewport fits all panels.
+ * Includes the Pirate Raid toggle button in the opponent section.
+ */
 import { motion, AnimatePresence } from 'framer-motion';
 import { TradingPost } from '../TradingPost';
 import { ShipsHold } from '../ShipsHold';

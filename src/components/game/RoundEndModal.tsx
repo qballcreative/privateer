@@ -1,3 +1,11 @@
+/**
+ * RoundEndModal — Between-Round Results Screen
+ *
+ * Shown at the end of each round in a best-of series. Displays the round
+ * winner, score breakdowns, revealed treasure chest tokens (if that rule
+ * is active), and a "Next Round" button. In multiplayer, only the host
+ * can advance to the next round.
+ */
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gift, RotateCcw } from 'lucide-react';
 import { Player, HiddenTreasure } from '@/types/game';
