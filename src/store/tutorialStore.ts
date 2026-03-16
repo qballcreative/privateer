@@ -1,14 +1,35 @@
+/**
+ * Tutorial Store — Interactive Onboarding Walkthrough
+ *
+ * Manages the state of the step-by-step tutorial that guides new players
+ * through the game board. Each step can optionally spotlight a UI element
+ * via a `highlightId` that matches a `data-tutorial-id` attribute in the DOM.
+ *
+ * The `hasSeenTutorial` flag is persisted so returning players aren't
+ * shown the tutorial again. Only this flag is persisted — active tutorial
+ * state (currentStep, isActive) resets on page reload.
+ *
+ * Persisted under the key 'plunder-tutorial'.
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+/** A single step in the tutorial walkthrough. */
 export interface TutorialStep {
   id: string;
   title: string;
   description: string;
-  highlightId?: string; // data-tutorial-id on the element to spotlight
-  optional?: boolean; // for optional-rule steps
+  /** If set, the tutorial tooltip will spotlight the element with this data-tutorial-id. */
+  highlightId?: string;
+  /** If true, this step is only shown when the relevant optional rule is active. */
+  optional?: boolean;
 }
 
+/**
+ * The ordered list of tutorial steps. Each step introduces a key concept
+ * of the game board, from the Trading Post to scoring to victory conditions.
+ */
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'welcome',
@@ -64,14 +85,25 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
 ];
 
 interface TutorialState {
+  /** Whether the tutorial overlay is currently showing. */
   isActive: boolean;
+  /** Zero-indexed current step in TUTORIAL_STEPS. */
   currentStep: number;
+  /** Total number of tutorial steps (for progress indicator). */
   totalSteps: number;
+  /** Whether the user has completed or skipped the tutorial at least once. */
   hasSeenTutorial: boolean;
+
+  // ─── Actions ────────────────────────────────────────────────────
+  /** Begin the tutorial from step 0. */
   start: () => void;
+  /** Advance to the next step; completes the tutorial if on the last step. */
   next: () => void;
+  /** Go back one step (clamped to step 0). */
   prev: () => void;
+  /** Skip the tutorial entirely and mark it as seen. */
   skip: () => void;
+  /** Mark the tutorial as complete. */
   complete: () => void;
 }
 
@@ -84,6 +116,7 @@ export const useTutorialStore = create<TutorialState>()(
       hasSeenTutorial: false,
       start: () => set({ isActive: true, currentStep: 0 }),
       next: () => set((s) => {
+        // If on last step, complete the tutorial
         if (s.currentStep >= TUTORIAL_STEPS.length - 1) {
           return { isActive: false, currentStep: 0, hasSeenTutorial: true };
         }
@@ -95,6 +128,7 @@ export const useTutorialStore = create<TutorialState>()(
     }),
     {
       name: 'plunder-tutorial',
+      // Only persist the "has seen" flag — tutorial progress resets on reload
       partialize: (state) => ({ hasSeenTutorial: state.hasSeenTutorial }),
     }
   )
