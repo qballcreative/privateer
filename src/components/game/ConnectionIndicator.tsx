@@ -1,3 +1,4 @@
+/** ConnectionIndicator — Multiplayer connection status badge with latency display. */
 import { motion } from 'framer-motion';
 import { Wifi, WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 import { cn } from '@/lib/utils';

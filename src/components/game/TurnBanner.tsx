@@ -1,3 +1,4 @@
+/** TurnBanner — Brief "Your Turn" overlay that flashes when control passes to the local player. */
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor } from 'lucide-react';
 

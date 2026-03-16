@@ -1,3 +1,4 @@
+/** HowToPlunder — Landing page section showing the three core actions (claim, trade, sell). */
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 const steps = [

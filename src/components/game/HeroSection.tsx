@@ -1,3 +1,4 @@
+/** HeroSection — Landing page hero banner with logo, tagline, and feature highlights. */
 import { motion } from 'framer-motion';
 const heroBg = '/images/hero-bg.jpg';
 import privateerLogo from '@/assets/privateer.webp';

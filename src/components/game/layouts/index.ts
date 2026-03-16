@@ -1,3 +1,4 @@
+/** Layout barrel export — re-exports all three responsive layout components. */
 export { PhoneLayout } from './PhoneLayout';
 export { TabletLayout } from './TabletLayout';
 export { DesktopLayout } from './DesktopLayout';

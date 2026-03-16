@@ -1,3 +1,4 @@
+/** MultiplayerChat — In-game chat overlay for multiplayer sessions with message sanitization. */
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';

@@ -1,3 +1,4 @@
+/** UnloadChest — Sell confirmation UI with animated token value preview and chest unlock animation. */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Card, GoodsType, INITIAL_TOKEN_VALUES } from '@/types/game';

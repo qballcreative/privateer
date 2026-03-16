@@ -1,4 +1,7 @@
-// Shared preload images used by LandingPage and GameBoard
+/**
+ * Image Preloader — Eagerly loads critical game images into the browser cache.
+ * Called from both LandingPage and GameBoard so assets are ready before gameplay.
+ */
 export const PRELOAD_IMAGES = [
   '/images/doubloons.webp', '/images/commissions.webp', '/images/fleet.webp',
   '/images/supply.webp', '/images/ledger-bg.webp', '/images/trading-post-bg.webp',
