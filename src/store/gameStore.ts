@@ -1,3 +1,13 @@
+/**
+ * Game Store — Central State Management (Zustand)
+ *
+ * The single source of truth for all game state: deck, market, players,
+ * tokens, scores, and phase transitions. Handles all game actions (take,
+ * sell, exchange, raid), turn management, round progression, and AI moves.
+ *
+ * Also manages multiplayer state sync (serialize/apply) and integrates
+ * with the RulesEngine for optional rule hooks (storm, raid, treasure).
+ */
 import { create } from "zustand";
 import { useRemoteConfigStore } from "./remoteConfigStore";
 import { useSettingsStore } from "./settingsStore";
