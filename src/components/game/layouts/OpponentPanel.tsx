@@ -35,7 +35,7 @@ export const OpponentPanel = memo(({
         ) : canUsePirateRaid() && !currentPlayer.isAI ? (
           <>
             <p className="text-xs text-muted-foreground mb-2">
-              Steal one card from your opponent!
+              Steal one cargo from your opponent!
             </p>
             {isRaidMode ? (
               <p className="text-xs text-red-400 font-medium animate-pulse">
