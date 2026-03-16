@@ -1,94 +1,61 @@
-# Privateer: Letters of Marque — Implementation Plan
 
-> Last updated: 2026-03-09
 
----
+# Smarter AI: Lookahead, Score Awareness, and Endgame Strategy
 
-## Fresh Site Assessment (v2) — Overall: **8.2 / 10** ⬆️
+## What Changes
 
-| Category | Score | Status |
-|----------|-------|--------|
-| Visual Design | 8.5 | ✅ Copyright fixed, logo resized |
-| Game Mechanics | 8.0 | ✅ Sell confirmation added |
-| AI Opponent | 8.0 | ✅ Extracted to module, thinking overlay |
-| UX & Playability | 7.5 | ✅ Invalid feedback + mini-info bar |
-| Mobile | 7.5 | ✅ Mini-info bar shows key stats |
-| Multiplayer | 6.0 | ✅ TURN server config ready |
-| Onboarding | 7.5 | ✅ Naming fixed |
-| Performance | 8.0 | ✅ Preload extracted |
-| Code Quality | 8.0 | ✅ AI extracted, immutable state |
-| Monetization | 6.0 | Ad space reserved |
+The current AI evaluates each move independently using weighted heuristics. At **hard** and **expert** difficulty, we'll add three new strategic layers:
 
----
+### 1. Score-Aware Decision Making
+The AI will compute its own score vs. opponents every turn using the existing `getScoreBreakdown` function. When **ahead**, it shifts strategy toward actions that deplete token stacks (triggering the 3-empty-stacks round-end condition) or exhaust the deck. When **behind**, it prioritizes high-value plays and bonus token pursuits.
 
-## ✅ Completed
+### 2. Endgame Acceleration / Stalling
+- **When ahead**: Boost scores for selling even small sets (depletes stacks faster), taking cards from near-empty stacks, and taking ships (thins the deck). Add an `endgameUrgency` weight to expert/hard tiers.
+- **When behind**: Penalize actions that would deplete stacks. Prefer hoarding for big bonus sells. Delay sells until maximum value is reached.
 
-### Quick Wins
-- Copyright year → 2026
-- "Iron" → "Cannonballs" in HowToPlay
-- Invalid action feedback wired to TradingPost
-- Preload images extracted to shared module
+### 3. Opponent-Aware Lookahead (Expert only)
+- Track what the opponent is likely collecting (cards in hand by type).
+- If the opponent is 1-2 cards away from a 5-card bonus sell, prioritize taking/raiding those card types from the market to deny them.
+- If optional rules are active: factor in storm disruption (don't hoard types that are scarce in market), save pirate raid for high-impact moments (opponent near a big sell), and account for treasure chest variance.
 
-### P0 Bugs
-- ✅ AI first-move bug fixed
-- ✅ Next-round first player (already implemented correctly)
-- ✅ Restart preserves firstPlayer (already implemented)
+## Technical Approach
 
-### P1 UX
-- ✅ Sell confirmation dialog with doubloon preview
-- ✅ Reduced in-game logo size ~30%
-- ✅ Mobile mini-info bar (supply, token stacks, opponent fleet)
+**File: `src/lib/aiPlayer.ts`**
 
-### P2 Multiplayer
-- ✅ ICE servers now loaded from remote config (supports TURN when added)
-- ✅ Heartbeat/ping-pong already implemented
-- ✅ DisconnectModal with countdown already exists
+1. **Import `getScoreBreakdown`** from `scoring.ts` — already available.
 
-### P3 Architecture
-- ✅ AI extracted to `src/lib/aiPlayer.ts` (~300 lines)
-- ✅ Fixed syncEngineRules no-op
-- ✅ Immutable state patterns in takeCard, takeAllShips, sellCards
+2. **Expand `DIFFICULTY_WEIGHTS`** with new fields:
+   - `endgameAwareness` (0 for easy/medium, 0.8 for hard, 1.5 for expert)
+   - `opponentModeling` (0 for easy/medium/hard, 1.0 for expert)
+   - `raidTiming` (0 for easy, 0.5 medium, 1.0 hard/expert) — save raid for high-impact moments
 
-### Visual Polish
-- ✅ AI "thinking" overlay (already implemented in ShipsHold)
+3. **Add `evaluateScorePosition` helper** — returns a factor (-1 to +1) indicating how far ahead/behind the AI is relative to the best opponent.
 
----
+4. **Add `evaluateEndgameImpact` helper** — scores how much an action accelerates or delays round end:
+   - Selling cards that would empty a token stack → high score when ahead
+   - Taking from near-empty stacks → positive when ahead
+   - Penalize stack-depleting actions when behind
 
-## Remaining Roadmap
+5. **Add `evaluateOpponentThreat` helper (expert only)** — scans opponent hands for near-complete sets (3+ of a type), returns blocking urgency score for market cards and raid targets of that type.
 
-### 🟢 P3 — Architecture
+6. **Modify raid timing** — at expert, don't raid immediately; save it for when an opponent is about to sell a 4+ card set (high blocking value). At lower difficulties, use it opportunistically as today.
 
-#### ✅ Split GameBoard Layouts
-Extracted phone/tablet/desktop into `src/components/game/layouts/`. GameBoard reduced from 881 → ~300 lines.
+7. **Apply modifiers in `computeAIMove`** — after generating all candidate actions, apply score-position and endgame modifiers to each `ScoredAction.score` before sorting.
 
----
+## Difficulty Behavior Summary
 
-### ✅ P2 — Multiplayer End-of-Game & Disconnect Fixes
-- Guest now receives `gameEnd` state (message handler listens on all non-lobby phases)
-- `getSerializableState` includes `roundWinners` and `maxRounds`
-- Host broadcasts final state on `gameEnd` transition
-- Multiplayer game results recorded for both players
-- Disconnect timer reduced to 10s intervals with repeating "Claim Victory" / "Wait 10 more" loop
-- Opponent forfeit triggers instant auto-claim victory
+```text
+              Easy    Medium    Hard      Expert
+──────────────────────────────────────────────────
+Score watch    No       No      Yes        Yes
+Endgame push   No       No      Yes        Yes (aggressive)
+Opp modeling   No       No      Partial    Full
+Raid timing    Random   Basic   Smart      Optimal
+Randomness     50%      25%     10%        0%
+```
 
-### 🔵 P4 — Monetization
+## What Stays the Same
+- All existing heuristics (token urgency, blocking, bonus pursuit, sell timing) remain and continue to work.
+- The `AIGameView` interface gains no new fields — score calculation uses the existing `players` array.
+- No changes to game store, rules engine, or UI.
 
-#### Real Ad SDK Integration
-Replace stubs with Google AdSense or similar.
-
-**Files:** `src/lib/adProvider.ts`, ad components
-
----
-
-## Visual Polish Backlog
-
-- [x] Parchment theme CSS variables (already implemented)
-- [x] Custom pirate favicon (skull & crossbones with coins)
-- [x] Victory screen treasure chest opening animation (already implemented)
-- [x] Round-end "Wax Seal" animation (already implemented)
-
----
-
-## ✅ Plan Complete
-
-All P0–P3 items and visual polish tasks are done. Only P4 (Real Ad SDK) remains as a future enhancement when ready to monetize.
