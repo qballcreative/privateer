@@ -43,7 +43,7 @@ const MedallionStack = ({
         {tokens.slice(0, 4).reverse().map((token, index) =>
         <motion.div
           key={token.id}
-          className="absolute w-11 h-11"
+          className="absolute w-11 h-11 text-left"
           style={{
             bottom: index * 3,
             left: '50%',
