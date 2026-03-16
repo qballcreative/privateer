@@ -13,22 +13,22 @@ interface BonusTokensProps {
 const sealImages = {
   three: '/Icons/redseal.webp',
   four: '/Icons/silverseal.webp',
-  five: '/Icons/goldseal.webp',
+  five: '/Icons/goldseal.webp'
 };
 
 const tierLabels = {
   three: '3+',
   four: '4+',
-  five: '5+',
+  five: '5+'
 };
 
-const MedallionStack = ({ 
-  tier, 
-  tokens 
-}: { 
-  tier: 'three' | 'four' | 'five'; 
-  tokens: BonusToken[] 
-}) => {
+const MedallionStack = ({
+  tier,
+  tokens
+
+
+
+}: {tier: 'three' | 'four' | 'five';tokens: BonusToken[];}) => {
   const isEmpty = tokens.length === 0;
   const sealSrc = sealImages[tier];
 
@@ -40,34 +40,34 @@ const MedallionStack = ({
       
       <div className="relative w-12 h-14 flex-shrink-0">
         {/* Stacked seals */}
-        {tokens.slice(0, 4).reverse().map((token, index) => (
-          <motion.div
-            key={token.id}
-            className="absolute w-11 h-11"
-            style={{
-              bottom: index * 3,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: index,
-            }}
-            initial={false}
-            animate={{ scale: 1 }}
-          >
+        {tokens.slice(0, 4).reverse().map((token, index) =>
+        <motion.div
+          key={token.id}
+          className="absolute w-11 h-11 text-left"
+          style={{
+            bottom: index * 3,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: index
+          }}
+          initial={false}
+          animate={{ scale: 1 }}>
+          
             <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-full h-full object-contain drop-shadow-md" />
           </motion.div>
-        ))}
+        )}
 
         {/* Empty state */}
-        {isEmpty && (
-          <div className="absolute inset-0 flex items-center justify-center">
+        {isEmpty &&
+        <div className="absolute inset-0 flex items-center justify-center">
             <img src={sealSrc} alt={`${tierLabels[tier]} seal`} className="w-11 h-11 object-contain opacity-20" />
           </div>
-        )}
+        }
       </div>
 
       <span className="text-xs text-primary font-bold text-center" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{tokens.length} left</span>
-    </div>
-  );
+    </div>);
+
 };
 
 export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusTokensProps) => {
@@ -81,7 +81,7 @@ export const BonusTokens = memo(({ threeCards, fourCards, fiveCards }: BonusToke
         <MedallionStack tier="four" tokens={fourCards} />
         <MedallionStack tier="five" tokens={fiveCards} />
       </div>
-    </div>
-  );
+    </div>);
+
 });
 BonusTokens.displayName = 'BonusTokens';
