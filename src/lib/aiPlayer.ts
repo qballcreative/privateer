@@ -1,9 +1,13 @@
 /**
  * AI Player Module — Strategic AI opponent for Privateer: Letters of Marque
  *
- * Extracted from gameStore to keep the store focused on state management.
- * The AI evaluates all legal moves, scores them via weighted heuristics
+ * Evaluates all legal moves, scores them via weighted heuristics
  * per difficulty tier, then picks the best (with optional randomness).
+ *
+ * Hard/Expert tiers add:
+ *  - Score-aware decision making (accelerate when ahead, stall when behind)
+ *  - Endgame acceleration / stalling
+ *  - Opponent-aware lookahead (expert: full opponent modeling)
  */
 
 import {
@@ -17,6 +21,7 @@ import {
   HAND_LIMIT,
 } from '@/types/game';
 import { secureRandom, secureRandomInt } from '@/lib/security';
+import { getScoreBreakdown } from '@/lib/scoring';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -44,18 +49,207 @@ interface ScoredAction {
   action: () => void;
   score: number;
   description: string;
+  /** Which goods type stacks this action would deplete (for endgame calc) */
+  depletesStack?: GoodsType;
+  /** Number of tokens removed from a stack */
+  tokensConsumed?: number;
 }
 
 // ─── Difficulty Weights ──────────────────────────────────────────────
 
-const DIFFICULTY_WEIGHTS = {
-  easy:   { blocking: 0,   bonusPursuit: 0.5, sellPatience: 0,   tokenUrgency: 0.3, randomVariance: 0.5 },
-  medium: { blocking: 0.3, bonusPursuit: 0.8, sellPatience: 0.5, tokenUrgency: 0.6, randomVariance: 0.25 },
-  hard:   { blocking: 0.8, bonusPursuit: 1.2, sellPatience: 1.0, tokenUrgency: 1.0, randomVariance: 0.1 },
-  expert: { blocking: 1.0, bonusPursuit: 1.5, sellPatience: 1.2, tokenUrgency: 1.2, randomVariance: 0 },
-} as const;
+interface DifficultyWeights {
+  blocking: number;
+  bonusPursuit: number;
+  sellPatience: number;
+  tokenUrgency: number;
+  randomVariance: number;
+  endgameAwareness: number;
+  opponentModeling: number;
+  raidTiming: number;
+}
 
-// ─── Evaluation Helpers ──────────────────────────────────────────────
+const DIFFICULTY_WEIGHTS: Record<Difficulty, DifficultyWeights> = {
+  easy:   { blocking: 0,   bonusPursuit: 0.5, sellPatience: 0,   tokenUrgency: 0.3, randomVariance: 0.5,  endgameAwareness: 0,   opponentModeling: 0,   raidTiming: 0   },
+  medium: { blocking: 0.3, bonusPursuit: 0.8, sellPatience: 0.5, tokenUrgency: 0.6, randomVariance: 0.25, endgameAwareness: 0,   opponentModeling: 0,   raidTiming: 0.5 },
+  hard:   { blocking: 0.8, bonusPursuit: 1.2, sellPatience: 1.0, tokenUrgency: 1.0, randomVariance: 0.1,  endgameAwareness: 0.8, opponentModeling: 0.5, raidTiming: 1.0 },
+  expert: { blocking: 1.0, bonusPursuit: 1.5, sellPatience: 1.2, tokenUrgency: 1.2, randomVariance: 0,    endgameAwareness: 1.5, opponentModeling: 1.0, raidTiming: 1.0 },
+};
+
+// ─── Score Position & Endgame Helpers ────────────────────────────────
+
+/**
+ * Returns a factor from -1 (far behind) to +1 (far ahead) indicating
+ * how the AI's score compares to the best opponent.
+ */
+const evaluateScorePosition = (ai: Player, opponents: Player[], allPlayers: Player[]): number => {
+  const aiScore = getScoreBreakdown(ai, allPlayers).total;
+  const bestOppScore = Math.max(...opponents.map(o => getScoreBreakdown(o, allPlayers).total));
+
+  if (aiScore === 0 && bestOppScore === 0) return 0;
+
+  const diff = aiScore - bestOppScore;
+  const maxPossible = Math.max(aiScore + bestOppScore, 1);
+  return Math.max(-1, Math.min(1, diff / maxPossible));
+};
+
+/**
+ * Count how many token stacks are empty or near-empty.
+ */
+const countDepletedStacks = (tokenStacks: Record<GoodsType, Token[]>): number => {
+  return Object.values(tokenStacks).filter(s => s.length === 0).length;
+};
+
+/**
+ * Endgame modifier: positive when ahead and action accelerates game end,
+ * negative when behind and action accelerates game end.
+ */
+const evaluateEndgameModifier = (
+  scorePosition: number,
+  depletesStack: GoodsType | undefined,
+  tokensConsumed: number,
+  tokenStacks: Record<GoodsType, Token[]>,
+  weights: DifficultyWeights,
+): number => {
+  if (weights.endgameAwareness === 0) return 0;
+  if (!depletesStack) return 0;
+
+  const stack = tokenStacks[depletesStack];
+  const wouldEmpty = stack.length <= tokensConsumed;
+  const nearEmpty = stack.length <= tokensConsumed + 1;
+  const currentDepleted = countDepletedStacks(tokenStacks);
+
+  let modifier = 0;
+
+  if (scorePosition > 0.1) {
+    // AI is ahead — accelerate game end
+    if (wouldEmpty) {
+      modifier += 8;
+      // Extra urgency if this would be the 3rd empty stack (game ends!)
+      if (currentDepleted >= 2) modifier += 12;
+    } else if (nearEmpty) {
+      modifier += 4;
+    }
+  } else if (scorePosition < -0.1) {
+    // AI is behind — avoid ending the game
+    if (wouldEmpty) {
+      modifier -= 6;
+      if (currentDepleted >= 2) modifier -= 10;
+    } else if (nearEmpty) {
+      modifier -= 3;
+    }
+    // When behind, boost bonus pursuit to catch up
+    modifier += 3; // general bonus for high-value plays
+  }
+
+  return modifier * weights.endgameAwareness;
+};
+
+/**
+ * When behind, add bonus for holding out for larger sells (bigger bonuses).
+ * When ahead, reduce penalty for small sells.
+ */
+const evaluateScoreAwareSellAdjustment = (
+  scorePosition: number,
+  cardCount: number,
+  weights: DifficultyWeights,
+): number => {
+  if (weights.endgameAwareness === 0) return 0;
+
+  if (scorePosition < -0.1) {
+    // Behind: heavily prefer big sells for bonus tokens
+    if (cardCount >= 5) return 6 * weights.endgameAwareness;
+    if (cardCount >= 4) return 3 * weights.endgameAwareness;
+    if (cardCount <= 2) return -4 * weights.endgameAwareness; // don't waste small sells
+  } else if (scorePosition > 0.1) {
+    // Ahead: small sells are fine if they deplete stacks
+    if (cardCount <= 2) return 2 * weights.endgameAwareness;
+  }
+
+  return 0;
+};
+
+// ─── Opponent Modeling ───────────────────────────────────────────────
+
+interface OpponentThreat {
+  type: GoodsType;
+  count: number;
+  urgency: number; // how close to a big sell
+}
+
+/**
+ * Identify what opponents are collecting and how threatening their sets are.
+ */
+const evaluateOpponentThreats = (
+  opponents: Player[],
+  tokenStacks: Record<GoodsType, Token[]>,
+  weights: DifficultyWeights,
+): OpponentThreat[] => {
+  if (weights.opponentModeling === 0) return [];
+
+  const threats: OpponentThreat[] = [];
+
+  for (const opp of opponents) {
+    const typeCounts: Partial<Record<GoodsType, number>> = {};
+    opp.hand.forEach(c => {
+      if (c.type !== 'ships') {
+        const t = c.type as GoodsType;
+        typeCounts[t] = (typeCounts[t] || 0) + 1;
+      }
+    });
+
+    for (const [type, count] of Object.entries(typeCounts)) {
+      const goodsType = type as GoodsType;
+      if (count >= 2 && tokenStacks[goodsType].length > 0) {
+        let urgency = 0;
+        if (count >= 4) urgency = 10; // about to do a 5-card sell
+        else if (count >= 3) urgency = 6; // about to do a 4-card sell
+        else if (count >= 2) urgency = 2; // building a set
+
+        threats.push({ type: goodsType, count, urgency });
+      }
+    }
+  }
+
+  return threats.sort((a, b) => b.urgency - a.urgency);
+};
+
+/**
+ * Blocking modifier: how much taking/raiding a card of this type
+ * denies an opponent's strategy.
+ */
+const evaluateOpponentDenial = (
+  type: GoodsType,
+  threats: OpponentThreat[],
+  weights: DifficultyWeights,
+): number => {
+  if (weights.opponentModeling === 0) return 0;
+
+  const threat = threats.find(t => t.type === type);
+  if (!threat) return 0;
+
+  return threat.urgency * weights.opponentModeling;
+};
+
+/**
+ * For expert: evaluate whether to save pirate raid for a high-impact moment.
+ */
+const evaluateRaidTiming = (
+  threats: OpponentThreat[],
+  weights: DifficultyWeights,
+): number => {
+  if (weights.raidTiming === 0) return 0;
+
+  // If an opponent has a big set (4+), raid is very valuable now
+  const maxThreat = threats.length > 0 ? threats[0].urgency : 0;
+
+  if (maxThreat >= 10) return 8 * weights.raidTiming; // opponent near 5-card sell — raid now!
+  if (maxThreat >= 6) return 4 * weights.raidTiming;  // opponent near 4-card sell
+
+  // No big threat — at expert, save the raid for later
+  return -3 * weights.raidTiming;
+};
+
+// ─── Base Evaluation Helpers ─────────────────────────────────────────
 
 /** How urgently a goods type should be collected/sold. */
 const evaluateTokenUrgency = (type: GoodsType, tokenStacks: Record<GoodsType, Token[]>): number => {
@@ -121,7 +315,7 @@ const evaluateTakeValue = (
   ai: Player,
   opponents: Player[],
   tokenStacks: Record<GoodsType, Token[]>,
-  weights: typeof DIFFICULTY_WEIGHTS[Difficulty],
+  weights: DifficultyWeights,
 ): number => {
   const stack = tokenStacks[type];
   if (stack.length === 0) return -2;
@@ -149,7 +343,7 @@ const evaluateExchange = (
   tokenStacks: Record<GoodsType, Token[]>,
   opponents: Player[],
   bonusTokens: AIGameView['bonusTokens'],
-  weights: typeof DIFFICULTY_WEIGHTS[Difficulty],
+  weights: DifficultyWeights,
 ): number => {
   const handCards = ai.hand.filter(c => handCardIds.includes(c.id));
   const handShips = ai.ships.filter(c => handCardIds.includes(c.id));
@@ -204,10 +398,20 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
   const opponents = players.filter((_, i) => i !== currentPlayerIndex);
   const weights = DIFFICULTY_WEIGHTS[difficulty];
 
+  // ─── Strategic context (hard/expert only) ──────────────────────
+  const scorePosition = weights.endgameAwareness > 0
+    ? evaluateScorePosition(ai, opponents, players)
+    : 0;
+
+  const opponentThreats = evaluateOpponentThreats(opponents, tokenStacks, weights);
+
   const scored: ScoredAction[] = [];
 
   // --- PIRATE RAID ---
   if (optionalRules.pirateRaid && !ai.hasUsedPirateRaid && ai.hand.length < HAND_LIMIT) {
+    // Evaluate raid timing — should we use it now or save it?
+    const raidTimingBonus = evaluateRaidTiming(opponentThreats, weights);
+
     for (const opp of opponents) {
       opp.hand.forEach((card) => {
         if (card.type === 'ships') return;
@@ -220,6 +424,12 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
 
         const aiCount = ai.hand.filter(c => c.type === type).length;
         if (aiCount >= 3) score += 8;
+
+        // Opponent denial bonus
+        score += evaluateOpponentDenial(type, opponentThreats, weights);
+
+        // Raid timing: positive = good time to raid, negative = save it
+        score += raidTimingBonus;
 
         scored.push({
           action: () => actions.pirateRaid(card.id),
@@ -236,7 +446,10 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
     if (ai.hand.length >= HAND_LIMIT) return;
 
     const type = card.type as GoodsType;
-    const score = evaluateTakeValue(type, ai, opponents, tokenStacks, weights);
+    let score = evaluateTakeValue(type, ai, opponents, tokenStacks, weights);
+
+    // Opponent denial: taking this card denies opponents
+    score += evaluateOpponentDenial(type, opponentThreats, weights);
 
     scored.push({
       action: () => actions.takeCard(card.id),
@@ -251,6 +464,11 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
     let score = ships.length * 2;
     if (ai.hand.length >= 5) score += 3;
     if (ai.ships.length >= 5) score -= 2;
+
+    // When ahead, taking ships thins the deck (accelerates game end)
+    if (scorePosition > 0.1 && weights.endgameAwareness > 0) {
+      score += ships.length * 2 * weights.endgameAwareness;
+    }
 
     scored.push({
       action: () => actions.takeAllShips(),
@@ -286,10 +504,15 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
         score += 5 * weights.tokenUrgency;
       }
 
+      // Score-aware sell adjustment
+      score += evaluateScoreAwareSellAdjustment(scorePosition, cards.length, weights);
+
       scored.push({
         action: () => actions.sellCards(cards.map((c) => c.id)),
         score,
         description: `sell ${cards.length} ${type}`,
+        depletesStack: goodsType,
+        tokensConsumed: Math.min(cards.length, stack.length),
       });
     }
   });
@@ -342,6 +565,19 @@ export function computeAIMove(view: AIGameView, actions: AIActions): void {
           }
         }
       }
+    }
+  }
+
+  // ─── APPLY ENDGAME MODIFIERS ──────────────────────────────────
+  if (weights.endgameAwareness > 0) {
+    for (const sa of scored) {
+      sa.score += evaluateEndgameModifier(
+        scorePosition,
+        sa.depletesStack,
+        sa.tokensConsumed || 0,
+        tokenStacks,
+        weights,
+      );
     }
   }
 
