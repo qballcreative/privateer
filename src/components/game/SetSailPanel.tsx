@@ -1,3 +1,4 @@
+/** SetSailPanel — Game setup form: player name, difficulty, mode, best-of, and start button. */
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Anchor, Trophy, Loader2, Info, X } from 'lucide-react';

@@ -1,18 +1,41 @@
+/**
+ * Settings Store — Persistent User Preferences
+ *
+ * Zustand store with localStorage persistence for all user-configurable
+ * settings: audio controls, optional game rules, theme, and notification timing.
+ *
+ * Persisted under the key 'plunder-settings' so preferences survive
+ * page refreshes and browser restarts.
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { OptionalRules } from '@/types/game';
 
 interface SettingsState {
+  // ─── Audio Settings ─────────────────────────────────────────────
+  /** Whether sound effects (card take, sell, raid, etc.) are enabled. */
   soundEnabled: boolean;
+  /** Whether background music plays during gameplay. */
   musicEnabled: boolean;
+  /** Sound effects volume (0.0 to 1.0). */
   soundVolume: number;
+  /** Background music volume (0.0 to 1.0). */
   musicVolume: number;
+
+  // ─── Gameplay Settings ──────────────────────────────────────────
+  /** How long (in seconds) the action notification banner stays visible. */
   actionNotificationDuration: number;
+  /** Which optional rules are enabled (Storm, Pirate Raid, Treasure Chest). */
   optionalRules: OptionalRules;
+
+  // ─── Visual Settings ────────────────────────────────────────────
+  /** Color theme: 'dark' (default) or 'parchment' (warm/light). */
   theme: 'dark' | 'parchment';
+  /** Whether the user has been shown the music availability hint toast. */
   hasSeenMusicHint: boolean;
   
-  // Actions
+  // ─── Actions ────────────────────────────────────────────────────
   setSoundEnabled: (enabled: boolean) => void;
   setMusicEnabled: (enabled: boolean) => void;
   setSoundVolume: (volume: number) => void;
@@ -24,6 +47,7 @@ interface SettingsState {
   setHasSeenMusicHint: (seen: boolean) => void;
 }
 
+/** Default optional rules — all disabled for new players. */
 const defaultOptionalRules: OptionalRules = {
   stormRule: false,
   pirateRaid: false,

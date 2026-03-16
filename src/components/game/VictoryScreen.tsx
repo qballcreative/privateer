@@ -1,3 +1,11 @@
+/**
+ * VictoryScreen — End-of-Game Results Display
+ *
+ * Full-screen overlay shown when the game series ends. Displays the winner,
+ * a confetti/gold particle celebration animation, detailed score breakdowns
+ * for both players, round-by-round results, and play again / return home buttons.
+ * Includes a looping victory video background for the winning player.
+ */
 import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, RotateCcw, Anchor, Crown, Coins } from 'lucide-react';

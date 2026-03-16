@@ -1,3 +1,4 @@
+/** VictoryConditions — Landing page section listing how to win (most doubloons, 3 depleted stacks, etc.). */
 import { motion } from 'framer-motion';
 import { Trophy, Target, AlertTriangle } from 'lucide-react';
 

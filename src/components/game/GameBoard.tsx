@@ -1,3 +1,22 @@
+/**
+ * GameBoard — Main Gameplay Component
+ *
+ * Orchestrates the entire in-game experience: renders the responsive layout
+ * (phone/tablet/desktop), manages game state subscriptions, handles audio,
+ * tutorials, multiplayer message passing, and victory/round-end modals.
+ *
+ * This component acts as the "controller" layer — it wires up the gameStore,
+ * settingsStore, multiplayerStore, and audio hooks, then passes props down
+ * to the layout components which handle the actual UI rendering.
+ *
+ * Key responsibilities:
+ *  - Sound effects and background music lifecycle
+ *  - Turn banner and action notification timing
+ *  - Multiplayer state sync (send/receive game state over PeerJS)
+ *  - Tutorial auto-start for first-time players
+ *  - Forfeit handling on tab close during multiplayer
+ *  - Game result recording to player stats
+ */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, calculateScore } from '@/store/gameStore';

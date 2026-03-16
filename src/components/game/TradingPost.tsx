@@ -1,3 +1,15 @@
+/**
+ * TradingPost — The Central Market
+ *
+ * Displays the 5-card market where players claim cargo, commandeer ships,
+ * or exchange goods. Supports two interaction modes:
+ *  - "Claim Cargo" (take): Click a card to take it into your hold
+ *  - "Trade Goods" (exchange): Select cards from market AND hold to swap
+ *
+ * Validates exchanges (same count, no same-type swaps, hand limit) and
+ * shows error feedback. Includes the "Commandeer Fleet" button for
+ * taking all ships at once.
+ */
 import { useState } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Card, HAND_LIMIT } from '@/types/game';

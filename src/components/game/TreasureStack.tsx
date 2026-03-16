@@ -1,3 +1,4 @@
+/** TreasureStack — Renders a single goods type's doubloon token stack with top-value highlight. */
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Token, GoodsType } from '@/types/game';

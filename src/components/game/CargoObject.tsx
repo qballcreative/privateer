@@ -1,3 +1,14 @@
+/**
+ * CargoObject — Visual Representation of a Game Card
+ *
+ * Renders a single cargo good or ship as a clickable token image.
+ * Used in the Trading Post (market), Ship's Hold (player hand),
+ * and exchange mode. Supports selection highlighting, disabled state,
+ * hidden state (face-down for opponent cards), and three size variants.
+ *
+ * Uses framer-motion layoutId for smooth card movement animations
+ * between the Trading Post and Ship's Hold.
+ */
 import { motion } from 'framer-motion';
 import { Card, CardType } from '@/types/game';
 import { cn } from '@/lib/utils';

@@ -1,3 +1,11 @@
+/**
+ * Layout Types — Shared Props & Constants for Responsive Layouts
+ *
+ * Defines the LayoutProps interface that all three layout components
+ * (PhoneLayout, TabletLayout, DesktopLayout) receive from GameBoard.
+ * Also exports shared constants like GOODS_ORDER and GOODS_IMAGES used
+ * across layouts for consistent rendering.
+ */
 import { GoodsType, Card, Token, BonusToken, Player } from '@/types/game';
 
 import rumImg from '@/assets/tokens/rum.webp';

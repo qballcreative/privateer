@@ -1,3 +1,4 @@
+/** BonusTokens — Displays the three tiers of commission seal stacks (3/4/5-card bonuses). */
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { BonusToken } from '@/types/game';

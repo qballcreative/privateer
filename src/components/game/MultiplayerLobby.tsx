@@ -1,3 +1,4 @@
+/** MultiplayerLobby — Host/join multiplayer game UI with room code generation and connection flow. */
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMultiplayerStore } from '@/store/multiplayerStore';

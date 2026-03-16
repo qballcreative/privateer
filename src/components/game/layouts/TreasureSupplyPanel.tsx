@@ -1,3 +1,4 @@
+/** TreasureSupplyPanel — Market prices display: all 6 doubloon token stacks + bonus commission seals. */
 import { memo } from 'react';
 import { TreasureStack } from '../TreasureStack';
 import { BonusTokens } from '../BonusTokens';

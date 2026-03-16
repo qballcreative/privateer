@@ -1,3 +1,14 @@
+/**
+ * Tutorial — Interactive Onboarding Overlay
+ *
+ * Step-by-step walkthrough that highlights key UI elements (Trading Post,
+ * Ship's Hold, Market Prices, etc.) with a spotlight cutout and tooltip.
+ * Auto-opens drawers on phone/tablet when steps target elements inside them.
+ *
+ * Uses the tutorialStore for step navigation and completion tracking.
+ * The spotlight is positioned by finding elements with matching
+ * data-tutorial-id attributes in the DOM.
+ */
 import { useEffect, useState, useRef, useLayoutEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTutorialStore, TUTORIAL_STEPS } from '@/store/tutorialStore';

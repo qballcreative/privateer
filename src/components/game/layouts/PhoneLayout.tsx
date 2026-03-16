@@ -1,3 +1,16 @@
+/**
+ * PhoneLayout — Mobile-First Game Layout (< 640px)
+ *
+ * Optimized for small screens with a vertically stacked layout:
+ *  - Collapsible Trading Post at the top
+ *  - Ship's Hold in the middle
+ *  - Bottom drawers (Sheet) for Market Prices and Opponent's Hold
+ *  - Compact score display in the top bar
+ *
+ * Uses Radix Sheet (drawer) components for panels that would take
+ * too much vertical space. Tutorial integration auto-opens relevant
+ * drawers when tutorial steps target elements inside them.
+ */
 import { useEffect } from 'react';
 import { AdBottomBanner } from '../AdBottomBanner';
 import { motion, AnimatePresence } from 'framer-motion';

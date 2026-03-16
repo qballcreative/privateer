@@ -1,9 +1,23 @@
+/**
+ * Game Audio Hook — Sound Effects & Background Music
+ *
+ * Provides playSound() and playMusic() functions that respect the user's
+ * audio settings from settingsStore. Sound effects are preloaded on mount
+ * for instant playback. Background music loops continuously when enabled.
+ *
+ * All audio files are loaded from /sounds/ in the public directory.
+ * Autoplay restrictions are handled gracefully — failed play() calls
+ * are silently caught (the user will hear audio on their next interaction).
+ */
+
 import { useEffect, useRef, useCallback } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { ActionType } from '@/types/game';
 
+/** All sound types that can be played — game actions plus UI feedback sounds. */
 type SoundType = ActionType | 'round-win' | 'round-lose' | 'game-win' | 'game-lose' | 'click' | 'error' | 'message' | 'new-round' | 'thud' | 'creak';
 
+/** Mapping of sound types to their audio file paths. */
 const SOUND_URLS: Record<SoundType, string> = {
   'take': '/sounds/card-take.mp3',
   'take-ships': '/sounds/ship-take.mp3',
@@ -23,16 +37,19 @@ const SOUND_URLS: Record<SoundType, string> = {
   'creak': '/sounds/sea_sounds.wav',
 };
 
+/** Path to the looping background music track. */
 const MUSIC_URL = '/sounds/background-music.mp3';
 
 export const useGameAudio = () => {
   const { soundEnabled, musicEnabled, soundVolume, musicVolume } = useSettingsStore();
+  /** Persistent reference to the background music Audio element. */
   const musicRef = useRef<HTMLAudioElement | null>(null);
+  /** Cache of preloaded sound effect Audio elements, keyed by SoundType. */
   const soundsRef = useRef<Map<SoundType, HTMLAudioElement>>(new Map());
 
-  // Initialize audio elements
+  // Initialize and preload all audio elements on first mount
   useEffect(() => {
-    // Create music element
+    // Create the background music element (looping)
     if (!musicRef.current) {
       const music = new Audio(MUSIC_URL);
       music.loop = true;
@@ -40,7 +57,7 @@ export const useGameAudio = () => {
       musicRef.current = music;
     }
 
-    // Preload sound effects
+    // Preload all sound effects so they play instantly when triggered
     Object.entries(SOUND_URLS).forEach(([type, url]) => {
       if (!soundsRef.current.has(type as SoundType)) {
         const audio = new Audio(url);
@@ -49,13 +66,14 @@ export const useGameAudio = () => {
       }
     });
 
+    // Clean up music on unmount
     return () => {
       musicRef.current?.pause();
       musicRef.current = null;
     };
   }, []);
 
-  // Update volumes
+  // Sync volume changes to all audio elements
   useEffect(() => {
     if (musicRef.current) {
       musicRef.current.volume = musicVolume;
@@ -65,12 +83,12 @@ export const useGameAudio = () => {
     });
   }, [soundVolume, musicVolume]);
 
-  // Handle music enable/disable
+  // Start or stop background music when the setting changes
   useEffect(() => {
     if (musicRef.current) {
       if (musicEnabled) {
         musicRef.current.play().catch(() => {
-          // Autoplay blocked - user interaction required
+          // Autoplay blocked by browser — will play on next user interaction
         });
       } else {
         musicRef.current.pause();
@@ -78,28 +96,32 @@ export const useGameAudio = () => {
     }
   }, [musicEnabled]);
 
+  /** Play a sound effect by type (respects soundEnabled setting). */
   const playSound = useCallback((type: SoundType) => {
     if (!soundEnabled) return;
     
     const audio = soundsRef.current.get(type);
     if (audio) {
-      audio.currentTime = 0;
+      audio.currentTime = 0; // Reset to start so rapid plays work
       audio.play().catch(() => {
-        // Sound play failed
+        // Sound play failed — silently ignore
       });
     }
   }, [soundEnabled]);
 
+  /** Convenience wrapper to play the sound for a game action type. */
   const playActionSound = useCallback((actionType: ActionType) => {
     playSound(actionType);
   }, [playSound]);
 
+  /** Start background music playback (if enabled in settings). */
   const playMusic = useCallback(() => {
     if (musicRef.current && musicEnabled) {
       musicRef.current.play().catch(() => {});
     }
   }, [musicEnabled]);
 
+  /** Stop and reset background music. */
   const stopMusic = useCallback(() => {
     if (musicRef.current) {
       musicRef.current.pause();

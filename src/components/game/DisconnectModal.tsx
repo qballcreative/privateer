@@ -1,3 +1,4 @@
+/** DisconnectModal — Handles multiplayer disconnection, forfeit detection, and reconnection UI. */
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Crown, RotateCcw, Home, Clock } from 'lucide-react';

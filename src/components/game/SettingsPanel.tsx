@@ -1,3 +1,4 @@
+/** SettingsPanel — Slide-out settings drawer for audio, theme, rules, privacy, and tutorial access. */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Volume2, VolumeX, Music, Clock, Scroll, Shield, Eye, BookOpen, Sun, Moon, GraduationCap } from 'lucide-react';

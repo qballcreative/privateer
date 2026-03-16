@@ -1,3 +1,4 @@
+/** OpponentPanel — Opponent's hold + scoreboard + pirate raid toggle (used in phone/tablet drawers). */
 import { memo } from 'react';
 import { ShipsHold } from '../ShipsHold';
 import { ScoreBoard } from '../ScoreBoard';
